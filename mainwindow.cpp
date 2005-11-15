@@ -76,7 +76,7 @@ BeFAKMainWindow::~BeFAKMainWindow() {
 }
 
 void BeFAKMainWindow::initTabs(BTabView *tv) {
-	tabFirma *tab1;
+	beFakTab *tab1;
 	tab1 = new tabFirma(tv);
 }
 

@@ -2,18 +2,13 @@
 #ifndef _TABFIRMA_H
 #define _TABFIRMA_H
 
-class BTab;
-class BTabView;
-class BView;
+#include "befaktab.h"
 
-class tabFirma {
+class tabFirma : public beFakTab {
 
 	public:
 		tabFirma(BTabView *tv);
 		~tabFirma();
-
-		BView *view;
-		BTab *tab;
 
 //	private:
 
