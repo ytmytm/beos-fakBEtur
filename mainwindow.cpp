@@ -1,27 +1,28 @@
 
 #include "mainwindow.h"
+#include "tabfirma.h"
 #include <View.h>
 #include <Alert.h>
-#include <Box.h>
-#include <Button.h>
-#include <CheckBox.h>
+//#include <Box.h>
+//#include <Button.h>
+//#include <CheckBox.h>
 #include <ListView.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
-#include <PopUpMenu.h>
-#include <RadioButton.h>
-#include <ScrollView.h>
-#include <StringView.h>
+//#include <PopUpMenu.h>
+//#include <RadioButton.h>
+//#include <ScrollView.h>
+//#include <StringView.h>
 #include <TabView.h>
-#include <TextControl.h>
+//#include <TextControl.h>
 #include <stdio.h>
 
 const uint32 MENU_DEFMSG 	= 'M000';
 
 BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
-	BRect(100, 100, 740, 580), windowTitle, B_DOCUMENT_WINDOW, B_OUTLINE_RESIZE, B_CURRENT_WORKSPACE ) {
+	BRect(100, 100, 900, 700), windowTitle, B_DOCUMENT_WINDOW, B_OUTLINE_RESIZE, B_CURRENT_WORKSPACE ) {
 
 	// get memory for objects
 	idlist = NULL;
@@ -51,6 +52,13 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
 
+	// tabview
+	r = mainView->Bounds();
+//	r.left = 150; r.top = 20; r.bottom = r.bottom - 50;
+	r.top = 20;
+	tabView = new BTabView(r, "tabView");
+	mainView->AddChild(tabView);
+
 	// initialize widgets
 	initTabs(tabView);
 
@@ -68,6 +76,8 @@ BeFAKMainWindow::~BeFAKMainWindow() {
 }
 
 void BeFAKMainWindow::initTabs(BTabView *tv) {
+	tabFirma *tab1;
+	tab1 = new tabFirma(tv);
 }
 
 void BeFAKMainWindow::curdataFromTabs(void) {
