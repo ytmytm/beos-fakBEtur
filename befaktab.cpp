@@ -16,7 +16,6 @@ beFakTab::beFakTab(BTabView *tv) {
 	tab = new BTab(view);
 	tv->AddTab(view, tab);
 	tab->SetLabel("Kontrahenci");
-
 }
 
 beFakTab::~beFakTab() {

@@ -69,6 +69,8 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	// initialize list
 //	XXX act like if this one is new or select the first one?
 	currentid = -1;
+
+	tabView->Select(0);
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
@@ -87,7 +89,7 @@ void BeFAKMainWindow::curdata2Tabs(void) {
 }
 
 void BeFAKMainWindow::MessageReceived(BMessage *Message) {
-	int i;
+//	int i;
 	this->DisableUpdates();
 	switch (Message->what) {
 		case MENU_DEFMSG:
