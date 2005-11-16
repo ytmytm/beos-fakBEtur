@@ -29,6 +29,7 @@ const uint32 DC			= 'TFDC';
 tabFirma::tabFirma(BTabView *tv) : beFakTab(tv) {
 
 	curdata = new firmadat();
+	this->dirty = false;
 
 	BRect r;
 	r = this->view->Bounds();
@@ -145,8 +146,12 @@ void tabFirma::MessageReceived(BMessage *Message) {
 	switch (Message->what) {
 		case DC:
 			printf("change!\n");
-			curdata->dirty = true;
+			this->dirty = true;
 			updateTab();
 			break;
 	}
+}
+
+void tabFirma::DoCommitCurdata(void) {
+	printf("INSERT/UPDATE\n");
 }

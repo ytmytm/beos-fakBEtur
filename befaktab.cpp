@@ -1,6 +1,8 @@
 
 #include "befaktab.h"
+#include "globals.h"
 
+#include <Alert.h>
 #include <TabView.h>
 #include <View.h>
 #include <stdio.h>
@@ -24,4 +26,32 @@ beFakTab::~beFakTab() {
 
 void beFakTab::MessageReceived(BMessage *Message) {
 	// process message
+}
+
+bool beFakTab::CommitCurdata(bool haveCancelButton = true) {
+	// ask if commit data from current object into database
+	if (!dirty)
+		return true;
+	// ask if store
+	BAlert *ask;
+	if (haveCancelButton)
+		ask = new BAlert(APP_NAME, "Zapisać zmiany w aktualnej karcie?", "Tak", "Nie", "Anuluj", B_WIDTH_AS_USUAL, B_IDEA_ALERT);
+	else
+		ask = new BAlert(APP_NAME, "Zapisać zmiany w aktualnej karcie?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_IDEA_ALERT);
+	int ret = ask->Go();
+	switch (ret) {
+		case 2:
+//printf("cancel\n");
+			return false;
+			break;
+		case 1:
+//printf("nie\n");
+			break;
+		case 0:
+		default:
+printf("commiting data\n");
+			curdataFromTab();
+			DoCommitCurdata();	// this is implemented in inherited class
+	};
+	return true;
 }

@@ -12,7 +12,6 @@ void firmadat::dump( void ) {
 }
 
 void firmadat::clear( void ) {
-	dirty = false;
 	id = -1;
 	for (int i=0;i<=10;i++) {
 		data[i] = "";

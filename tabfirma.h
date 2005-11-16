@@ -18,6 +18,9 @@ class tabFirma : public beFakTab {
 		tabFirma(BTabView *tv);
 		~tabFirma();
 		void MessageReceived(BMessage *Message);
+		//
+		void DoCommitCurdata(void);
+		//
 		// update - enable/disable widgets, parse msg (combo items)
 		// curdataTo - read data from curtab to widgets, call update
 		// curdataFrom - read from widgets to curtab

@@ -118,7 +118,7 @@ void BeFAKMainWindow::ChangedSelection(int newid) {
 bool BeFAKMainWindow::QuitRequested() {
 //	config->position = this->Frame();
 //	config->save();
-//	CommitCurdata(false);
+	curTab->CommitCurdata(false);
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return BWindow::QuitRequested();
 }

@@ -11,7 +11,6 @@
 			void dump(void);
 			void clear(void);
 			// data holders
-			bool dirty;
 			int id;
 			// data itself
 			BString data[11];

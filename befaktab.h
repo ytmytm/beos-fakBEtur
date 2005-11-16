@@ -13,10 +13,18 @@ class beFakTab {
 		virtual ~beFakTab();
 
 		virtual void MessageReceived(BMessage *Message);
+		virtual bool CommitCurdata(bool haveCancelButton = true);
+		virtual void DoCommitCurdata(void) { };	// INSERT/UPDATE
+
+		virtual void curdataFromTab(void) { };
+		virtual void curdataToTab(void) { };
+		virtual void updateTab(void) { };
 
 		BView *view;
 		BTab *tab;
-	//private:
+
+	protected:
+		bool dirty;
 };
 
 #endif
