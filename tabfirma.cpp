@@ -14,6 +14,7 @@
 #include <CheckBox.h>
 #include <ListView.h>
 #include <ScrollView.h>
+#include <TabView.h>
 #include <TextControl.h>
 #include <stdio.h>
 
@@ -31,6 +32,7 @@ tabFirma::tabFirma(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	curdata = new firmadat(db);
 	this->dirty = false;
 
+	this->tab->SetLabel("Kontrahenci");
 	BRect r;
 	r = this->view->Bounds();
 

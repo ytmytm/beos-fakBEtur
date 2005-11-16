@@ -15,12 +15,11 @@ beFakTab::beFakTab(BTabView *tv, sqlite *db) {
 
 	r = tv->Bounds();
 	r.InsetBy(5, 10);
-	view = new BView(r, "tabFirma", B_FOLLOW_ALL_SIDES, 0);
+	view = new BView(r, "tab", B_FOLLOW_ALL_SIDES, 0);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	tab = new BTab(view);
 	tv->AddTab(view, tab);
-	tab->SetLabel("Kontrahenci");
 }
 
 beFakTab::~beFakTab() {

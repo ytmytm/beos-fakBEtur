@@ -1,6 +1,9 @@
 
+//XXXX curtab - reagować na przełączanie!!!
+
 #include "mainwindow.h"
 #include "tabfirma.h"
+#include "tabtowar.h"
 
 #include <View.h>
 #include <Menu.h>
@@ -53,8 +56,8 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 
 	// initialize datawidgets
 	initTabs(tabView);
-	tabView->Select(0);
-	curTab = tab1;
+	tabView->Select(1);
+	curTab = tab2;
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
@@ -63,6 +66,7 @@ BeFAKMainWindow::~BeFAKMainWindow() {
 
 void BeFAKMainWindow::initTabs(BTabView *tv) {
 	tab1 = new tabFirma(tv, dbData);
+	tab2 = new tabTowar(tv, dbData);
 }
 
 void BeFAKMainWindow::MessageReceived(BMessage *Message) {

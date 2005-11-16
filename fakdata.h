@@ -26,6 +26,25 @@
 			char *dbErrMsg;
 	};
 
+	class towardat {
+		public:
+			towardat(sqlite *db);
+			~towardat() { };
+			void dump(void);
+			void clear(void);
+			// data management
+			int generate_id(void);
+			// data holders
+			int id;
+			// data itself
+			BString data[4], notatki;
+			bool usluga;
+			int netto, zakupu, marza, rabat;
+		private:
+			sqlite *dbData;
+			char *dbErrMsg;
+	};
+
 	// helper
 	int toint(const char *input);
 

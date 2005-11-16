@@ -106,6 +106,37 @@ void firmadat::del(void) {
 
 //----------------------
 
+towardat::towardat(sqlite *db) {
+	clear();
+	dbData = db;
+}
+
+void towardat::dump(void) {
+	printf("towardat: id=%i, implement rest\n", id);
+}
+
+void towardat::clear(void) {
+	id = -1;
+	data[0] = data[1] = data[2] = data[3] = notatki = "";
+	usluga = false;
+	netto = zakupu = marza = rabat = 0;
+}
+
+int towardat::generate_id(void) {
+	int newid = 1;
+	int nRows, nCols;
+	char **result;
+	sqlite_get_table(dbData, "SELECT MAX(id) FROM towar", &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows > 0) {
+		// there is something in db
+		newid = toint(result[1]) + 1;
+	}
+	sqlite_free_table(result);
+	return newid;
+}
+
+//----------------------
+
 #include <stdlib.h>
 
 int toint(const char *input) {
