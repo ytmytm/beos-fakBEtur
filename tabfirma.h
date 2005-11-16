@@ -15,7 +15,7 @@ class BTextControl;
 class tabFirma : public beFakTab {
 
 	public:
-		tabFirma(BTabView *tv);
+		tabFirma(BTabView *tv, sqlite *db);
 		~tabFirma();
 		void MessageReceived(BMessage *Message);
 		//

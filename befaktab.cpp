@@ -7,7 +7,10 @@
 #include <View.h>
 #include <stdio.h>
 
-beFakTab::beFakTab(BTabView *tv) {
+beFakTab::beFakTab(BTabView *tv, sqlite *db) {
+
+	dbData = db;
+
 	BRect r;
 
 	r = tv->Bounds();

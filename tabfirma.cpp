@@ -26,7 +26,7 @@ const uint32 BUT_RESTORE= 'TFBR';
 const uint32 BUT_SAVE	= 'TFBS';
 const uint32 DC			= 'TFDC';
 
-tabFirma::tabFirma(BTabView *tv) : beFakTab(tv) {
+tabFirma::tabFirma(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 
 	curdata = new firmadat();
 	this->dirty = false;

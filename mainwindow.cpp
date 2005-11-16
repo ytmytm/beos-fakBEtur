@@ -59,9 +59,6 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	tabView = new BTabView(r, "tabView");
 	mainView->AddChild(tabView);
 
-	// initialize widgets
-	initTabs(tabView);
-
 	// initialize database
 	int ret = OpenDatabase();
 	if (ret < 0)
@@ -70,6 +67,8 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 //	XXX act like if this one is new or select the first one?
 	currentid = -1;
 
+	// initialize datawidgets
+	initTabs(tabView);
 	tabView->Select(0);
 	curTab = tab1;
 }
@@ -79,7 +78,7 @@ BeFAKMainWindow::~BeFAKMainWindow() {
 }
 
 void BeFAKMainWindow::initTabs(BTabView *tv) {
-	tab1 = new tabFirma(tv);
+	tab1 = new tabFirma(tv, dbData);
 }
 
 void BeFAKMainWindow::curdataFromTabs(void) {

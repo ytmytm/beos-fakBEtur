@@ -2,6 +2,8 @@
 #ifndef _BEFAKTAB_H
 #define _BEFAKTAB_H
 
+#include <sqlite.h>
+
 class BMessage;
 class BTab;
 class BTabView;
@@ -9,7 +11,7 @@ class BView;
 
 class beFakTab {
 	public:
-		beFakTab(BTabView *tv);
+		beFakTab(BTabView *tv, sqlite *db);
 		virtual ~beFakTab();
 
 		virtual void MessageReceived(BMessage *Message);
@@ -22,6 +24,8 @@ class beFakTab {
 
 		BView *view;
 		BTab *tab;
+
+		sqlite *dbData;
 
 	protected:
 		bool dirty;
