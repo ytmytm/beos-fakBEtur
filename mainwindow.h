@@ -7,23 +7,6 @@
 	#include <sqlite.h>
 	#include "globals.h"
 
-// helper
-int toint(const char *input);
-
-// fakt data storage
-#include <String.h>
-class fakdat {
-	public:
-	fakdat(void) { };
-	~fakdat() { };
-	void dump_all(void);
-	void clear(void);
-	// data holders
-	bool dirty;
-	int id;
-	// data
-};
-
 	class beFakTab;
 	class BButton;
 	class BCheckBox;
@@ -46,33 +29,12 @@ class fakdat {
 			// database handlers
 			int OpenDatabase(void);
 			void CloseDatabase(void);
-			void RefreshIndexList(void);
-			void FetchCurdata(int id);
-			bool CommitCurdata(bool haveCancelButton = true);	// action?
-			void DoCommitCurdata(void);
-			void DoDeleteCurdata(void);
-			int GenerateId(void);
 			// tab handlers
 			void initTabs(BTabView *tv);
-			void curdataFromTabs(void);
-			void curdata2Tabs(void);
-			// init - setup widgets, call update
-			// update - enable/disable widgets, parse msg (combo items)
-			// curdata2 - read data from curtab to widgets, call update
-			// curdatafrom - read from widgets to curtab
-			// tab1
-			void initTab1(BTabView *tv);
-			void updateTab1(BMessage *msg = NULL);
-			void curdataFromTab1(void);
-			void curdata2Tab1(void);
-
-			// action
-			void ChangedSelection(int newid);
 
 			// main view widgets
 			BMenuBar *menuBar;
 			BMenu *menu;
-			BListView *listView;
 			BTabView *tabView;
 
 			// tabs
@@ -81,10 +43,9 @@ class fakdat {
 			// database
 			sqlite *dbData;
 			char *dbErrMsg;
-			// data holders
-			fakdat *curdata;	// must exist BEFORE tabs are created
-			int currentid;	// id of currently edited data, <0 -> INSERT >=0 -> UPDATE
-			int *idlist;	// ids of listView data
 	};
+
+// helper
+int toint(const char *input);
 
 #endif

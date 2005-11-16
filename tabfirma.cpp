@@ -1,9 +1,8 @@
 //
-// skopiować logikę z kesy (mainwindow) - obsługa buttonów i zmiany fokusu
-// na liście, wypełnianie listy itd. - messagereceived i okolice
+// część bazodanowa w firmadat, z wyjątkiem wypełniania listy, pomyśleć
+// jak to koszernie rozdzielić
 //
-// część bazodanową przenieść do klasy danych (tylko handle na db, otwieranie
-// z mainwindow, alerty tamże)
+// część kodu będzie użyta ponownie w zakładce towarowej
 //
 
 
@@ -28,6 +27,7 @@ const uint32 DC			= 'TFDC';
 
 tabFirma::tabFirma(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 
+	idlist = NULL;
 	curdata = new firmadat(db);
 	this->dirty = false;
 
@@ -101,6 +101,8 @@ tabFirma::tabFirma(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	data[7]->SetDivider(50); data[8]->SetDivider(50);
 	data[9]->SetDivider(50); data[10]->SetDivider(50);
 	updateTab();
+
+	RefreshIndexList();
 }
 
 tabFirma::~tabFirma() {
@@ -145,16 +147,107 @@ void tabFirma::updateTab(void) {
 void tabFirma::MessageReceived(BMessage *Message) {
 	switch (Message->what) {
 		case DC:
-			printf("change!\n");
 			this->dirty = true;
 			updateTab();
+			break;
+		case BUT_NEW:
+			if (CommitCurdata()) {
+				// clear curdata
+				curdata->clear();
+				// refresh tabs
+				curdataToTab();
+			}
+			break;
+		case BUT_RESTORE:
+			DoFetchCurdata();
+			break;
+		case BUT_DEL:
+			DoDeleteCurdata();
+			break;
+		case BUT_SAVE:
+			curdataFromTab();
+			DoCommitCurdata();
+			curdataToTab();
+			break;
+		case LIST_SEL:
+		case LIST_INV:
+//			printf("list selection/invoc\n");
+			int i = list->CurrentSelection(0);
+//			printf("got:%i\n",i);
+			if (i>=0) {
+//				printf("sel:%i,id=%i\n",i,idlist[i]);
+				ChangedSelection(idlist[i]);
+			} else {
+				// XXX deselection? what to do???
+			}
 			break;
 	}
 }
 
+void tabFirma::ChangedSelection(int newid) {
+	if (!(CommitCurdata())) {
+		// XXX do nothing if cancel, restore old selection?
+		return;
+	}
+	// fetch and store into new data
+	curdata->id = newid;
+	DoFetchCurdata();
+}
+
 void tabFirma::DoCommitCurdata(void) {
-	printf("INSERT/UPDATE\n");
 	curdata->commit();
 	this->dirty = false;
-	//RefreshIndexList();
+	RefreshIndexList();
+}
+
+void tabFirma::DoDeleteCurdata(void) {
+// XXX ask for confimation?
+	curdata->del();
+	curdataToTab();
+	RefreshIndexList();
+}
+
+void tabFirma::DoFetchCurdata(void) {
+	if (curdata->id >=0) {
+		curdata->fetch();
+		this->dirty = false;
+		curdataToTab();
+	}
+}
+
+void tabFirma::RefreshIndexList(void) {
+	// clear current list
+	if (list->CountItems()>0) {
+		BStringItem *anItem;
+		for (int i=0; (anItem=(BStringItem*)list->ItemAt(i)); i++)
+			delete anItem;
+		if (!list->IsEmpty())
+			list->MakeEmpty();
+	}
+	// clear current idlist
+	if (idlist!=NULL) {
+		delete [] idlist;
+		idlist = NULL;
+	}
+	// select list from db
+	int nRows, nCols;
+	char **result;
+	char *dbErrMsg;
+	BString sqlQuery;
+	sqlQuery = "SELECT id, symbol, nazwa FROM FIRMA ORDER BY id";
+	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows < 1) {
+		// XXX database is empty, do sth about it?
+		printf("database is empty\n");
+	} else {
+		BString tmp;
+		idlist = new int[nRows];
+		for (int i=1;i<=nRows;i++) {
+			idlist[i-1] = toint(result[i*nCols+0]);
+			tmp = result[i*nCols+1];
+			tmp << ", " << result[i*nCols+2];
+			list->AddItem(new BStringItem(tmp.String()));
+		}
+	}
+	sqlite_free_table(result);
 }

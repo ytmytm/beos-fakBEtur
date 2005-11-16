@@ -18,8 +18,13 @@ class tabFirma : public beFakTab {
 		tabFirma(BTabView *tv, sqlite *db);
 		~tabFirma();
 		void MessageReceived(BMessage *Message);
+		void ChangedSelection(int newid);
 		//
 		void DoCommitCurdata(void);
+		void DoDeleteCurdata(void);
+		void DoFetchCurdata(void);
+		//
+		void RefreshIndexList(void);
 		//
 		// update - enable/disable widgets, parse msg (combo items)
 		// curdataTo - read data from curtab to widgets, call update
@@ -35,6 +40,7 @@ class tabFirma : public beFakTab {
 		BTextControl *data[11];
 		BCheckBox *odbiorca, *dostawca, *aktywny, *zablokowany;
 		firmadat *curdata;
+		int *idlist;
 };
 
 #endif

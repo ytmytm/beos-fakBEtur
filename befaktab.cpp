@@ -31,6 +31,7 @@ void beFakTab::MessageReceived(BMessage *Message) {
 	// process message
 }
 
+// if returns false -> cancel action and resume editing current data
 bool beFakTab::CommitCurdata(bool haveCancelButton = true) {
 	// ask if commit data from current object into database
 	if (!dirty)

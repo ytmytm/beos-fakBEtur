@@ -14,6 +14,8 @@
 			// data management
 			int generate_id(void);
 			void commit(void);
+			void fetch(void);
+			void del(void);
 			// data holders
 			int id;
 			// data itself
@@ -22,9 +24,9 @@
 		private:
 			sqlite *dbData;
 			char *dbErrMsg;
-
-			// helper
-			int toint(const char *input);
 	};
+
+	// helper
+	int toint(const char *input);
 
 #endif

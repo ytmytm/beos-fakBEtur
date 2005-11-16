@@ -28,7 +28,7 @@ int firmadat::generate_id(void) {
 	int newid = 1;
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT MAX(id) FROM karta", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT MAX(id) FROM firma", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows > 0) {
 		// there is something in db
 		newid = toint(result[1]) + 1;
@@ -59,7 +59,7 @@ printf("commit\n");
 		sql += ", %i, %i, %i, %i";
 		sql += ", %i)";
 	}
-printf("sql:[%s]\n",sql.String());
+//printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		data[0].String(), data[1].String(), data[2].String(), data[3].String(),
 		data[4].String(), data[5].String(), data[6].String(), data[7].String(),
@@ -69,11 +69,46 @@ printf("sql:[%s]\n",sql.String());
 	printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
 
+void firmadat::fetch(void) {
+printf("in fetchcurdata with %i\n",id);
+	int i, j;
+	int nRows, nCols;
+	char **result;
+	BString sql;	
+	sql = "SELECT ";
+	sql += "nazwa, symbol, adres, kod, miejscowosc, telefon, email";
+	sql += ", nip, regon, bank, konto";
+	sql += ", odbiorca, dostawca, aktywny, zablokowany";
+	sql += " FROM firma WHERE id = ";
+	sql << id;
+//printf("sql:%s\n",sql.String());
+	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+printf ("got:%ix%i\n", nRows, nCols);
+	// readout data
+	i = nCols;
+	for (j=0;j<=10;j++) {
+		data[j] = result[i++];
+	}
+	odbiorca = toint(result[i++]);
+	dostawca = toint(result[i++]);
+	aktywny = toint(result[i++]);
+	zablokowany = toint(result[i++]);
+
+	sqlite_free_table(result);
+}
+
+void firmadat::del(void) {
+	if (id>=0) {
+		sqlite_exec_printf(dbData, "DELETE FROM firma WHERE id = %i", 0, 0, &dbErrMsg, id);
+	}
+	clear();
+}
+
 //----------------------
 
 #include <stdlib.h>
 
-int firmadat::toint(const char *input) {
+int toint(const char *input) {
 	if (input != NULL)
 		return strtol(input, NULL, 10);
 	else
