@@ -27,6 +27,8 @@ CREATE TABLE firma (
 
 	aktywny INTEGER,
 	blokada INTEGER,
+	odbiorca INTEGER,
+	dostawca INTEGER,
 	PRIMARY KEY(id,symbol)
 );
  
