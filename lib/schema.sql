@@ -14,21 +14,22 @@ INSERT INTO stawka_vat (id, nazwa, stawka) VALUES (5, 'zwolnione', 0);
 
 CREATE TABLE firma (
 	id INTEGER NOT NULL,
-	symbol TEXT NOT NULL DEFAULT '',
 	nazwa TEXT,
+	symbol TEXT NOT NULL DEFAULT '',
 	adres TEXT,
 	kod TEXT,
-	miasto TEXT,
+	miejscowosc TEXT,
 	telefon TEXT,
 	email TEXT,
 	nip TEXT,
+	regon TEXT,
 	bank TEXT,
 	konto TEXT,
 
-	aktywny INTEGER,
-	blokada INTEGER,
 	odbiorca INTEGER,
 	dostawca INTEGER,
+	aktywny INTEGER,
+	zablokowany INTEGER,
 	PRIMARY KEY(id,symbol)
 );
  
