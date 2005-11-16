@@ -32,4 +32,23 @@ CREATE TABLE firma (
 	zablokowany INTEGER,
 	PRIMARY KEY(id,symbol)
 );
+
+CREATE TABLE towar (
+	id INTEGER NOT NULL,
+	nazwa TEXT,
+	symbol TEXT NOT NULL DEFAULT '',
+	pkwiu TEXT,
+	jm TEXT,
+	usluga INTEGER NOT NULL DEFAULT 0,
+	dodany DATE,
+
+	netto INTEGER,
+	vat INTEGER,
+	zakupu INTEGER,
+	marza INTEGER,
+	rabat INTEGER,
+
+	notatki TEXT,
+	PRIMARY KEY(id,symbol)
+);
  
