@@ -212,18 +212,6 @@ printf("in fetchcurdata with %i\n",id);
 	curdata->dirty = false;
 }
 
-//--------------------
-
-void fakdat::dump_all(void) {
-	printf("------------\n");
-	printf("\n");
-}
-
-void fakdat::clear(void) {
-	dirty = false;
-	id = -1;
-}
-
 //---------------------
 
 #include <stdlib.h>

@@ -14,7 +14,7 @@ int toint(const char *input);
 #include <String.h>
 class fakdat {
 	public:
-	fakdat(void) { clear(); };
+	fakdat(void) { };
 	~fakdat() { };
 	void dump_all(void);
 	void clear(void);
@@ -75,12 +75,7 @@ class fakdat {
 			BListView *listView;
 			BTabView *tabView;
 
-			// bottom navigation/control
-//			BButton *but_new, *but_clear, *but_restore, *but_delete, *but_save;
-			// tab1 controls
-//			BTextControl *t1miejsc, *t1nazwalokalna, *t1gmina, *t1powiat, *t1wojewodztwo;
-//			BTextControl *t1nrobszaru, *t1nrinwent, *t1x, *t1y, *t1stanmiejsc, *t1stanobszar;
-//			BCheckBox *t1cz, *t1ct, *t1cl, *t1cw, *t1ca, *t1cp, *t1cr;
+			// tabs
 			beFakTab *curTab, *tab1;
 
 			// database
