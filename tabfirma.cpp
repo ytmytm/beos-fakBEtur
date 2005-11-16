@@ -1,6 +1,6 @@
 //
 // skopiować logikę z kesy (mainwindow) - obsługa buttonów i zmiany fokusu
-// na liście, wypełnianie listy itd.
+// na liście, wypełnianie listy itd. - messagereceived i okolice
 //
 // część bazodanową przenieść do klasy danych (tylko handle na db, otwieranie
 // z mainwindow, alerty tamże)
@@ -28,7 +28,7 @@ const uint32 DC			= 'TFDC';
 
 tabFirma::tabFirma(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 
-	curdata = new firmadat();
+	curdata = new firmadat(db);
 	this->dirty = false;
 
 	BRect r;
@@ -154,4 +154,7 @@ void tabFirma::MessageReceived(BMessage *Message) {
 
 void tabFirma::DoCommitCurdata(void) {
 	printf("INSERT/UPDATE\n");
+	curdata->commit();
+	this->dirty = false;
+	//RefreshIndexList();
 }
