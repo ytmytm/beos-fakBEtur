@@ -1,4 +1,14 @@
 
+// todo:
+// curdata to/from, msg hangling, db functions: commit,fetch,delete
+// fetch vats into menu, (keep local?)
+// update: calculate brutto, show dodano
+// change/commit: check data (numerical!)
+//
+// problem: ceny i marża mogą być w ułamkach! (zamiana '.' na ',', tylko cyfry)
+//
+// sprawdzić jak właściwie działa netto/marża/rabat w bizmaster
+// sprawdzić co jest w zakładce 'ceny' w cf
 
 #include "tabtowar.h"
 #include "fakdata.h"
