@@ -1,5 +1,14 @@
+//
+// skopiować logikę z kesy (mainwindow) - obsługa buttonów i zmiany fokusu
+// na liście, wypełnianie listy itd.
+//
+// część bazodanową przenieść do klasy danych (tylko handle na db, otwieranie
+// z mainwindow, alerty tamże)
+//
+
 
 #include "tabfirma.h"
+#include "fakdata.h"
 
 #include <Box.h>
 #include <Button.h>
@@ -18,8 +27,10 @@ const uint32 BUT_SAVE	= 'TFBS';
 const uint32 DC			= 'TFDC';
 
 tabFirma::tabFirma(BTabView *tv) : beFakTab(tv) {
-	BRect r;
 
+	curdata = new firmadat();
+
+	BRect r;
 	r = this->view->Bounds();
 
 	// listview in scrollview
@@ -88,8 +99,54 @@ tabFirma::tabFirma(BTabView *tv) : beFakTab(tv) {
 	data[3]->SetDivider(50); data[5]->SetDivider(50);
 	data[7]->SetDivider(50); data[8]->SetDivider(50);
 	data[9]->SetDivider(50); data[10]->SetDivider(50);
+	updateTab();
 }
 
 tabFirma::~tabFirma() {
 
+}
+
+void tabFirma::curdataFromTab(void) {
+	int i;
+	for (i=0;i<=10;i++) {
+		curdata->data[i] = data[i]->Text();
+	}
+	curdata->odbiorca = (odbiorca->Value() == B_CONTROL_ON);
+	curdata->dostawca = (dostawca->Value() == B_CONTROL_ON);
+	curdata->aktywny = (aktywny->Value() == B_CONTROL_ON);
+	curdata->zablokowany = (zablokowany->Value() == B_CONTROL_ON);
+}
+
+void tabFirma::curdataToTab(void) {
+	int i;
+	for (i=0;i<=10;i++) {
+		data[i]->SetText(curdata->data[i].String());
+	}
+	odbiorca->SetValue(curdata->odbiorca ? B_CONTROL_ON : B_CONTROL_OFF);
+	dostawca->SetValue(curdata->dostawca ? B_CONTROL_ON : B_CONTROL_OFF);
+	aktywny->SetValue(curdata->aktywny ? B_CONTROL_ON : B_CONTROL_OFF);
+	zablokowany->SetValue(curdata->zablokowany ? B_CONTROL_ON : B_CONTROL_OFF);
+	updateTab();
+}
+
+void tabFirma::updateTab(void) {
+	bool state = (zablokowany->Value() != B_CONTROL_ON);
+
+	int i;
+	for (i=0;i<=10;i++) {
+		data[i]->SetEnabled(state);
+	}
+	odbiorca->SetEnabled(state);
+	dostawca->SetEnabled(state);
+	aktywny->SetEnabled(state);	
+}
+
+void tabFirma::MessageReceived(BMessage *Message) {
+	switch (Message->what) {
+		case DC:
+			printf("change!\n");
+			curdata->dirty = true;
+			updateTab();
+			break;
+	}
 }

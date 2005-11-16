@@ -2,6 +2,7 @@
 #ifndef _BEFAKTAB_H
 #define _BEFAKTAB_H
 
+class BMessage;
 class BTab;
 class BTabView;
 class BView;
@@ -9,7 +10,9 @@ class BView;
 class beFakTab {
 	public:
 		beFakTab(BTabView *tv);
-		~beFakTab();
+		virtual ~beFakTab();
+
+		virtual void MessageReceived(BMessage *Message);
 
 		BView *view;
 		BTab *tab;

@@ -21,3 +21,7 @@ beFakTab::beFakTab(BTabView *tv) {
 beFakTab::~beFakTab() {
 	// nothing?
 }
+
+void beFakTab::MessageReceived(BMessage *Message) {
+	// process message
+}

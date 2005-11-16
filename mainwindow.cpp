@@ -71,6 +71,7 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	currentid = -1;
 
 	tabView->Select(0);
+	curTab = tab1;
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
@@ -78,7 +79,6 @@ BeFAKMainWindow::~BeFAKMainWindow() {
 }
 
 void BeFAKMainWindow::initTabs(BTabView *tv) {
-	beFakTab *tab1;
 	tab1 = new tabFirma(tv);
 }
 
@@ -96,6 +96,7 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 //			RefreshIndexList();
 			break;
 		default:
+			curTab->MessageReceived(Message);
 			BWindow::MessageReceived(Message);
 			break;
 	}
