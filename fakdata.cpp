@@ -12,8 +12,9 @@ void firmadat::dump( void ) {
 }
 
 void firmadat::clear( void ) {
-	int i;
-	for (i=0;i<=10;i++) {
+	dirty = false;
+	id = -1;
+	for (int i=0;i<=10;i++) {
 		data[i] = "";
 	}
 	odbiorca = dostawca = aktywny = zablokowany = false;
