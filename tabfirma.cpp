@@ -138,7 +138,7 @@ void tabFirma::updateTab(void) {
 	}
 	odbiorca->SetEnabled(state);
 	dostawca->SetEnabled(state);
-	aktywny->SetEnabled(state);	
+	aktywny->SetEnabled(state);
 }
 
 void tabFirma::MessageReceived(BMessage *Message) {
