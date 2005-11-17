@@ -1,8 +1,7 @@
 
 // todo:
-// menu msg hangling (vat, jm)
+// menu msg hangling (vat)
 // fetch vats into menu, (keep local?)
-// update: calculate brutto
 // change/commit: check data (numerical!)
 // trzymac ceny i marze jako decimal(10,2)? mozna wtedy zwalic obliczenia na sqlite
 //		select round(34.23*0.22,2) -> 7.53 (7.5306)
@@ -11,7 +10,7 @@
 // sprawdzić jak właściwie działa netto/marża/rabat w bizmaster
 // sprawdzić co robi 'usługa'
 // sprawdzić co jest w zakładce 'ceny' w cf
-// kontrola wymaganych pól (cena, vat, itd.)
+// kontrola wypełnienia wymaganych pól (cena, vat, itd.)
 
 #include "tabtowar.h"
 #include "fakdata.h"
