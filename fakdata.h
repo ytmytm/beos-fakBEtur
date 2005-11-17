@@ -42,7 +42,8 @@
 			// data itself
 			BString data[4], notatki, dodany;
 			bool usluga;
-			int netto, zakupu, marza, rabat, vat;
+			int netto, zakupu, marza, rabat;
+			int vat, vatitem;
 		private:
 			sqlite *dbData;
 			char *dbErrMsg;

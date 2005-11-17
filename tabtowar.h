@@ -45,6 +45,7 @@ class tabTowar : public beFakTab {
 		BCheckBox *usluga;
 		BStringView *dodany, *brutto;
 		BTextView *notatki;
+		BMenuItem **vatItems;
 		towardat *curdata;
 		int *idlist;
 };

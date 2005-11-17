@@ -120,6 +120,8 @@ void towardat::clear(void) {
 	data[0] = data[1] = data[2] = data[3] = notatki = dodany = "";
 	usluga = false;
 	netto = zakupu = marza = rabat = 0;
+	vat = 0;
+	vatitem = 0;
 }
 
 int towardat::generate_id(void) {
@@ -199,6 +201,18 @@ printf ("got:%ix%i\n", nRows, nCols);
 	rabat = toint(result[i++]);
 	dodany = result[i++];
 
+	sqlite_free_table(result);
+
+	sql = "SELECT id FROM stawka_vat WHERE stawka = ";
+	sql << vat;
+	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+printf ("got:%ix%i, %s\n", nRows, nCols, result[1]);
+	if (nRows < 1) {
+		vatitem = 0;
+	} else {
+		vatitem = toint(result[1])-1;
+		if (vatitem<0) vatitem = 0;
+	}
 	sqlite_free_table(result);
 }
 
