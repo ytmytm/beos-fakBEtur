@@ -20,28 +20,30 @@ class tabTowar : public beFakTab {
 		tabTowar(BTabView *tv, sqlite *db);
 		~tabTowar();
 		void MessageReceived(BMessage *Message);
-//		void ChangedSelection(int newid);
+		void ChangedSelection(int newid);
 		//
-//		void DoCommitCurdata(void);
-//		void DoDeleteCurdata(void);
-//		void DoFetchCurdata(void);
+		void DoCommitCurdata(void);
+		void DoDeleteCurdata(void);
+		void DoFetchCurdata(void);
 		//
-//		void RefreshIndexList(void);
+		void RefreshIndexList(void);
 		//
 		// update - enable/disable widgets, parse msg (combo items)
 		// curdataTo - read data from curtab to widgets, call update
 		// curdataFrom - read from widgets to curtab
-//		void curdataFromTab(void);
-//		void curdataToTab(void);
-//		void updateTab(void);
+		void curdataFromTab(void);
+		void curdataToTab(void);
+		void updateTab(void);
 
 	private:
+		const char *validateDecimal(const char *input);
+
 		BButton *but_new, *but_del, *but_restore, *but_save;
 		BListView *list;
 		BBox *box1, *box2, *box3;
 		BTextControl *data[4], *ceny[4];
 		BCheckBox *usluga;
-		BStringView *dodano, *brutto;
+		BStringView *dodany, *brutto;
 		BTextView *notatki;
 		towardat *curdata;
 		int *idlist;

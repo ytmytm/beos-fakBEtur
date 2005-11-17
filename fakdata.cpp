@@ -117,7 +117,7 @@ void towardat::dump(void) {
 
 void towardat::clear(void) {
 	id = -1;
-	data[0] = data[1] = data[2] = data[3] = notatki = "";
+	data[0] = data[1] = data[2] = data[3] = notatki = dodany = "";
 	usluga = false;
 	netto = zakupu = marza = rabat = 0;
 }
@@ -133,6 +133,80 @@ int towardat::generate_id(void) {
 	}
 	sqlite_free_table(result);
 	return newid;
+}
+
+void towardat::commit(void) {
+	BString sql;
+	int ret;
+printf("commit\n");
+	if (id>=0) {	// UPDATE
+		sql = "UPDATE towar SET ";
+		sql += "nazwa = %Q, symbol = %Q, pkwiu = %Q, jm = %Q";
+		sql += ", usluga = %i, notatki = %Q, vat = %i";
+		sql += ", netto = %i, zakupu = %i, marza = %i, rabat = %i";
+		sql += ", dodany = date('now')";
+		sql += " WHERE id = %i";
+	} else {		// INSERT
+		id = generate_id();
+		sql += "INSERT INTO towar ( ";
+		sql += "nazwa, symbol, pkwiu, jm";
+		sql += ", usluga, notatki, vat";
+		sql += ", netto, zakupu, marza, rabat";
+		sql += ", dodany";
+		sql += ", id ) VALUES ( ";
+		sql += "%Q, %Q, %Q, %Q";
+		sql += ", %i, %Q, %i";
+		sql += ", %i, %i, %i, %i";
+		sql += ", date('now')";
+		sql += ", %i)";
+	}
+//printf("sql:[%s]\n",sql.String());
+	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
+		data[0].String(), data[1].String(), data[2].String(), data[3].String(),
+		usluga, notatki.String(), vat,
+		netto, zakupu, marza, rabat,
+		id);
+	printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
+}
+
+void towardat::fetch(void) {
+printf("in fetchcurdata with %i\n",id);
+	int i, j;
+	int nRows, nCols;
+	char **result;
+	BString sql;	
+	sql = "SELECT ";
+	sql += "nazwa, symbol, pkwiu, jm";
+	sql += ", usluga, notatki, vat";
+	sql += ", netto, zakupu, marza, rabat";
+	sql += ", dodany";
+	sql += " FROM towar WHERE id = ";
+	sql << id;
+//printf("sql:%s\n",sql.String());
+	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+printf ("got:%ix%i\n", nRows, nCols);
+	// readout data
+	i = nCols;
+	for (j=0;j<=3;j++) {
+		data[j] = result[i++];
+	}
+	usluga = toint(result[i++]);
+	notatki = result[i++];
+	vat = toint(result[i++]);
+	netto = toint(result[i++]);
+	zakupu = toint(result[i++]);
+	marza = toint(result[i++]);
+	rabat = toint(result[i++]);
+	dodany = result[i++];
+
+	sqlite_free_table(result);
+}
+
+void towardat::del(void) {
+	if (id>=0) {
+		sqlite_exec_printf(dbData, "DELETE FROM towar WHERE id = %i", 0, 0, &dbErrMsg, id);
+	}
+	clear();
 }
 
 //----------------------

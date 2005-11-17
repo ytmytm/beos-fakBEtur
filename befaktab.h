@@ -26,6 +26,7 @@ class beFakTab {
 		BTab *tab;
 
 		sqlite *dbData;
+		char *dbErrMsg;
 
 	protected:
 		bool dirty;

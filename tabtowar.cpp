@@ -1,14 +1,17 @@
 
 // todo:
-// curdata to/from, msg hangling, db functions: commit,fetch,delete
+// menu msg hangling (vat, jm)
 // fetch vats into menu, (keep local?)
-// update: calculate brutto, show dodano
+// update: calculate brutto
 // change/commit: check data (numerical!)
-//
+// trzymac ceny i marze jako decimal(10,2)? mozna wtedy zwalic obliczenia na sqlite
+//		select round(34.23*0.22,2) -> 7.53 (7.5306)
 // problem: ceny i marża mogą być w ułamkach! (zamiana '.' na ',', tylko cyfry)
 //
 // sprawdzić jak właściwie działa netto/marża/rabat w bizmaster
+// sprawdzić co robi 'usługa'
 // sprawdzić co jest w zakładce 'ceny' w cf
+// kontrola wymaganych pól (cena, vat, itd.)
 
 #include "tabtowar.h"
 #include "fakdata.h"
@@ -36,6 +39,7 @@ const uint32 BUT_SAVE	= 'TTBS';
 const uint32 DC			= 'TTDC';
 
 const uint32 MENUJM		= 'TTMJ';
+const uint32 MENUVAT	= 'TTMV';
 
 const char *jmiary[] = { "szt.", "kg", "kpl.", "m", "mb", "m2", "km", NULL };
 
@@ -77,10 +81,10 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	box1->AddChild(data[2]); box1->AddChild(data[3]);
 	usluga = new BCheckBox(BRect(350,50,420,65), "ttdo", "Usługa", new BMessage(DC));
 	box1->AddChild(usluga);
-	dodano = new BStringView(BRect(280,80,340,95), "tts0", "Dodano");
-	box1->AddChild(dodano);
-	dodano = new BStringView(BRect(350,80,420,95), "ttsd", "XX-YY-ZZZZ");
-	box1->AddChild(dodano);
+	dodany = new BStringView(BRect(280,80,340,95), "tts0", "Dodano");
+	box1->AddChild(dodany);
+	dodany = new BStringView(BRect(350,80,420,95), "ttsd", "XX-YY-ZZZZ");
+	box1->AddChild(dodany);
 	// box1-menu
 	BMenu *menujm = new BMenu("");
 	BMessage *msg;
@@ -112,7 +116,7 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	// box2-menu
 	BPopUpMenu *menuvat = new BPopUpMenu("");
 //XXX fetch from db!
-	menuvat->AddItem(new BMenuItem("zw.", new BMessage('abcd')));
+	menuvat->AddItem(new BMenuItem("zw.", new BMessage(MENUVAT)));
 	BMenuField *menuvatField = new BMenuField(BRect(200,15,330,35), "ttmv", "VAT", menuvat);
 	menuvatField->SetDivider(be_plain_font->StringWidth(menuvatField->Label())+15);
 	box2->AddChild(menuvatField);
@@ -134,19 +138,201 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	}
 	data[0]->SetDivider(50); data[2]->SetDivider(50);
 	ceny[0]->SetDivider(90); ceny[1]->SetDivider(90);
-//XXX	updateTab();
-//XXX	RefreshIndexList();
+	updateTab();
+	RefreshIndexList();
 }
 
 tabTowar::~tabTowar() {
 
 }
 
+const char *tabTowar::validateDecimal(const char *input) {
+	static BString tmp;
+	int i, l = strlen(input);
+	bool wasDot = false;
+//printf("input=[%s]\n",input);
+	tmp = "";
+	for (i=0;i<l;i++) {
+		if ((input[i] >= '0') && (input[i] <= '9')) {
+			tmp += input[i];
+		} else {
+			if (((input[i]=='.')||(input[i]==',')) && (!wasDot)) {
+				tmp += '.';
+				wasDot = true;
+				// truncate to 2 decimal places
+				if (i+3<l)
+					l = i+3;
+			}
+		}
+//printf("in[%i]=%c, tmp=[%s]\n",i,input[i],tmp.String());
+	}
+	return tmp.String();
+}
+
+void tabTowar::curdataFromTab(void) {
+	int i;
+	for (i=0;i<=3;i++) {
+		curdata->data[i] = data[i]->Text();
+	}
+	curdata->usluga = (usluga->Value() == B_CONTROL_ON);
+	curdata->notatki = notatki->Text();
+	curdata->netto = 100*toint(validateDecimal(ceny[0]->Text()));
+	curdata->zakupu = 100*toint(validateDecimal(ceny[1]->Text()));
+	curdata->marza = 100*toint(validateDecimal(ceny[2]->Text()));
+	curdata->rabat = 100*toint(validateDecimal(ceny[3]->Text()));
+	// XXX vat!
+}
+
+void tabTowar::curdataToTab(void) {
+	int i;
+	for (i=0;i<=3;i++) {
+		data[i]->SetText(curdata->data[i].String());
+	}
+	usluga->SetValue(curdata->usluga ? B_CONTROL_ON : B_CONTROL_OFF);
+	notatki->SetText(curdata->notatki.String());
+	BString tmp;
+	tmp << (curdata->netto / 100); ceny[0]->SetText(tmp.String()); tmp = "";
+	tmp << (curdata->zakupu / 100); ceny[1]->SetText(tmp.String()); tmp = "";
+	tmp << (curdata->marza / 100); ceny[2]->SetText(tmp.String()); tmp = "";
+	tmp << (curdata->rabat / 100); ceny[3]->SetText(tmp.String());
+	dodany->SetText(curdata->dodany.String());
+	// XXX vat!
+	updateTab();
+}
+
+void tabTowar::updateTab(void) {
+	int i;
+	for (i=0;i<=3;i++) {
+		ceny[i]->SetText(validateDecimal(ceny[i]->Text()));
+	}
+	// XXX usluga, to cos wylaczyc/wyzerowac???
+	int nRows, nCols;
+	char **result;
+	BString sql;	
+// XXX brać tu pod uwagę rabat/marżę???
+	sql = "SELECT ROUND(0";
+	sql += ceny[0]->Text();
+	sql += "*(1+";
+	sql += "0.22";	// vat
+	sql += "),2)";
+//printf("sql:%s\n",sql.String());
+	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+//printf ("got:%ix%i\n", nRows, nCols);
+	// readout data
+	brutto->SetText(result[1]);
+}
+
 void tabTowar::MessageReceived(BMessage *Message) {
+	int i;
 	switch (Message->what) {
 		case DC:
 			this->dirty = true;
-//XXX			updateTab();
+			updateTab();
 			break;
+		case BUT_NEW:
+			if (CommitCurdata()) {
+				// clear curdata
+				curdata->clear();
+				// refresh tabs
+				curdataToTab();
+			}
+			break;
+		case BUT_RESTORE:
+			DoFetchCurdata();
+			break;
+		case BUT_DEL:
+			DoDeleteCurdata();
+			break;
+		case BUT_SAVE:
+			curdataFromTab();
+			DoCommitCurdata();
+			curdataToTab();
+			break;
+		case LIST_SEL:
+		case LIST_INV:
+//			printf("list selection/invoc\n");
+			i = list->CurrentSelection(0);
+//			printf("got:%i\n",i);
+			if (i>=0) {
+//				printf("sel:%i,id=%i\n",i,idlist[i]);
+				ChangedSelection(idlist[i]);
+			} else {
+				// XXX deselection? what to do???
+			}
+			break;
+		case MENUJM:
+			const char *tmp;
+			if (Message->FindString("_jm", &tmp) == B_OK) {
+				data[3]->SetText(tmp);
+				this->dirty = true;
+			}
 	}
+}
+
+void tabTowar::ChangedSelection(int newid) {
+	if (!(CommitCurdata())) {
+		// XXX do nothing if cancel, restore old selection?
+		return;
+	}
+	// fetch and store into new data
+	curdata->id = newid;
+	DoFetchCurdata();
+}
+
+void tabTowar::DoCommitCurdata(void) {
+	curdata->commit();
+	this->dirty = false;
+	RefreshIndexList();
+}
+
+void tabTowar::DoDeleteCurdata(void) {
+// XXX ask for confimation?
+	curdata->del();
+	curdataToTab();
+	RefreshIndexList();
+}
+
+void tabTowar::DoFetchCurdata(void) {
+	if (curdata->id >=0) {
+		curdata->fetch();
+		this->dirty = false;
+		curdataToTab();
+	}
+}
+
+void tabTowar::RefreshIndexList(void) {
+	// clear current list
+	if (list->CountItems()>0) {
+		BStringItem *anItem;
+		for (int i=0; (anItem=(BStringItem*)list->ItemAt(i)); i++)
+			delete anItem;
+		if (!list->IsEmpty())
+			list->MakeEmpty();
+	}
+	// clear current idlist
+	if (idlist!=NULL) {
+		delete [] idlist;
+		idlist = NULL;
+	}
+	// select list from db
+	int nRows, nCols;
+	char **result;
+	char *dbErrMsg;
+	BString sqlQuery;
+	sqlQuery = "SELECT id, symbol, nazwa FROM towar ORDER BY id";
+	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows < 1) {
+		// XXX database is empty, do sth about it?
+		printf("database is empty\n");
+	} else {
+		BString tmp;
+		idlist = new int[nRows];
+		for (int i=1;i<=nRows;i++) {
+			idlist[i-1] = toint(result[i*nCols+0]);
+			tmp = result[i*nCols+1];
+			tmp << ", " << result[i*nCols+2];
+			list->AddItem(new BStringItem(tmp.String()));
+		}
+	}
+	sqlite_free_table(result);
 }

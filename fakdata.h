@@ -34,12 +34,15 @@
 			void clear(void);
 			// data management
 			int generate_id(void);
+			void commit(void);
+			void fetch(void);
+			void del(void);
 			// data holders
 			int id;
 			// data itself
-			BString data[4], notatki;
+			BString data[4], notatki, dodany;
 			bool usluga;
-			int netto, zakupu, marza, rabat;
+			int netto, zakupu, marza, rabat, vat;
 		private:
 			sqlite *dbData;
 			char *dbErrMsg;
