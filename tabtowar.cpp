@@ -9,6 +9,7 @@
 //				czy wynika to ze sposobu liczenia?
 // 3.005 vs. 8.255 - real! jeśli nic się nie uda, to zapamiętać jako integery
 // źródła sqlite - tam poszukać? zamiast round - truncate + cośtam?
+// a może obliczać tak jak jest, a tylko round() mieć własne?
 //
 // sprawdzić jak właściwie działa netto/marża/rabat w bizmaster
 // sprawdzić co robi 'usługa'
