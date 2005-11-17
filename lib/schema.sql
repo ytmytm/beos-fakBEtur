@@ -1,16 +1,19 @@
 
+--- bool aktywne is there to ensure data integrity (if this would be editable)
+
 CREATE TABLE stawka_vat (
 	id INTEGER NOT NULL,
 	nazwa TEXT NOT NULL DEFAULT '',
-	stawka INTEGER,
+	stawka DECIMAL(6,3),
+	aktywne INTEGER,
 	PRIMARY KEY(id)
 );
 
-INSERT INTO stawka_vat (id, nazwa, stawka) VALUES (1, '0%', 0);
-INSERT INTO stawka_vat (id, nazwa, stawka) VALUES (2, '3%', 3);
-INSERT INTO stawka_vat (id, nazwa, stawka) VALUES (3, '7%', 7);
-INSERT INTO stawka_vat (id, nazwa, stawka) VALUES (4, '22%', 22);
-INSERT INTO stawka_vat (id, nazwa, stawka) VALUES (5, 'zwolnione', 0);
+INSERT INTO stawka_vat (id, nazwa, stawka, aktywne) VALUES (1, '0%', 0, 1);
+INSERT INTO stawka_vat (id, nazwa, stawka, aktywne) VALUES (2, '3%', 3, 1);
+INSERT INTO stawka_vat (id, nazwa, stawka, aktywne) VALUES (3, '7%', 7, 1);
+INSERT INTO stawka_vat (id, nazwa, stawka, aktywne) VALUES (4, '22%', 22, 1);
+INSERT INTO stawka_vat (id, nazwa, stawka, aktywne) VALUES (5, 'zwolnione', 0, 1);
 
 CREATE TABLE firma (
 	id INTEGER NOT NULL,
@@ -33,6 +36,9 @@ CREATE TABLE firma (
 	PRIMARY KEY(id,symbol)
 );
 
+--- vatid points to stawka_vat table
+--- sqlite doesn't enforce constrains, but data should be set conforming by app 
+
 CREATE TABLE towar (
 	id INTEGER NOT NULL,
 	nazwa TEXT,
@@ -42,11 +48,11 @@ CREATE TABLE towar (
 	usluga INTEGER NOT NULL DEFAULT 0,
 	dodany DATE,
 
-	netto INTEGER,
-	vat INTEGER,
-	zakupu INTEGER,
-	marza INTEGER,
-	rabat INTEGER,
+	vatid INTEGER,
+	netto DECIMAL(12,2),
+	zakupu DECIMAL(12,2),
+	marza DECIMAL(12,2),
+	rabat DECIMAL(12,2),
 
 	notatki TEXT,
 	PRIMARY KEY(id,symbol)
