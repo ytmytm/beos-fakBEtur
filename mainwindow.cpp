@@ -1,5 +1,8 @@
 
-//XXXX curtab - reagować na przełączanie!!!
+//
+// zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
+// dziedziczyć z btab?
+//
 
 #include "mainwindow.h"
 #include "tabfirma.h"
@@ -57,7 +60,6 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	// initialize datawidgets
 	initTabs(tabView);
 	tabView->Select(1);
-	curTab = tab2;
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
@@ -65,18 +67,17 @@ BeFAKMainWindow::~BeFAKMainWindow() {
 }
 
 void BeFAKMainWindow::initTabs(BTabView *tv) {
-	tab1 = new tabFirma(tv, dbData);
-	tab2 = new tabTowar(tv, dbData);
+	tabs[0] = new tabFirma(tv, dbData);
+	tabs[1] = new tabTowar(tv, dbData);
 }
 
 void BeFAKMainWindow::MessageReceived(BMessage *Message) {
-//	int i;
 	this->DisableUpdates();
 	switch (Message->what) {
 		case MENU_DEFMSG:
-//			RefreshIndexList();
 			break;
 		default:
+			curTab = tabs[tabView->Selection()];
 			curTab->MessageReceived(Message);
 			BWindow::MessageReceived(Message);
 			break;
