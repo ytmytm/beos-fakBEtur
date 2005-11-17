@@ -37,6 +37,7 @@ class tabTowar : public beFakTab {
 		void updateTab(void);
 
 	private:
+		const char *execSQL(const char *input);
 		const char *validateDecimal(const char *input);
 
 		BButton *but_new, *but_del, *but_restore, *but_save;

@@ -1,10 +1,14 @@
 //
-// zwalic obliczenia na sqlite
+// zwalic obliczenia na sqlite [O ILE TO ZADZIAŁA! TAM SĄ REALE!]
 //		select round(34.23*0.22,2) -> 7.53 (7.5306)
 // obliczenia działają jeżeli choćby jedna liczba ma '.' - np. 25/100.0
 // pola ceny[] idą przez sqlite - można wpisywać wyrażenia arytmetyczne,
 // ale: 1+7/2=1.0+7/2=4 ! (każde działanie musi być z '.')
+// UWAGA: czy sqlite3 z affinity NUMERICAL też tego potrzebuje (spr. linuks)
 // arytmetyka: czy 3.50*1.03 do 2 cyfr to 3.60 czy 3.61? (wynik 3.605)
+//				czy wynika to ze sposobu liczenia?
+// 3.005 vs. 8.255 - real! jeśli nic się nie uda, to zapamiętać jako integery
+// źródła sqlite - tam poszukać? zamiast round - truncate + cośtam?
 //
 // sprawdzić jak właściwie działa netto/marża/rabat w bizmaster
 // sprawdzić co robi 'usługa'
@@ -165,11 +169,22 @@ tabTowar::~tabTowar() {
 
 }
 
-const char *tabTowar::validateDecimal(const char *input) {
-	static BString tmp;
+const char *tabTowar::execSQL(const char *input) {
 	int nRows, nCols;
 	char **result;
-	BString sql;
+	static BString res;
+//printf("sql=[%s]\n",sql.String());
+	sqlite_get_table(dbData, input, &result, &nRows, &nCols, &dbErrMsg);
+//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
+	if (nRows < 1)
+		res = "";
+	else
+		res = result[1];
+	return res.String();
+}
+
+const char *tabTowar::validateDecimal(const char *input) {
+	BString sql, tmp;
 
 	tmp = input;
 	if (tmp.Length() == 0)
@@ -177,14 +192,7 @@ const char *tabTowar::validateDecimal(const char *input) {
 	tmp.ReplaceAll(",",".");	// XXX more safeguards?
 
 	sql = "SELECT ROUND("; sql += tmp; sql += ", 2)";
-//printf("sql=[%s]\n",sql.String());
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
-	if (nRows < 1)
-		tmp = "";
-	else
-		tmp = result[1];
-	return tmp.String();
+	return execSQL(sql.String());
 }
 
 void tabTowar::curdataFromTab(void) {
@@ -223,17 +231,12 @@ void tabTowar::updateTab(void) {
 		return;
 	}
 	// XXX usluga, to cos wylaczyc/wyzerowac???
-	int nRows, nCols;
-	char **result;
 	BString sql;
 // XXX brać tu pod uwagę rabat/marżę???
 	sql = "SELECT ROUND(0"; sql += ceny[0]->Text();
 	sql += "*(100+stawka)/100.0,2) FROM stawka_vat WHERE id = ";
 	sql << curdata->vatid;
-//printf("sql:%s\n",sql.String());
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
-	brutto->SetText(result[1]);
+	brutto->SetText(execSQL(sql.String()));
 }
 
 void tabTowar::MessageReceived(BMessage *Message) {
