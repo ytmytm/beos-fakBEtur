@@ -119,9 +119,8 @@ void towardat::clear(void) {
 	id = -1;
 	data[0] = data[1] = data[2] = data[3] = notatki = dodany = "";
 	usluga = false;
-	netto = zakupu = marza = rabat = 0;
-	vat = 0;
-	vatitem = 0;
+	ceny[0] = ceny[1] = ceny[2] = ceny[3] = "";
+	vatid = -1;
 }
 
 int towardat::generate_id(void) {
@@ -144,74 +143,56 @@ printf("commit\n");
 	if (id>=0) {	// UPDATE
 		sql = "UPDATE towar SET ";
 		sql += "nazwa = %Q, symbol = %Q, pkwiu = %Q, jm = %Q";
-		sql += ", usluga = %i, notatki = %Q, vat = %i";
-		sql += ", netto = %i, zakupu = %i, marza = %i, rabat = %i";
-		sql += ", dodany = date('now')";
+		sql += ", usluga = %i, dodany = date('now'), notatki = %Q, vatid = %i";
+		sql += ", netto = %Q, zakupu = %Q, marza = %Q, rabat = %Q";
 		sql += " WHERE id = %i";
 	} else {		// INSERT
 		id = generate_id();
 		sql += "INSERT INTO towar ( ";
 		sql += "nazwa, symbol, pkwiu, jm";
-		sql += ", usluga, notatki, vat";
+		sql += ", usluga, dodany, notatki, vatid";
 		sql += ", netto, zakupu, marza, rabat";
-		sql += ", dodany";
 		sql += ", id ) VALUES ( ";
 		sql += "%Q, %Q, %Q, %Q";
-		sql += ", %i, %Q, %i";
-		sql += ", %i, %i, %i, %i";
-		sql += ", date('now')";
+		sql += ", %i, date('now'), %Q, %i";
+		sql += ", %Q, %Q, %Q, %Q";
 		sql += ", %i)";
 	}
 //printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		data[0].String(), data[1].String(), data[2].String(), data[3].String(),
-		usluga, notatki.String(), vat,
-		netto, zakupu, marza, rabat,
+		usluga, notatki.String(), vatid,
+		ceny[0].String(), ceny[1].String(), ceny[2].String(), ceny[3].String(),
 		id);
-	printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
+//printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
 
 void towardat::fetch(void) {
-printf("in fetchcurdata with %i\n",id);
+//printf("in fetchcurdata with %i\n",id);
 	int i, j;
 	int nRows, nCols;
 	char **result;
 	BString sql;	
 	sql = "SELECT ";
 	sql += "nazwa, symbol, pkwiu, jm";
-	sql += ", usluga, notatki, vat";
+	sql += ", usluga, dodany, notatki, vatid";
 	sql += ", netto, zakupu, marza, rabat";
-	sql += ", dodany";
 	sql += " FROM towar WHERE id = ";
 	sql << id;
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-printf ("got:%ix%i\n", nRows, nCols);
+//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	// readout data
 	i = nCols;
 	for (j=0;j<=3;j++) {
 		data[j] = result[i++];
 	}
 	usluga = toint(result[i++]);
-	notatki = result[i++];
-	vat = toint(result[i++]);
-	netto = toint(result[i++]);
-	zakupu = toint(result[i++]);
-	marza = toint(result[i++]);
-	rabat = toint(result[i++]);
 	dodany = result[i++];
-
-	sqlite_free_table(result);
-
-	sql = "SELECT id FROM stawka_vat WHERE stawka = ";
-	sql << vat;
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-printf ("got:%ix%i, %s\n", nRows, nCols, result[1]);
-	if (nRows < 1) {
-		vatitem = 0;
-	} else {
-		vatitem = toint(result[1])-1;
-		if (vatitem<0) vatitem = 0;
+	notatki = result[i++];
+	vatid = toint(result[i++]);
+	for (j=0;j<=3;j++) {
+		ceny[j] = result[i++];
 	}
 	sqlite_free_table(result);
 }

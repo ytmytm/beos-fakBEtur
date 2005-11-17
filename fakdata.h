@@ -40,10 +40,9 @@
 			// data holders
 			int id;
 			// data itself
-			BString data[4], notatki, dodany;
+			BString data[4], ceny[4], notatki, dodany;
 			bool usluga;
-			int netto, zakupu, marza, rabat;
-			int vat, vatitem;
+			int vatid;
 		private:
 			sqlite *dbData;
 			char *dbErrMsg;

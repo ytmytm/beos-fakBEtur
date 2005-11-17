@@ -1,20 +1,22 @@
 //
-// trzymac ceny i marze jako decimal(10,2(-4))? mozna wtedy zwalic obliczenia na sqlite
+// zwalic obliczenia na sqlite
 //		select round(34.23*0.22,2) -> 7.53 (7.5306)
-// round działa jeżeli choćby jedna liczba ma '.' - np. 25/100.0
-//
-// trzymac vat jako foreign key (poczytac o tym!), nie kombinowac z wartosciami stawek
-//
-// problem: ceny i marża mogą być w ułamkach! (zamiana '.' na ',', tylko cyfry)
+// obliczenia działają jeżeli choćby jedna liczba ma '.' - np. 25/100.0
+// pola ceny[] idą przez sqlite - można wpisywać wyrażenia arytmetyczne,
+// ale: 1+7/2=1.0+7/2=4 ! (każde działanie musi być z '.')
+// arytmetyka: czy 3.50*1.03 do 2 cyfr to 3.60 czy 3.61? (wynik 3.605)
 //
 // sprawdzić jak właściwie działa netto/marża/rabat w bizmaster
 // sprawdzić co robi 'usługa'
 // sprawdzić co jest w zakładce 'ceny' w cf
 // kontrola wypełnienia wymaganych pól (cena, vat, itd.) - czy są i czym są
+//    (wszystko w DoCommitCurdata)
 
+#include "globals.h"
 #include "tabtowar.h"
 #include "fakdata.h"
 
+#include <Alert.h>
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
@@ -37,10 +39,11 @@ const uint32 BUT_RESTORE= 'TTBR';
 const uint32 BUT_SAVE	= 'TTBS';
 const uint32 DC			= 'TTDC';
 
+const uint32 IGNORE		= 'IGNO';
 const uint32 MENUJM		= 'TTMJ';
 const uint32 MENUVAT	= 'TTMV';
 
-const char *jmiary[] = { "szt.", "kg", "kpl.", "m", "mb", "m2", "km", NULL };
+const char *jmiary[] = { "szt.", "kg", "kpl.", "m", "mb", "m2", "km", "l", NULL };
 
 tabTowar::tabTowar(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 
@@ -113,22 +116,24 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	brutto = new BStringView(BRect(400,15,475,35), "ttbr", "XXXX,YY zł");
 	box2->AddChild(brutto);
 	// box2-menu
-	BPopUpMenu *menuvat = new BPopUpMenu("");
+	menuvat = new BPopUpMenu("[wybierz]");
 	int nRows, nCols;
 	char **result;
 	BString sqlQuery;
-	sqlQuery = "SELECT nazwa, stawka FROM stawka_vat ORDER BY id";
+	sqlQuery = "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id";
 	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// XXX Panic! empty vat table
 	} else {
-		vatItems = new BMenuItem*[nRows];
+		vatMenuItems = new BMenuItem*[nRows];
+		vatIds = new int[nRows];
+		vatRows = nRows;
 		for (int i=1;i<=nRows;i++) {
 			msg = new BMessage(MENUVAT);
-			msg->AddString("_vat", result[i*nCols+1]);
-			msg->AddInt32("_item", i-1);
-			vatItems[i-1] = new BMenuItem(result[i*nCols+0], msg);
-			menuvat->AddItem(vatItems[i-1]);
+			msg->AddInt32("_vatid", toint(result[i*nCols+0]));
+			vatIds[i-1] = toint(result[i*nCols+0]);
+			vatMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
+			menuvat->AddItem(vatMenuItems[i-1]);
 		}
 	}
 	BMenuField *menuvatField = new BMenuField(BRect(200,15,330,35), "ttmv", "VAT", menuvat);
@@ -162,24 +167,23 @@ tabTowar::~tabTowar() {
 
 const char *tabTowar::validateDecimal(const char *input) {
 	static BString tmp;
-	int i, l = strlen(input);
-	bool wasDot = false;
-//printf("input=[%s]\n",input);
-	tmp = "";
-	for (i=0;i<l;i++) {
-		if ((input[i] >= '0') && (input[i] <= '9')) {
-			tmp += input[i];
-		} else {
-			if (((input[i]=='.')||(input[i]==',')) && (!wasDot)) {
-				tmp += '.';
-				wasDot = true;
-				// truncate to 2 decimal places
-				if (i+3<l)
-					l = i+3;
-			}
-		}
-//printf("in[%i]=%c, tmp=[%s]\n",i,input[i],tmp.String());
-	}
+	int nRows, nCols;
+	char **result;
+	BString sql;
+
+	tmp = input;
+	if (tmp.Length() == 0)
+		tmp = "0";
+	tmp.ReplaceAll(",",".");	// XXX more safeguards?
+
+	sql = "SELECT ROUND("; sql += tmp; sql += ", 2)";
+//printf("sql=[%s]\n",sql.String());
+	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
+	if (nRows < 1)
+		tmp = "";
+	else
+		tmp = result[1];
 	return tmp.String();
 }
 
@@ -187,29 +191,21 @@ void tabTowar::curdataFromTab(void) {
 	int i;
 	for (i=0;i<=3;i++) {
 		curdata->data[i] = data[i]->Text();
+		curdata->ceny[i] = validateDecimal(ceny[i]->Text());
 	}
 	curdata->usluga = (usluga->Value() == B_CONTROL_ON);
 	curdata->notatki = notatki->Text();
-	curdata->netto = 100*toint(validateDecimal(ceny[0]->Text()));
-	curdata->zakupu = 100*toint(validateDecimal(ceny[1]->Text()));
-	curdata->marza = 100*toint(validateDecimal(ceny[2]->Text()));
-	curdata->rabat = 100*toint(validateDecimal(ceny[3]->Text()));
 }
 
 void tabTowar::curdataToTab(void) {
 	int i;
 	for (i=0;i<=3;i++) {
 		data[i]->SetText(curdata->data[i].String());
+		ceny[i]->SetText(curdata->ceny[i].String());
 	}
 	usluga->SetValue(curdata->usluga ? B_CONTROL_ON : B_CONTROL_OFF);
 	notatki->SetText(curdata->notatki.String());
-	BString tmp;
-	tmp << (curdata->netto / 100); ceny[0]->SetText(tmp.String()); tmp = "";
-	tmp << (curdata->zakupu / 100); ceny[1]->SetText(tmp.String()); tmp = "";
-	tmp << (curdata->marza / 100); ceny[2]->SetText(tmp.String()); tmp = "";
-	tmp << (curdata->rabat / 100); ceny[3]->SetText(tmp.String());
 	dodany->SetText(curdata->dodany.String());
-	vatItems[curdata->vatitem]->SetMarked(true);
 	updateTab();
 }
 
@@ -218,20 +214,25 @@ void tabTowar::updateTab(void) {
 	for (i=0;i<=3;i++) {
 		ceny[i]->SetText(validateDecimal(ceny[i]->Text()));
 	}
+	for (i=0;i<vatRows;i++) {
+		vatMenuItems[i]->SetMarked((vatIds[i] == curdata->vatid));
+	}
+	if (curdata->vatid < 0) {
+		menuvat->Superitem()->SetLabel("[wybierz]");
+		brutto->SetText("???");
+		return;
+	}
 	// XXX usluga, to cos wylaczyc/wyzerowac???
 	int nRows, nCols;
 	char **result;
-	BString sql;	
+	BString sql;
 // XXX brać tu pod uwagę rabat/marżę???
-	sql = "SELECT ROUND(0";
-	sql += ceny[0]->Text();
-	sql += "*(100+";
-	sql << curdata->vat;
-	sql += ")/100.0,2)";
+	sql = "SELECT ROUND(0"; sql += ceny[0]->Text();
+	sql += "*(100+stawka)/100.0,2) FROM stawka_vat WHERE id = ";
+	sql << curdata->vatid;
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-//printf ("got:%ix%i\n", nRows, nCols);
-	// readout data
+//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	brutto->SetText(result[1]);
 }
 
@@ -282,14 +283,11 @@ void tabTowar::MessageReceived(BMessage *Message) {
 				this->dirty = true;
 			}
 		case MENUVAT:
-			if (Message->FindString("_vat", &tmp) == B_OK) {
-				curdata->vat = toint(tmp);
-				this->dirty = true;
-				if (Message->FindInt32("_item", &item) == B_OK) {
-					curdata->vatitem = item;
-				}
-				updateTab();
+			this->dirty = true;
+			if (Message->FindInt32("_vatid", &item) == B_OK) {
+				curdata->vatid = item;
 			}
+			updateTab();
 	}
 }
 
@@ -304,6 +302,13 @@ void tabTowar::ChangedSelection(int newid) {
 }
 
 void tabTowar::DoCommitCurdata(void) {
+	// XXX perform all checks against supplied data
+	if (curdata->vatid < 0) {
+		// alert!
+		BAlert *error = new BAlert(APP_NAME, "Nie wybrano stawki VAT!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return;
+	}
 	curdata->commit();
 	this->dirty = false;
 	RefreshIndexList();

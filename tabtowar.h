@@ -10,6 +10,7 @@ class BButton;
 class BCheckBox;
 class BListView;
 class BMessage;
+class BPopUpMenu;
 class BStringView;
 class BTextControl;
 class BTextView;
@@ -45,7 +46,10 @@ class tabTowar : public beFakTab {
 		BCheckBox *usluga;
 		BStringView *dodany, *brutto;
 		BTextView *notatki;
-		BMenuItem **vatItems;
+		BPopUpMenu *menuvat;
+		BMenuItem **vatMenuItems;
+		int *vatIds, vatRows;
+
 		towardat *curdata;
 		int *idlist;
 };
