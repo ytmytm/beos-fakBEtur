@@ -10,9 +10,10 @@
 // 3.005 vs. 8.255 - real! jeśli nic się nie uda, to zapamiętać jako integery
 // źródła sqlite - tam poszukać? zamiast round - truncate + cośtam?
 // a może obliczać tak jak jest, a tylko round() mieć własne?
-// NIE! bledy zaokraglen przy groszowych cenach!
 //
-// sprawdzić co robi 'usługa'
+// .07 * 1.22 = 0.0854 -> 0.09 czy 0.08? (ustawa?)
+//
+// pole 'usługa' - związane tylko z magazynem
 // kontrola wypełnienia wymaganych pól (cena, vat, itd.) - czy są i czym są
 //    (wszystko w DoCommitCurdata)
 
