@@ -120,6 +120,7 @@ void towardat::clear(void) {
 	data[0] = data[1] = data[2] = data[3] = notatki = dodany = "";
 	usluga = false;
 	ceny[0] = ceny[1] = ceny[2] = ceny[3] = "";
+	ceny[4] = "1.0"; ceny[5] = "";
 	vatid = -1;
 }
 
@@ -144,7 +145,7 @@ printf("commit\n");
 		sql = "UPDATE towar SET ";
 		sql += "nazwa = %Q, symbol = %Q, pkwiu = %Q, jm = %Q";
 		sql += ", usluga = %i, dodany = date('now'), notatki = %Q, vatid = %i";
-		sql += ", netto = %Q, zakupu = %Q, marza = %Q, rabat = %Q";
+		sql += ", netto = %Q, zakupu = %Q, marza = %Q, rabat = %Q, kurs = %Q, clo = %Q";
 		sql += " WHERE id = %i";
 	} else {		// INSERT
 		id = generate_id();
@@ -152,19 +153,22 @@ printf("commit\n");
 		sql += "nazwa, symbol, pkwiu, jm";
 		sql += ", usluga, dodany, notatki, vatid";
 		sql += ", netto, zakupu, marza, rabat";
+		sql += ", kurs, clo";
 		sql += ", id ) VALUES ( ";
 		sql += "%Q, %Q, %Q, %Q";
 		sql += ", %i, date('now'), %Q, %i";
 		sql += ", %Q, %Q, %Q, %Q";
+		sql += ", %Q, %Q";
 		sql += ", %i)";
 	}
-//printf("sql:[%s]\n",sql.String());
+printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		data[0].String(), data[1].String(), data[2].String(), data[3].String(),
 		usluga, notatki.String(), vatid,
 		ceny[0].String(), ceny[1].String(), ceny[2].String(), ceny[3].String(),
+		ceny[4].String(), ceny[5].String(),
 		id);
-//printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
+printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
 
 void towardat::fetch(void) {
@@ -176,12 +180,12 @@ void towardat::fetch(void) {
 	sql = "SELECT ";
 	sql += "nazwa, symbol, pkwiu, jm";
 	sql += ", usluga, dodany, notatki, vatid";
-	sql += ", netto, zakupu, marza, rabat";
+	sql += ", netto, zakupu, marza, rabat, kurs, clo";
 	sql += " FROM towar WHERE id = ";
 	sql << id;
-//printf("sql:%s\n",sql.String());
+printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
+printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	// readout data
 	i = nCols;
 	for (j=0;j<=3;j++) {
@@ -191,7 +195,7 @@ void towardat::fetch(void) {
 	dodany = result[i++];
 	notatki = result[i++];
 	vatid = toint(result[i++]);
-	for (j=0;j<=3;j++) {
+	for (j=0;j<=5;j++) {
 		ceny[j] = result[i++];
 	}
 	sqlite_free_table(result);

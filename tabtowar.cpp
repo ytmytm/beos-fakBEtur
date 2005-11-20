@@ -43,6 +43,9 @@ const uint32 BUT_DEL	= 'TTBD';
 const uint32 BUT_RESTORE= 'TTBR';
 const uint32 BUT_SAVE	= 'TTBS';
 const uint32 DC			= 'TTDC';
+const uint32 BUT_SELL	= 'TTBL';
+const uint32 BUT_IMPORT	= 'TTBI';
+const uint32 BUT_MARZA	= 'TTBM';
 
 const uint32 IGNORE		= 'IGNO';
 const uint32 MENUJM		= 'TTMJ';
@@ -104,18 +107,28 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	BMenuField *menujmField = new BMenuField(BRect(280,50,340,65), "ttmf", NULL, menujm);
 	box1->AddChild(menujmField);
 	// box2
-	box2 = new BBox(BRect(230,150,710,230), "tt_box2");
+	box2 = new BBox(BRect(230,150,710,300), "tt_box2");
 	box2->SetLabel("Ceny");
 	this->view->AddChild(box2);
 	// box2-stuff
 	ceny[0] = new BTextControl(BRect(10,15,190,35), "ttc0", "Cena netto (zł)", NULL, new BMessage(DC));
-	ceny[1] = new BTextControl(BRect(10,50,190,65), "ttc1", "Netto zakupu (zł)", NULL, new BMessage(DC));
-	ceny[2] = new BTextControl(BRect(200,50,340,65), "ttc2", "Marża (%)", NULL, new BMessage(DC));
-	ceny[3] = new BTextControl(BRect(350,50,470,65), "ttc3", "Rabat (%)", NULL, new BMessage(DC));
+	ceny[1] = new BTextControl(BRect(10,50,190,65), "ttc1", "Netto zakupu", NULL, new BMessage(DC));
+	ceny[2] = new BTextControl(BRect(10,80,190,95), "ttc2", "Marża (%)", NULL, new BMessage(DC));
+	ceny[3] = new BTextControl(BRect(200,50,310,65), "ttc3", "Rabat (%)", NULL, new BMessage(DC));
+	ceny[4] = new BTextControl(BRect(10,110,190,125), "ttc4", "Kurs waluty", NULL, new BMessage(DC));
+	ceny[5] = new BTextControl(BRect(200,110,310,125), "ttc5", "Cło (%)", NULL, new BMessage(DC));
 	box2->AddChild(ceny[0]);
 	box2->AddChild(ceny[1]);
 	box2->AddChild(ceny[2]);
 	box2->AddChild(ceny[3]);
+	box2->AddChild(ceny[4]);
+	box2->AddChild(ceny[5]);
+	but_sell = new BButton(BRect(340,50,420,65), "tt_but_sell", "Cena sprzedaży", new BMessage(BUT_SELL));
+	but_marza = new BButton(BRect(340,80,420,95), "tt_but_marza", "Marża", new BMessage(BUT_MARZA));
+	but_import = new BButton(BRect(340,110,420,125), "tt_but_import", "Import", new BMessage(BUT_IMPORT));
+	box2->AddChild(but_sell);
+	box2->AddChild(but_marza);
+	box2->AddChild(but_import);
 	brutto = new BStringView(BRect(330,15,390,35), "ttb0", "Cena brutto:");
 	box2->AddChild(brutto);
 	brutto = new BStringView(BRect(400,15,475,35), "ttbr", "XXXX,YY zł");
@@ -145,7 +158,7 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	menuvatField->SetDivider(be_plain_font->StringWidth(menuvatField->Label())+15);
 	box2->AddChild(menuvatField);
 	// box3
-	box3 = new BBox(BRect(230,240,710,320), "tt_box3");
+	box3 = new BBox(BRect(230,310,710,390), "tt_box3");
 	box3->SetLabel("Notatki");
 	this->view->AddChild(box3);
 	// box3-stuff
@@ -158,10 +171,13 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	int i;
 	for (i=0;i<=3;i++) {
 		data[i]->SetDivider(be_plain_font->StringWidth(data[i]->Label())+5);
+	}
+	for (i=0;i<=5;i++) {
 		ceny[i]->SetDivider(be_plain_font->StringWidth(ceny[i]->Label())+5);
 	}
 	data[0]->SetDivider(50); data[2]->SetDivider(50);
-	ceny[0]->SetDivider(90); ceny[1]->SetDivider(90);
+	ceny[0]->SetDivider(70); ceny[1]->SetDivider(70);
+	ceny[2]->SetDivider(70); ceny[4]->SetDivider(70);
 	updateTab();
 	RefreshIndexList();
 }
@@ -200,6 +216,8 @@ void tabTowar::curdataFromTab(void) {
 	int i;
 	for (i=0;i<=3;i++) {
 		curdata->data[i] = data[i]->Text();
+	}
+	for (i=0;i<=5;i++) {
 		curdata->ceny[i] = validateDecimal(ceny[i]->Text());
 	}
 	curdata->usluga = (usluga->Value() == B_CONTROL_ON);
@@ -210,6 +228,8 @@ void tabTowar::curdataToTab(void) {
 	int i;
 	for (i=0;i<=3;i++) {
 		data[i]->SetText(curdata->data[i].String());
+	}
+	for (i=0;i<=5;i++) {
 		ceny[i]->SetText(curdata->ceny[i].String());
 	}
 	usluga->SetValue(curdata->usluga ? B_CONTROL_ON : B_CONTROL_OFF);
@@ -220,7 +240,7 @@ void tabTowar::curdataToTab(void) {
 
 void tabTowar::updateTab(void) {
 	int i;
-	for (i=0;i<=3;i++) {
+	for (i=0;i<=5;i++) {
 		ceny[i]->SetText(validateDecimal(ceny[i]->Text()));
 	}
 	for (i=0;i<vatRows;i++) {
@@ -268,6 +288,15 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			curdataFromTab();
 			DoCommitCurdata();
 			curdataToTab();
+			break;
+		case BUT_SELL:
+			printf("calc sell\n");
+			break;
+		case BUT_MARZA:
+			printf("calc marza\n");
+			break;
+		case BUT_IMPORT:
+			printf("calc import\n");
 			break;
 		case LIST_SEL:
 		case LIST_INV:
