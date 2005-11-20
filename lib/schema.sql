@@ -53,6 +53,8 @@ CREATE TABLE towar (
 	zakupu DECIMAL(12,2),
 	marza DECIMAL(12,2),
 	rabat DECIMAL(12,2),
+	kurs DECIMAL(12,2),
+	clo DECIMAL(12,2),
 
 	notatki TEXT,
 	PRIMARY KEY(id,symbol)
