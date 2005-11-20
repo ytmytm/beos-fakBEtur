@@ -10,10 +10,9 @@
 // 3.005 vs. 8.255 - real! jeśli nic się nie uda, to zapamiętać jako integery
 // źródła sqlite - tam poszukać? zamiast round - truncate + cośtam?
 // a może obliczać tak jak jest, a tylko round() mieć własne?
+// NIE! bledy zaokraglen przy groszowych cenach!
 //
-// sprawdzić jak właściwie działa netto/marża/rabat w bizmaster
 // sprawdzić co robi 'usługa'
-// sprawdzić co jest w zakładce 'ceny' w cf
 // kontrola wypełnienia wymaganych pól (cena, vat, itd.) - czy są i czym są
 //    (wszystko w DoCommitCurdata)
 
@@ -115,7 +114,7 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	ceny[1] = new BTextControl(BRect(10,50,190,65), "ttc1", "Netto zakupu", NULL, new BMessage(DC));
 	ceny[2] = new BTextControl(BRect(10,80,190,95), "ttc2", "Marża (%)", NULL, new BMessage(DC));
 	ceny[3] = new BTextControl(BRect(200,50,310,65), "ttc3", "Rabat (%)", NULL, new BMessage(DC));
-	ceny[4] = new BTextControl(BRect(10,110,190,125), "ttc4", "Kurs waluty", NULL, new BMessage(DC));
+	ceny[4] = new BTextControl(BRect(10,110,190,125), "ttc4", "Kurs waluty", "1", new BMessage(DC));
 	ceny[5] = new BTextControl(BRect(200,110,310,125), "ttc5", "Cło (%)", NULL, new BMessage(DC));
 	box2->AddChild(ceny[0]);
 	box2->AddChild(ceny[1]);
@@ -253,7 +252,7 @@ void tabTowar::updateTab(void) {
 	}
 	// XXX usluga, to cos wylaczyc/wyzerowac???
 	BString sql;
-// XXX brać tu pod uwagę rabat/marżę???
+// brać tu pod uwagę rabat/marżę - NIE: robi to but_sell
 	sql = "SELECT ROUND(0"; sql += ceny[0]->Text();
 	sql += "*(100+stawka)/100.0,2) FROM stawka_vat WHERE id = ";
 	sql << curdata->vatid;
@@ -264,6 +263,7 @@ void tabTowar::MessageReceived(BMessage *Message) {
 	int i;
 	int32 item;
 	const char *tmp;
+	BString result,sql;
 
 	switch (Message->what) {
 		case DC:
@@ -290,13 +290,55 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			curdataToTab();
 			break;
 		case BUT_SELL:
-			printf("calc sell\n");
+//			printf("calc sell\n");
+			sql = "SELECT ROUND(0";
+			sql += validateDecimal(ceny[1]->Text());
+			sql += "*(1.0+";
+			sql += validateDecimal(ceny[2]->Text());
+			sql += "/100.0)";
+			sql += "*(1.0-";
+			sql += validateDecimal(ceny[3]->Text());
+			sql += "/100.0),2)";
+			result = execSQL(sql.String());
+//			printf("sql:[%s]\nres[%s]\n",sql.String(),result.String());
+			ceny[0]->SetText(result.String());
+			updateTab();
 			break;
 		case BUT_MARZA:
-			printf("calc marza\n");
+//			printf("calc marza\n");
+			sql = "SELECT ROUND((0";
+			sql += validateDecimal(ceny[0]->Text());
+			sql += "/(0";
+			sql += validateDecimal(ceny[1]->Text());
+			sql += "*(1.0-";
+			sql += validateDecimal(ceny[3]->Text());
+			sql += "/100.0)*";
+			sql += validateDecimal(ceny[4]->Text());
+			sql += "*(1+";
+			sql += validateDecimal(ceny[5]->Text());
+			sql += "/100.0))-1)*100,2)";
+			result = execSQL(sql.String());
+//			printf("sql:[%s]\nres[%s]\n",sql.String(),result.String());
+			ceny[2]->SetText(result.String());
+			updateTab();
 			break;
 		case BUT_IMPORT:
-			printf("calc import\n");
+//			printf("calc import\n");
+			sql = "SELECT ROUND(0";
+			sql += validateDecimal(ceny[1]->Text());
+			sql += "*(1.0+";
+			sql += validateDecimal(ceny[2]->Text());
+			sql += "/100.0)*";
+			sql += validateDecimal(ceny[4]->Text());
+			sql += "*(1.0+";
+			sql += validateDecimal(ceny[5]->Text());
+			sql += "/100.0)*(1.0-";
+			sql += validateDecimal(ceny[3]->Text());
+			sql += "/100.0),2)";
+			result = execSQL(sql.String());
+//			printf("sql:[%s]\nres[%s]\n",sql.String(),result.String());
+			ceny[0]->SetText(result.String());
+			updateTab();
 			break;
 		case LIST_SEL:
 		case LIST_INV:
