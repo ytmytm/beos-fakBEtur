@@ -218,3 +218,44 @@ int toint(const char *input) {
 	else
 		return 0;
 }
+
+// not thread-safe!
+// zaokraglanie zgodnie z rozporzadzeniem Ministra Finansow z 25.05.2005
+// (Dz.U. 2005 nr 95 poz. 798), roz. 4, par 9, pkt. 6
+const char *decround(const char *input) {
+	static char out[512];
+	int i = 0;
+	int l = strlen(input);
+	char c;
+
+	int z = 0;		// zlote
+	int g = 0;		// grosze
+	int w = 0;		// wykladnik
+	bool grosze = false;
+
+	memset(out,0,sizeof(out));
+	while (i<l) {
+		c = input[i++];
+		if (c == '.') 
+			grosze = true;
+		else
+		if (!grosze)
+			z = z*10+c-'0';
+		else {
+			w++;
+			if (w<3)
+				g = g*10+c-'0';
+			else
+			if (w==3) {
+				if ((c-'0')>=5) {
+					g++;
+					if (g>=100) { z++, g-=100; }
+				}
+				break;	// nie interesuja nas cyfry poza .00x
+			}
+		}
+	}
+	if (w==1) g*=10;
+	sprintf(out, "%i.%02i", z, g);
+	return out;
+}

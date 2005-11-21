@@ -1,17 +1,8 @@
 //
-// zwalic obliczenia na sqlite [O ILE TO ZADZIAŁA! TAM SĄ REALE!]
-//		select round(34.23*0.22,2) -> 7.53 (7.5306)
-// obliczenia działają jeżeli choćby jedna liczba ma '.' - np. 25/100.0
-// pola ceny[] idą przez sqlite - można wpisywać wyrażenia arytmetyczne,
-// ale: 1+7/2=1.0+7/2=4 ! (każde działanie musi być z '.')
-// UWAGA: czy sqlite3 z affinity NUMERICAL też tego potrzebuje (spr. linuks)
-// arytmetyka: czy 3.50*1.03 do 2 cyfr to 3.60 czy 3.61? (wynik 3.605)
-//				czy wynika to ze sposobu liczenia?
-// 3.005 vs. 8.255 - real! jeśli nic się nie uda, to zapamiętać jako integery
-// źródła sqlite - tam poszukać? zamiast round - truncate + cośtam?
-// a może obliczać tak jak jest, a tylko round() mieć własne?
-//
-// .07 * 1.22 = 0.0854 -> 0.09 czy 0.08? (ustawa?)
+// obliczenia via sqlite, dzialaja ladnie jesli argumenty maja '.' np. 25/100.0
+// zaokraglanie do dwoch cyfr wlasne, zgodne z rozporzadzeniem mf (0.005->0.01)
+// pozostaje miec nadzieje, ze jest liczone poprawnie
+// pola ceny[] ida przez sqlite - mozna wpisywac wyrazenia arytmetyczne
 //
 // pole 'usługa' - związane tylko z magazynem
 // kontrola wypełnienia wymaganych pól (cena, vat, itd.) - czy są i czym są
@@ -208,8 +199,8 @@ const char *tabTowar::validateDecimal(const char *input) {
 		tmp = "0";
 	tmp.ReplaceAll(",",".");	// XXX more safeguards?
 
-	sql = "SELECT ROUND("; sql += tmp; sql += ", 2)";
-	return execSQL(sql.String());
+	sql = "SELECT ABS(0"; sql += tmp; sql += ")";
+	return decround(execSQL(sql.String()));
 }
 
 void tabTowar::curdataFromTab(void) {
@@ -254,10 +245,10 @@ void tabTowar::updateTab(void) {
 	// XXX usluga, to cos wylaczyc/wyzerowac???
 	BString sql;
 // brać tu pod uwagę rabat/marżę - NIE: robi to but_sell
-	sql = "SELECT ROUND(0"; sql += ceny[0]->Text();
-	sql += "*(100+stawka)/100.0,2) FROM stawka_vat WHERE id = ";
+	sql = "SELECT 0"; sql += ceny[0]->Text();
+	sql += "*(100+stawka)/100.0 FROM stawka_vat WHERE id = ";
 	sql << curdata->vatid;
-	brutto->SetText(execSQL(sql.String()));
+	brutto->SetText(decround(execSQL(sql.String())));
 }
 
 void tabTowar::MessageReceived(BMessage *Message) {
@@ -292,22 +283,22 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			break;
 		case BUT_SELL:
 //			printf("calc sell\n");
-			sql = "SELECT ROUND(0";
+			sql = "SELECT 0";
 			sql += validateDecimal(ceny[1]->Text());
 			sql += "*(1.0+";
 			sql += validateDecimal(ceny[2]->Text());
 			sql += "/100.0)";
 			sql += "*(1.0-";
 			sql += validateDecimal(ceny[3]->Text());
-			sql += "/100.0),2)";
-			result = execSQL(sql.String());
+			sql += "/100.0)";
+			result = decround(execSQL(sql.String()));
 //			printf("sql:[%s]\nres[%s]\n",sql.String(),result.String());
 			ceny[0]->SetText(result.String());
 			updateTab();
 			break;
 		case BUT_MARZA:
 //			printf("calc marza\n");
-			sql = "SELECT ROUND((0";
+			sql = "SELECT (0";
 			sql += validateDecimal(ceny[0]->Text());
 			sql += "/(0";
 			sql += validateDecimal(ceny[1]->Text());
@@ -317,15 +308,15 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			sql += validateDecimal(ceny[4]->Text());
 			sql += "*(1+";
 			sql += validateDecimal(ceny[5]->Text());
-			sql += "/100.0))-1)*100,2)";
-			result = execSQL(sql.String());
+			sql += "/100.0))-1)*100";
+			result = decround(execSQL(sql.String()));
 //			printf("sql:[%s]\nres[%s]\n",sql.String(),result.String());
 			ceny[2]->SetText(result.String());
 			updateTab();
 			break;
 		case BUT_IMPORT:
 //			printf("calc import\n");
-			sql = "SELECT ROUND(0";
+			sql = "SELECT 0";
 			sql += validateDecimal(ceny[1]->Text());
 			sql += "*(1.0+";
 			sql += validateDecimal(ceny[2]->Text());
@@ -335,8 +326,8 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			sql += validateDecimal(ceny[5]->Text());
 			sql += "/100.0)*(1.0-";
 			sql += validateDecimal(ceny[3]->Text());
-			sql += "/100.0),2)";
-			result = execSQL(sql.String());
+			sql += "/100.0)";
+			result = decround(execSQL(sql.String()));
 //			printf("sql:[%s]\nres[%s]\n",sql.String(),result.String());
 			ceny[0]->SetText(result.String());
 			updateTab();
