@@ -60,3 +60,57 @@ CREATE TABLE towar (
 	PRIMARY KEY(id,symbol)
 );
  
+
+CREATE TABLE faktura (
+	id			INTEGER NOT NULL,
+	nazwa			TEXT,
+
+	data_wystawienia	DATE,
+	miejsce_wystawienia	TEXT,
+	data_sprzedazy		DATE,
+
+	termin_zaplaty		DATE,
+	sposob_zaplaty		TEXT,
+
+	srodek_transportu	TEXT,
+
+	wystawil		TEXT,
+	uwagi			TEXT,
+
+	zaplacono		TEXT,
+	zapl_dnia		TEXT,
+	zapl_kwota		TEXT,
+
+	--- odbiorca - kopia struktury z firmy
+	onazwa			TEXT,
+	oadres			TEXT,
+	okod			TEXT,
+	omiejscowosc		TEXT,
+	otelefon		TEXT,
+	oemail			TEXT,
+	onip			TEXT,
+	oregon			TEXT,
+	obank			TEXT,
+	okonto			TEXT,
+
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE pozycjafakt (
+	id		INTEGER NOT NULL,
+	fakturaid	INTEGER NOT NULL,
+	lp		INTEGER NOT NULL,
+	ilosc		INTEGER NOT NULL,
+
+	--- towar - kopia struktury z towar
+	nazwa		TEXT,
+	pkwiu		TEXT,
+	jm		TEXT,
+
+	vatid		INTEGER,
+	netto		INTEGER,
+	rabat		INTEGER,
+
+	PRIMARY KEY(id,fakturaid)
+);
+
