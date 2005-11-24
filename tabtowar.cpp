@@ -10,7 +10,6 @@
 
 #include "globals.h"
 #include "tabtowar.h"
-#include "fakdata.h"
 
 #include <Alert.h>
 #include <Box.h>
