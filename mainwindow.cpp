@@ -60,7 +60,7 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 
 	// initialize datawidgets
 	initTabs(tabView);
-	tabView->Select(1);
+	tabView->Select(2);
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
