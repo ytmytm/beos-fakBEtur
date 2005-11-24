@@ -4,10 +4,12 @@
 
 #include <Box.h>
 #include <Button.h>
+#include <CheckBox.h>
 #include <ListView.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <PopUpMenu.h>
 #include <ScrollView.h>
 #include <TabView.h>
 #include <TextControl.h>
@@ -24,8 +26,11 @@ const uint32 DC			= 'TFDC';
 
 const uint32 CBUT		= 'TFCB';
 const uint32 MENUST		= 'TFMS';
+const uint32 MENUFP		= 'TFMF';
+const uint32 MENUFSYM	= 'TFMY';
 
 const char *stransportu[] = { "własny sprzedawcy", "własny odbiorcy", NULL };
+const char *fplatnosci[] = { "gotówką", "przelewem", "czekiem", "kartą płatniczą", "kartą kredytową", NULL };
 
 tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 
@@ -68,8 +73,10 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	tbv2->AddTab(viewpozy, tabpozy);
 	tabpozy->SetLabel("Pozycje");
 //	views: 0,0,490,600
+	nazwa = new BTextControl(BRect(10,10,300,30), "tfna", "Nr faktury", NULL, new BMessage(DC));
+	viewogol->AddChild(nazwa);
 	// box1
-	box1 = new BBox(BRect(10,10,300,180),"tf1box1");
+	box1 = new BBox(BRect(10,40,300,210),"tf1box1");
 	box1->SetLabel("");
 	viewogol->AddChild(box1);
 	// box1-stuff
@@ -87,6 +94,8 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	msg = new BMessage(CBUT);
 	msg->AddInt32("_butnum", 0);
 	cbut[0] = new BButton(BRect(260,70,280,90), "tfcbut0", "+", msg);
+	msg = new BMessage(CBUT);
+	msg->AddInt32("_butnum", 1);
 	cbut[1] = new BButton(BRect(260,100,280,120), "tfcbut1", "+", msg);
 	box1->AddChild(cbut[0]);
 	box1->AddChild(cbut[1]);
@@ -95,7 +104,6 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 		ogol[i]->SetDivider(70);
 	// box1-menu
 	BMenu *menust = new BMenu("");
-//	BMessage *msg;
 	int j=0;
 	while (stransportu[j] != NULL) {
 		msg = new BMessage(MENUST); msg->AddString("_st",stransportu[j]);
@@ -105,14 +113,103 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	BMenuField *menustField = new BMenuField(BRect(260,130,280,150), "tfmfst", NULL, menust);
 	box1->AddChild(menustField);
 	// box2
-	box2 = new BBox(BRect(310,10,590,90),"tf1box2");
+	box2 = new BBox(BRect(310,40,590,120),"tf1box2");
 	box2->SetLabel("Płatność");
 	viewogol->AddChild(box2);
 	// box2-stuff
+	ogol[5] = new BTextControl(BRect(10,10,150,30), "tfd5", "Forma", NULL, new BMessage(DC));
+	ogol[6] = new BTextControl(BRect(10,40,150,60), "tfd6", "Termin", NULL, new BMessage(DC));
+	ogol[7] = new BTextControl(BRect(200,40,270,60), "tfd7", "Dni", NULL, new BMessage(DC));
+	box2->AddChild(ogol[5]);
+	box2->AddChild(ogol[6]);
+	box2->AddChild(ogol[7]);
+	ogol[5]->SetDivider(50); ogol[6]->SetDivider(50); ogol[7]->SetDivider(20);
+	// box2-menu
+	BMenu *menufp = new BMenu("");
+	j=0;
+	while (fplatnosci[j] != NULL) {
+		msg = new BMessage(MENUFP); msg->AddString("_fp",fplatnosci[j]);
+		menufp->AddItem(new BMenuItem(fplatnosci[j], msg));
+		j++;
+	}
+	BMenuField *menufpField = new BMenuField(BRect(160,10,180,30), "tfmffp", NULL, menufp);
+	box2->AddChild(menufpField);
+	msg = new BMessage(CBUT);
+	msg->AddInt32("_butnum", 2);
+	cbut[2] = new BButton(BRect(160,40,180,60), "tfcbut2", "+", msg);
+	box2->AddChild(cbut[2]);
 	// box3
-	box3 = new BBox(BRect(310,100,590,180),"tf1box3");
+	box3 = new BBox(BRect(310,130,590,210),"tf1box3");
 	box3->SetLabel("Zaliczka");
 	viewogol->AddChild(box3);
+	// box3-stuff
+	cbzaplacono = new BCheckBox(BRect(10,25,80,40), "tfzap", "Zapłacono", new BMessage(DC));
+	box3->AddChild(cbzaplacono);
+	ogol[8] = new BTextControl(BRect(90,20,230,40), "tfd8", "Kwota (zł)", NULL, new BMessage(DC));
+	ogol[9] = new BTextControl(BRect(10,50,170,70), "tfd9", "Data", NULL, new BMessage(DC));
+	box3->AddChild(ogol[8]);
+	box3->AddChild(ogol[9]);
+	ogol[8]->SetDivider(50); ogol[9]->SetDivider(50);
+	msg = new BMessage(CBUT);
+	msg->AddInt32("_butnum", 3);
+	cbut[3] = new BButton(BRect(180,50,200,70), "tfcbut3", "+", msg);
+	box3->AddChild(cbut[3]);
+	// box4
+	box4 = new BBox(BRect(10,220,590,460),"tfbox4");
+	box4->SetLabel("Odbiorca");
+	viewogol->AddChild(box4);
+	// box1-stuff
+	data[0] = new BTextControl(BRect(10,15,270,35), "tfd0", "Nazwa", NULL, new BMessage(DC));
+//	data[1] = new BTextControl(BRect(280,15,420,35), "tfd1", "Symbol", NULL, new BMessage(DC));
+	data[2] = new BTextControl(BRect(10,50,420,65), "tfd2", "Adres", NULL, new BMessage(DC));
+	data[3] = new BTextControl(BRect(10,80,150,95), "tfd3", "Kod", NULL, new BMessage(DC));
+	data[4] = new BTextControl(BRect(160,80,420,95), "tfd4", "Miejscowość", NULL, new BMessage(DC));
+	data[5] = new BTextControl(BRect(10,110,200,125), "tfd5", "Tel.", NULL, new BMessage(DC));
+	data[6] = new BTextControl(BRect(210,110,420,125), "tfd6", "Email", NULL, new BMessage(DC));
+	box4->AddChild(data[0]); //box4->AddChild(data[1]);
+	box4->AddChild(data[2]);
+	box4->AddChild(data[3]); box4->AddChild(data[4]);
+	box4->AddChild(data[5]); box4->AddChild(data[6]);
+	r.top = 140; r.bottom = 155; r.left = 10, r.right = 420;
+	data[7] = new BTextControl(r, "tfd7", "NIP", NULL, new BMessage(DC)); r.OffsetBy(0, 25);
+	data[8] = new BTextControl(r, "tfd8", "REGON", NULL, new BMessage(DC)); r.OffsetBy(0, 25);
+	data[9] = new BTextControl(r, "tfd9", "Bank", NULL, new BMessage(DC)); r.OffsetBy(0, 25);
+	data[10] = new BTextControl(r, "tfd10", "Nr konta", NULL, new BMessage(DC));
+	box4->AddChild(data[7]); box4->AddChild(data[8]);
+	box4->AddChild(data[9]); box4->AddChild(data[10]);
+	// fix widths
+	for (i=0;i<=6;i++) {
+		if (i!=1)
+		data[i]->SetDivider(be_plain_font->StringWidth(data[i]->Label())+5);
+	}
+	data[0]->SetDivider(50); data[2]->SetDivider(50);
+	data[3]->SetDivider(50); data[5]->SetDivider(50);
+	data[7]->SetDivider(50); data[8]->SetDivider(50);
+	data[9]->SetDivider(50); data[10]->SetDivider(50);
+	// firma-symbole
+	BPopUpMenu *menusymbol = new BPopUpMenu("[wybierz]");
+	int nRows, nCols;
+	char **result;
+	BString sqlQuery;
+	sqlQuery = "SELECT id, symbol FROM firma WHERE aktywny = 1 ORDER BY id";
+	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows < 1) {
+		// XXX Panic! empty vat table
+	} else {
+		symbolMenuItems = new BMenuItem*[nRows];
+		symbolIds = new int[nRows];
+		symbolRows = nRows;
+		for (int i=1;i<=nRows;i++) {
+			msg = new BMessage(MENUFSYM);
+			msg->AddInt32("_firmaid", toint(result[i*nCols+0]));
+			symbolIds[i-1] = toint(result[i*nCols+0]);
+			symbolMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
+			menusymbol->AddItem(symbolMenuItems[i-1]);
+		}
+	}
+	BMenuField *menusymbolField = new BMenuField(BRect(280,15,420,35), "tfmsymbol", "Symbol", menusymbol);
+	menusymbolField->SetDivider(be_plain_font->StringWidth(menusymbolField->Label())+15);
+	box4->AddChild(menusymbolField);
 	// updateTab();
 	// RefreshIndexList();
 }

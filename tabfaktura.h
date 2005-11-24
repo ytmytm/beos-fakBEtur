@@ -7,6 +7,7 @@
 
 class BBox;
 class BButton;
+class BCheckBox;
 class BListView;
 class BTab;
 class BTabView;
@@ -22,14 +23,18 @@ class tabFaktura : public beFakTab {
 		BView *viewogol, *viewpozy;
 		BTab *tabogol, *tabpozy;
 		BTabView *tv2;
-		BBox *box1, *box2, *box3;
+		BBox *box1, *box2, *box3, *box4;
 
 		BButton *but_new, *but_del, *but_restore, *but_save;
 //		BButton *but_sell, *but_marza, *but_import;
 		BButton *cbut[5];
+		BCheckBox *cbzaplacono;
 		BListView *list;
 
-		BTextControl *ogol[11];
+		BTextControl *nazwa;
+		BTextControl *ogol[11], *data[11];
+		BMenuItem **symbolMenuItems;
+		int *symbolIds, symbolRows;
 
 		fakturadat *curdata;
 		int *idlist;
