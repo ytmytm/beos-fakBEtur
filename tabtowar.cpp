@@ -178,32 +178,6 @@ tabTowar::~tabTowar() {
 
 }
 
-const char *tabTowar::execSQL(const char *input) {
-	int nRows, nCols;
-	char **result;
-	static BString res;
-//printf("sql=[%s]\n",sql.String());
-	sqlite_get_table(dbData, input, &result, &nRows, &nCols, &dbErrMsg);
-//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
-	if (nRows < 1)
-		res = "";
-	else
-		res = result[1];
-	return res.String();
-}
-
-const char *tabTowar::validateDecimal(const char *input) {
-	BString sql, tmp;
-
-	tmp = input;
-	if (tmp.Length() == 0)
-		tmp = "0";
-	tmp.ReplaceAll(",",".");	// XXX more safeguards?
-
-	sql = "SELECT ABS(0"; sql += tmp; sql += ")";
-	return decround(execSQL(sql.String()));
-}
-
 void tabTowar::curdataFromTab(void) {
 	int i;
 	for (i=0;i<=3;i++) {

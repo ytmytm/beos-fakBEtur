@@ -22,6 +22,9 @@ class beFakTab {
 		virtual void curdataToTab(void) { };
 		virtual void updateTab(void) { };
 
+		const char *execSQL(const char *input);
+		const char *validateDecimal(const char *input);
+
 		BView *view;
 		BTab *tab;
 
