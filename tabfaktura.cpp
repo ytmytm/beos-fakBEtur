@@ -160,13 +160,12 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	viewogol->AddChild(box4);
 	// box1-stuff
 	data[0] = new BTextControl(BRect(10,15,270,35), "tfd0", "Nazwa", NULL, new BMessage(DC));
-//	data[1] = new BTextControl(BRect(280,15,420,35), "tfd1", "Symbol", NULL, new BMessage(DC));
 	data[2] = new BTextControl(BRect(10,50,420,65), "tfd2", "Adres", NULL, new BMessage(DC));
 	data[3] = new BTextControl(BRect(10,80,150,95), "tfd3", "Kod", NULL, new BMessage(DC));
 	data[4] = new BTextControl(BRect(160,80,420,95), "tfd4", "Miejscowość", NULL, new BMessage(DC));
 	data[5] = new BTextControl(BRect(10,110,200,125), "tfd5", "Tel.", NULL, new BMessage(DC));
 	data[6] = new BTextControl(BRect(210,110,420,125), "tfd6", "Email", NULL, new BMessage(DC));
-	box4->AddChild(data[0]); //box4->AddChild(data[1]);
+	box4->AddChild(data[0]);
 	box4->AddChild(data[2]);
 	box4->AddChild(data[3]); box4->AddChild(data[4]);
 	box4->AddChild(data[5]); box4->AddChild(data[6]);
@@ -194,7 +193,7 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	sqlQuery = "SELECT id, symbol FROM firma WHERE aktywny = 1 ORDER BY id";
 	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
-		// XXX Panic! empty vat table
+		// XXX Panic! empty table
 	} else {
 		symbolMenuItems = new BMenuItem*[nRows];
 		symbolIds = new int[nRows];
