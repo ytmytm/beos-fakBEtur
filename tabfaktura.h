@@ -7,7 +7,9 @@
 
 class BButton;
 class BListView;
+class BTab;
 class BTabView;
+class BView;
 
 class tabFaktura : public beFakTab {
 
@@ -16,6 +18,10 @@ class tabFaktura : public beFakTab {
 		~tabFaktura();
 //		void MessageReceived(BMessage *Message);
 	private:
+		BView *viewogol, *viewpozy;
+		BTab *tabogol, *tabpozy;
+		BTabView *tv2;
+
 		BButton *but_new, *but_del, *but_restore, *but_save;
 //		BButton *but_sell, *but_marza, *but_import;
 		BListView *list;

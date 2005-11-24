@@ -43,6 +43,22 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	this->view->AddChild(but_del);
 	this->view->AddChild(but_restore);
 	this->view->AddChild(but_save);
+
+	BTabView *tbv2 = new BTabView(BRect(180,0,790,500), "tftbv2");
+	this->view->AddChild(tbv2);
+	r = tbv2->Bounds();
+	r.InsetBy(5,5);
+	viewogol = new BView(r, "tfviewogol", B_FOLLOW_ALL_SIDES, 0);
+	viewogol->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	tabogol = new BTab(viewogol);
+	tbv2->AddTab(viewogol, tabogol);
+	tabogol->SetLabel("Dane ogólne");
+	viewpozy = new BView(r, "tfviewpozy", B_FOLLOW_ALL_SIDES, 0);
+	viewpozy->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	tabpozy = new BTab(viewpozy);
+	tbv2->AddTab(viewpozy, tabpozy);
+	tabpozy->SetLabel("Pozycje");
+//	views: 0,0,490,600
 }
 
 tabFaktura::~tabFaktura() {
