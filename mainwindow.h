@@ -38,7 +38,7 @@
 			BTabView *tabView;
 
 			// tabs
-			beFakTab *curTab, *tabs[2];
+			beFakTab *curTab, *tabs[3];
 
 			// database
 			sqlite *dbData;

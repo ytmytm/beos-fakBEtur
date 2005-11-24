@@ -259,3 +259,23 @@ const char *decround(const char *input) {
 	sprintf(out, "%i.%02i", z, g);
 	return out;
 }
+
+//----------------------
+
+fakturadat::fakturadat(sqlite *db) {
+	clear();
+	dbData = db;
+}
+
+void fakturadat::dump(void) {
+	printf("fakturadat: id=%i, implement rest\n", id);
+}
+
+void fakturadat::clear(void) {
+	id = -1;
+//	data[0] = data[1] = data[2] = data[3] = notatki = dodany = "";
+//	usluga = false;
+//	ceny[0] = ceny[1] = ceny[2] = ceny[3] = "";
+//	ceny[4] = "1.0"; ceny[5] = "";
+//	vatid = -1;
+}

@@ -7,6 +7,7 @@
 #include "mainwindow.h"
 #include "tabfirma.h"
 #include "tabtowar.h"
+#include "tabfaktura.h"
 
 #include <View.h>
 #include <Menu.h>
@@ -69,6 +70,7 @@ BeFAKMainWindow::~BeFAKMainWindow() {
 void BeFAKMainWindow::initTabs(BTabView *tv) {
 	tabs[0] = new tabFirma(tv, dbData);
 	tabs[1] = new tabTowar(tv, dbData);
+	tabs[2] = new tabFaktura(tv, dbData);
 }
 
 void BeFAKMainWindow::MessageReceived(BMessage *Message) {

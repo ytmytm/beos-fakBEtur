@@ -48,6 +48,21 @@
 			char *dbErrMsg;
 	};
 
+	class fakturadat {
+		public:
+			fakturadat(sqlite *db);
+			~fakturadat() { };
+			void dump(void);
+			void clear(void);
+			//
+		private:
+			// data holders
+			int id;
+			// data itself
+			sqlite *dbData;
+			char *dbErrMsg;
+	};
+
 	// helpers
 	int toint(const char *input);
 	const char *decround(const char *input);
