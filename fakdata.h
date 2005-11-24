@@ -54,10 +54,13 @@
 			~fakturadat() { };
 			void dump(void);
 			void clear(void);
-			//
-		private:
+			// data management
+			int generate_id(void);
+			int generate_pozid(void);
+			void del(void);
 			// data holders
 			int id;
+		private:
 			// data itself
 			sqlite *dbData;
 			char *dbErrMsg;

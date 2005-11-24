@@ -279,3 +279,37 @@ void fakturadat::clear(void) {
 //	ceny[4] = "1.0"; ceny[5] = "";
 //	vatid = -1;
 }
+
+int fakturadat::generate_id(void) {
+	int newid = 1;
+	int nRows, nCols;
+	char **result;
+	sqlite_get_table(dbData, "SELECT MAX(id) FROM faktura", &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows > 0) {
+		// there is something in db
+		newid = toint(result[1]) + 1;
+	}
+	sqlite_free_table(result);
+	return newid;
+}
+
+int fakturadat::generate_pozid(void) {
+	int newid = 1;
+	int nRows, nCols;
+	char **result;
+	sqlite_get_table(dbData, "SELECT MAX(id) FROM pozycjafakt", &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows > 0) {
+		// there is something in db
+		newid = toint(result[1]) + 1;
+	}
+	sqlite_free_table(result);
+	return newid;
+}
+
+void fakturadat::del(void) {
+	if (id>=0) {
+		sqlite_exec_printf(dbData, "DELETE FROM faktura WHERE id = %i", 0, 0, &dbErrMsg, id);
+		sqlite_exec_printf(dbData, "DELETE FROM pozycjafakt WHERE fakturaid = %i", 0, 0, &dbErrMsg, id);
+	}
+	clear();
+}
