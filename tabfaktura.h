@@ -19,13 +19,13 @@ class tabFaktura : public beFakTab {
 		tabFaktura(BTabView *tv, sqlite *db);
 		~tabFaktura();
 		void MessageReceived(BMessage *Message);
-//		void ChangedSelection(int newid);
+		void ChangedSelection(int newid);
 		//
-//		void DoCommitCurdata(void);
+		void DoCommitCurdata(void);
 		void DoDeleteCurdata(void);
-//		void DoFetchCurdata(void);
+		void DoFetchCurdata(void);
 		//
-//		void RefreshIndexList(void);
+		void RefreshIndexList(void);
 		//
 		// make a new one, fill defaults
 		void makeNewForm(void);

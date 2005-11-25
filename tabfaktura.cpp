@@ -1,13 +1,8 @@
 //
 // dopisać:
-//	curtotab
-//  tabtocur
-//  messagereceived (pozostałe)
-//  refreshlist
 // domyślnie podana nazwa: '##/miesiac/rok'
-// dowiązać widgety do danych
 //
-// wypełnić drugą kartę - lista, towary, podsumowanie?
+// wypełnić drugą kartę - lista, towary, podsumowanie? (label z numerem!)
 //	lista: tablica klas towardat
 // dodać trzecią kartę na notatki?
 // opcja faktury korygującej (jak? trzeba pamiętać co się zmieniło)
@@ -227,7 +222,7 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	box4->AddChild(menusymbolField);
 	makeNewForm();
 	updateTab();
-	//XXX RefreshIndexList();
+	RefreshIndexList();
 }
 
 tabFaktura::~tabFaktura() {
@@ -236,6 +231,7 @@ tabFaktura::~tabFaktura() {
 
 void tabFaktura::curdataFromTab(void) {
 	int i;
+	curdata->nazwa = nazwa->Text();
 	for (i=0;i<=9;i++)
 		curdata->ogol[i]=ogol[i]->Text();
 	for (i=0;i<=10;i++)
@@ -246,6 +242,7 @@ void tabFaktura::curdataFromTab(void) {
 
 void tabFaktura::curdataToTab(void) {
 	int i;
+	nazwa->SetText(curdata->nazwa.String());
 	for (i=0;i<=9;i++)
 		ogol[i]->SetText(curdata->ogol[i].String());
 	for (i=0;i<=10;i++)
@@ -268,6 +265,7 @@ void tabFaktura::updateTab(void) {
 
 void tabFaktura::makeNewForm(void) {
 	curdata->clear();
+	// XXX refresh symbolmenu
 	// XXX prepare new 'nazwa' for faktura
 	curdata->ogol[2] = execSQL("SELECT DATE('now')");
 	curdata->ogol[3] = execSQL("SELECT DATE('now')");
@@ -298,7 +296,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			}
 			break;
 		case BUT_RESTORE:
-//XXX			DoFetchCurdata();
+			DoFetchCurdata();
 			break;
 		case BUT_DEL:
 			DoDeleteCurdata();
@@ -307,6 +305,18 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			curdataFromTab();
 			DoCommitCurdata();
 			curdataToTab();
+			break;
+		case LIST_SEL:
+		case LIST_INV:
+//			printf("list selection/invoc\n");
+			i = list->CurrentSelection(0);
+//			printf("got:%i\n",i);
+			if (i>=0) {
+//				printf("sel:%i,id=%i\n",i,idlist[i]);
+				ChangedSelection(idlist[i]);
+			} else {
+				// XXX deselection? what to do???
+			}
 			break;
 		case MENUST:
 			if (Message->FindString("_st", &tmp) == B_OK) {
@@ -340,9 +350,68 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 	}
 }
 
+void tabFaktura::ChangedSelection(int newid) {
+	if (!(CommitCurdata())) {
+		// XXX do nothing if cancel, restore old selection?
+		return;
+	}
+	// fetch and store into new data
+	curdata->id = newid;
+	DoFetchCurdata();
+}
+
+void tabFaktura::DoCommitCurdata(void) {
+	// XXX perform all checks against supplied data
+	curdata->commit();
+	this->dirty = false;
+	RefreshIndexList();
+}
+
 void tabFaktura::DoDeleteCurdata(void) {
 // XXX ask for confimation?
 	curdata->del();
 	curdataToTab();
-//XXX	RefreshIndexList();
+	RefreshIndexList();
+}
+
+void tabFaktura::DoFetchCurdata(void) {
+	if (curdata->id >=0) {
+		curdata->fetch();
+		this->dirty = false;
+		curdataToTab();
+	}
+}
+
+void tabFaktura::RefreshIndexList(void) {
+	// clear current list
+	if (list->CountItems()>0) {
+		BStringItem *anItem;
+		for (int i=0; (anItem=(BStringItem*)list->ItemAt(i)); i++)
+			delete anItem;
+		if (!list->IsEmpty())
+			list->MakeEmpty();
+	}
+	// clear current idlist
+	if (idlist!=NULL) {
+		delete [] idlist;
+		idlist = NULL;
+	}
+	// select list from db
+	int nRows, nCols;
+	char **result;
+	char *dbErrMsg;
+	BString sqlQuery;
+	sqlQuery = "SELECT id, nazwa FROM faktura ORDER BY id";
+	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows < 1) {
+		// XXX database is empty, do sth about it?
+		printf("database is empty\n");
+	} else {
+		idlist = new int[nRows];
+		for (int i=1;i<=nRows;i++) {
+			idlist[i-1] = toint(result[i*nCols+0]);
+			list->AddItem(new BStringItem(result[i*nCols+1]));
+		}
+	}
+	sqlite_free_table(result);
 }
