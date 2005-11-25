@@ -27,11 +27,14 @@ class tabFaktura : public beFakTab {
 		//
 //		void RefreshIndexList(void);
 		//
+		// make a new one, fill defaults
+		void makeNewForm(void);
+		//
 		// update - enable/disable widgets, parse msg (combo items)
 		// curdataTo - read data from curtab to widgets, call update
 		// curdataFrom - read from widgets to curtab
-//		void curdataFromTab(void);
-//		void curdataToTab(void);
+		void curdataFromTab(void);
+		void curdataToTab(void);
 		void updateTab(void);
 	private:
 		BView *viewogol, *viewpozy;
