@@ -272,12 +272,15 @@ void fakturadat::dump(void) {
 }
 
 void fakturadat::clear(void) {
+	int i;
 	id = -1;
-//	data[0] = data[1] = data[2] = data[3] = notatki = dodany = "";
-//	usluga = false;
-//	ceny[0] = ceny[1] = ceny[2] = ceny[3] = "";
-//	ceny[4] = "1.0"; ceny[5] = "";
-//	vatid = -1;
+	for (i=0;i<=9;i++)
+		ogol[i] = "";
+	for (i=0;i<=10;i++)
+		odata[i] = "";
+	zaplacono = false;
+	/// XXX
+	/// ustawiac date sprzedazy/wystawienia/numer faktury tutaj?
 }
 
 int fakturadat::generate_id(void) {

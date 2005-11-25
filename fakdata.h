@@ -60,6 +60,9 @@
 			void del(void);
 			// data holders
 			int id;
+			// data itself
+			BString ogol[10], odata[11];
+			bool zaplacono;
 		private:
 			// data itself
 			sqlite *dbData;
