@@ -324,12 +324,14 @@ void tabTowar::MessageReceived(BMessage *Message) {
 				data[3]->SetText(tmp);
 				this->dirty = true;
 			}
+			break;
 		case MENUVAT:
 			this->dirty = true;
 			if (Message->FindInt32("_vatid", &item) == B_OK) {
 				curdata->vatid = item;
 			}
 			updateTab();
+			break;
 	}
 }
 
