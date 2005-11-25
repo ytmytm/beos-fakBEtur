@@ -2,9 +2,9 @@
 // dopisać:
 // domyślnie podana nazwa: '##/miesiac/rok'
 //
-// wypełnić drugą kartę - lista, towary, podsumowanie? (label z numerem!)
+// druga karta - label z numerem? (może na tytuł okna?)
 //	lista: tablica klas towardat
-// dodać trzecią kartę na notatki?
+// wyrzucić uwagi i zastąpić całym podsumowaniem? podsumowanie na 3 karcie?
 // opcja faktury korygującej (jak? trzeba pamiętać co się zmieniło)
 //
 
@@ -20,8 +20,10 @@
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <ScrollView.h>
+#include <StringView.h>
 #include <TabView.h>
 #include <TextControl.h>
+#include <TextView.h>
 
 #include <stdio.h>
 
@@ -39,8 +41,18 @@ const uint32 MENUFP		= 'TFMF';
 const uint32 MENUFSYM	= 'TFMY';
 const uint32 TERMCHANGE	= 'TFCT';
 
+const uint32 DCT		= 'TFDD';
+const uint32 BUT_PSAVE	= 'TFB0';
+const uint32 BUT_PIMPORT= 'TFB1';
+const uint32 BUT_PDEL	= 'TFB2';
+const uint32 MENUTSYM	= 'TFMT';
+const uint32 MENUVAT	= 'TFMV';
+const uint32 MENUJM		= 'TFMJ';
+
 const char *stransportu[] = { "własny sprzedawcy", "własny odbiorcy", NULL };
 const char *fplatnosci[] = { "gotówką", "przelewem", "czekiem", "kartą płatniczą", "kartą kredytową", NULL };
+extern const char *jmiary[];
+
 
 tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 
@@ -83,6 +95,19 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	tabpozy = new BTab(viewpozy);
 	tbv2->AddTab(viewpozy, tabpozy);
 	tabpozy->SetLabel("Pozycje");
+
+	initTab1();
+	initTab2();
+	makeNewForm();
+	updateTab();
+	RefreshIndexList();
+}
+
+tabFaktura::~tabFaktura() {
+
+}
+
+void tabFaktura::initTab1(void) {
 //	views: 0,0,490,600
 	nazwa = new BTextControl(BRect(10,10,300,30), "tfna", "Nr faktury", NULL, new BMessage(DC));
 	viewogol->AddChild(nazwa);
@@ -180,6 +205,7 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	box4->AddChild(data[2]);
 	box4->AddChild(data[3]); box4->AddChild(data[4]);
 	box4->AddChild(data[5]); box4->AddChild(data[6]);
+	BRect r;
 	r.top = 140; r.bottom = 155; r.left = 10, r.right = 420;
 	data[7] = new BTextControl(r, "tfd7", "NIP", NULL, new BMessage(DC)); r.OffsetBy(0, 25);
 	data[8] = new BTextControl(r, "tfd8", "REGON", NULL, new BMessage(DC)); r.OffsetBy(0, 25);
@@ -220,13 +246,126 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	BMenuField *menusymbolField = new BMenuField(BRect(280,15,420,35), "tfmsymbol", "Symbol", menusymbol);
 	menusymbolField->SetDivider(be_plain_font->StringWidth(menusymbolField->Label())+15);
 	box4->AddChild(menusymbolField);
-	makeNewForm();
-	updateTab();
-	RefreshIndexList();
 }
 
-tabFaktura::~tabFaktura() {
-
+void tabFaktura::initTab2(void) {
+	BMessage *msg;
+	// box5
+	box5 = new BBox(BRect(10,10,590,350),"tfbox5");
+	box5->SetLabel("Pozycje");
+	viewpozy->AddChild(box5);
+	// box5-stuff
+	viewtable = new BView(BRect(10,20,560,160), "tableview", B_FOLLOW_ALL_SIDES, 0);
+//	viewtable->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	box5->AddChild(new BScrollView("ftablescroll", viewtable, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, true));
+	// box6
+	box6 = new BBox(BRect(10,170,570,250), "tfbox6");
+	box6->SetLabel("Nowa pozycja");
+	box5->AddChild(box6);
+	// box6-stuff
+	towar[0] = new BTextControl(BRect(10,15,190,35), "tftowar0", "Nazwa", NULL, new BMessage(DCT));
+	towar[1] = new BTextControl(BRect(310,15,460,35), "tftowar1", "PKWiU", NULL, new BMessage(DCT));
+	towar[2] = new BTextControl(BRect(10,45,190,65), "tftowar2", "Cena netto (zł)", NULL, new BMessage(DCT));
+	towar[3] = new BTextControl(BRect(200,45,290,65), "tftowar3", "Rabat (%)", NULL, new BMessage(DCT));
+	towar[4] = new BTextControl(BRect(300,45,430,65), "tftowar4", "Ilość", NULL, new BMessage(DCT));
+	towar[5] = new BTextControl(BRect(440,45,500,65), "tftowar5", "jm", NULL, new BMessage(DCT));
+	box6->AddChild(towar[0]); box6->AddChild(towar[1]);
+	box6->AddChild(towar[2]); box6->AddChild(towar[3]);
+	box6->AddChild(towar[4]); box6->AddChild(towar[5]);
+	// towar-symbole
+	BPopUpMenu *tmenusymbol = new BPopUpMenu("[wybierz]");
+	int nRows, nCols;
+	char **result;
+	BString sqlQuery;
+	sqlQuery = "SELECT id, symbol FROM towar ORDER BY id";
+	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows < 1) {
+		// XXX Panic! empty table
+	} else {
+		tsymbolMenuItems = new BMenuItem*[nRows];
+		tsymbolIds = new int[nRows];
+		tsymbolRows = nRows;
+		for (int i=1;i<=nRows;i++) {
+			msg = new BMessage(MENUTSYM);
+			msg->AddInt32("_towarid", toint(result[i*nCols+0]));
+			tsymbolIds[i-1] = toint(result[i*nCols+0]);
+			tsymbolMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
+			tmenusymbol->AddItem(tsymbolMenuItems[i-1]);
+		}
+	}
+	BMenuField *tmenusymbolField = new BMenuField(BRect(200,15,300,35), "tfmtsymbol", "Symb.", tmenusymbol);
+	tmenusymbolField->SetDivider(be_plain_font->StringWidth(tmenusymbolField->Label())+15);
+	box6->AddChild(tmenusymbolField);
+	// vat-menu
+	BPopUpMenu *menuvat = new BPopUpMenu("[wybierz]");
+	sqlQuery = "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id";
+	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows < 1) {
+		// XXX Panic! empty vat table
+	} else {
+		vatMenuItems = new BMenuItem*[nRows];
+		vatIds = new int[nRows];
+		vatRows = nRows;
+		for (int i=1;i<=nRows;i++) {
+			msg = new BMessage(MENUVAT);
+			msg->AddInt32("_vatid", toint(result[i*nCols+0]));
+			vatIds[i-1] = toint(result[i*nCols+0]);
+			vatMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
+			menuvat->AddItem(vatMenuItems[i-1]);
+		}
+	}
+	BMenuField *menuvatField = new BMenuField(BRect(470,15,555,35), "tfmv", "VAT", menuvat);
+	menuvatField->SetDivider(be_plain_font->StringWidth(menuvatField->Label())+15);
+	box6->AddChild(menuvatField);
+	// jm-menu
+	BMenu *menujm = new BMenu("");
+	int j=0;
+	while (jmiary[j] != NULL) {
+		msg = new BMessage(MENUJM); msg->AddString("_jm",jmiary[j]);
+		menujm->AddItem(new BMenuItem(jmiary[j], msg));
+		j++;
+	}
+	BMenuField *menujmField = new BMenuField(BRect(505,45,555,65), "tfmf", NULL, menujm);
+	box6->AddChild(menujmField);
+	// box5-stuff-cont
+	but_psave = new BButton(BRect(10,260,70,290), "tf_but_psave", "Zapisz", new BMessage(BUT_PSAVE));
+	but_pimport = new BButton(BRect(400,260,480,290), "tf_but_pimport", "Import z innej", new BMessage(BUT_PIMPORT));
+	but_pdel = new BButton(BRect(490,260,560,290), "tf_but_pdel", "Usuń", new BMessage(BUT_PDEL));
+	box5->AddChild(but_psave);
+	box5->AddChild(but_pimport);
+	box5->AddChild(but_pdel);
+	BRect r, s;
+	r.left = 10; r.right = 100; r.top = 290; r.bottom = 310;
+	s = r; s.OffsetBy(0,20);
+	box5->AddChild(new BStringView(r, "tf_ss0", "Cena jednostkowa")); r.OffsetBy(100,0);
+	box5->AddChild(new BStringView(r, "tf_ss1", "Cena brutto")); r.OffsetBy(80,0);
+	box5->AddChild(new BStringView(r, "tf_ss2", "Ilość")); r.OffsetBy(80,0);
+	box5->AddChild(new BStringView(r, "tf_ss3", "Wartość netto")); r.OffsetBy(80,0);
+	box5->AddChild(new BStringView(r, "tf_ss4", "Kwota VAT")); r.OffsetBy(80,0);
+	box5->AddChild(new BStringView(r, "tf_ss5", "Wartość brutto"));
+	for (j=0;j<=5;j++) {
+		suma[j] = new BStringView(s, NULL, "???");
+		box5->AddChild(suma[j]);
+		if (j==0)
+			s.OffsetBy(100,0);
+		else
+			s.OffsetBy(80,0);
+	}
+	// box7
+	box7 = new BBox(BRect(10,360,590,450), "tfbox7");
+	box7->SetLabel("Uwagi");
+	viewpozy->AddChild(box7);
+	// box7-stuff
+	r = box7->Bounds();
+	r.InsetBy(10,15);
+	s = r; s.OffsetTo(0,0);
+	uwagi = new BTextView(r, "tfuwagi", s, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
+	box7->AddChild(uwagi);
+	// fix widths
+	towar[0]->SetDivider(50);
+	towar[1]->SetDivider(50);
+	towar[2]->SetDivider(90);
+	towar[4]->SetDivider(30);
 }
 
 void tabFaktura::curdataFromTab(void) {
