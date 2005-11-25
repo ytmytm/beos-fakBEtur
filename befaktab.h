@@ -24,6 +24,7 @@ class beFakTab {
 
 		const char *execSQL(const char *input);
 		const char *validateDecimal(const char *input);
+		const char *validateDate(const char *input);
 
 		BView *view;
 		BTab *tab;

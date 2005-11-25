@@ -58,6 +58,14 @@ const char *beFakTab::validateDecimal(const char *input) {
 	return decround(execSQL(sql.String()));
 }
 
+const char *beFakTab::validateDate(const char *input) {
+	static BString res;
+	/// XXX implement!
+	/// check for 'YYYY-MM-DD', if missing put '01' or '01-01'
+	res = input;
+	return res.String();
+}
+
 // if returns false -> cancel action and resume editing current data
 bool beFakTab::CommitCurdata(bool haveCancelButton = true) {
 	// ask if commit data from current object into database
