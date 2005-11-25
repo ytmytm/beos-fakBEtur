@@ -7,8 +7,11 @@
 // pole 'usługa' - związane tylko z magazynem
 // kontrola wypełnienia wymaganych pól (cena, vat, itd.) - czy są i czym są
 //    (wszystko w DoCommitCurdata)
+// TODO:
 // blokada: DoCommitCurdata powinno zwracać wartość do Commit, aby móc anulować
 // zmianę pozycji (cur-dirty, zmiana na liście)
+// bug: uruchomienie i zamknięcie daje segv, wystarczy kliknąć na listę aby
+//		zamknięcie poszło czysto
 
 #include "globals.h"
 #include "tabtowar.h"
