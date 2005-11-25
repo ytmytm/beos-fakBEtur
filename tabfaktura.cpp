@@ -1,3 +1,17 @@
+//
+// dopisać:
+//	curtotab
+//  tabtocur
+//  messagereceived (pozostałe)
+//  refreshlist
+// domyślnie podana nazwa: '##/miesiac/rok'
+// dowiązać widgety do danych
+//
+// wypełnić drugą kartę - lista, towary, podsumowanie?
+//	lista: tablica klas towardat
+// dodać trzecią kartę na notatki?
+// opcja faktury korygującej (jak? trzeba pamiętać co się zmieniło)
+//
 
 #include "globals.h"
 #include "tabfaktura.h"
@@ -28,6 +42,7 @@ const uint32 CBUT		= 'TFCB';
 const uint32 MENUST		= 'TFMS';
 const uint32 MENUFP		= 'TFMF';
 const uint32 MENUFSYM	= 'TFMY';
+const uint32 TERMCHANGE	= 'TFCT';
 
 const char *stransportu[] = { "własny sprzedawcy", "własny odbiorcy", NULL };
 const char *fplatnosci[] = { "gotówką", "przelewem", "czekiem", "kartą płatniczą", "kartą kredytową", NULL };
@@ -36,6 +51,7 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 
 	idlist = NULL;
 	curdata = new fakturadat(db);
+	odbiorca = new firmadat(db);
 	this->dirty = false;
 
 	this->tab->SetLabel("Faktury");
@@ -90,6 +106,10 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	box1->AddChild(ogol[2]);
 	box1->AddChild(ogol[3]);
 	box1->AddChild(ogol[4]);
+	//XXX these defaults should go to BUT_NEW handler, called upon start!
+	ogol[2]->SetText(execSQL("SELECT DATE('now')"));
+	ogol[3]->SetText(execSQL("SELECT DATE('now')"));
+	//XXX
 	BMessage *msg;
 	msg = new BMessage(CBUT);
 	msg->AddInt32("_butnum", 0);
@@ -119,10 +139,17 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	// box2-stuff
 	ogol[5] = new BTextControl(BRect(10,10,150,30), "tfd5", "Forma", NULL, new BMessage(DC));
 	ogol[6] = new BTextControl(BRect(10,40,150,60), "tfd6", "Termin", NULL, new BMessage(DC));
-	ogol[7] = new BTextControl(BRect(200,40,270,60), "tfd7", "Dni", NULL, new BMessage(DC));
+	ogol[7] = new BTextControl(BRect(200,40,270,60), "tfd7", "Dni", "30", new BMessage(TERMCHANGE));
 	box2->AddChild(ogol[5]);
 	box2->AddChild(ogol[6]);
 	box2->AddChild(ogol[7]);
+	// XXX this is in TERMCHANGE handler
+	BString tmp;
+	tmp = "SELECT DATE('now', '0";
+	tmp << ogol[7]->Text();
+	tmp += " days')";
+	ogol[6]->SetText(execSQL(tmp.String()));
+	// XXX
 	ogol[5]->SetDivider(50); ogol[6]->SetDivider(50); ogol[7]->SetDivider(20);
 	// box2-menu
 	BMenu *menufp = new BMenu("");
@@ -209,10 +236,86 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	BMenuField *menusymbolField = new BMenuField(BRect(280,15,420,35), "tfmsymbol", "Symbol", menusymbol);
 	menusymbolField->SetDivider(be_plain_font->StringWidth(menusymbolField->Label())+15);
 	box4->AddChild(menusymbolField);
-	// updateTab();
-	// RefreshIndexList();
+	updateTab();
+	//XXX RefreshIndexList();
 }
 
 tabFaktura::~tabFaktura() {
 
+}
+
+void tabFaktura::updateTab(void) {
+	bool state = (cbzaplacono->Value() == B_CONTROL_ON);
+	ogol[8]->SetEnabled(state);
+	ogol[9]->SetEnabled(state);
+	cbut[3]->SetEnabled(state);
+}
+
+void tabFaktura::MessageReceived(BMessage *Message) {
+	int i;
+	int32 item;
+	const char *tmp;
+	BString result,sql;
+
+	switch (Message->what) {
+		case DC:
+			this->dirty = true;
+			updateTab();
+			break;
+		case BUT_NEW:
+			if (CommitCurdata()) {
+				// clear curdata
+				curdata->clear();
+				// refresh tabs
+//XXX				curdataToTab();
+			}
+			break;
+		case BUT_RESTORE:
+//XXX			DoFetchCurdata();
+			break;
+		case BUT_DEL:
+			DoDeleteCurdata();
+			break;
+		case BUT_SAVE:
+//XXX			curdataFromTab();
+			DoCommitCurdata();
+//XXX			curdataToTab();
+			break;
+		case MENUST:
+			if (Message->FindString("_st", &tmp) == B_OK) {
+				ogol[4]->SetText(tmp);
+				this->dirty = true;
+			}
+			break;
+		case MENUFP:
+			if (Message->FindString("_fp", &tmp) == B_OK) {
+				ogol[5]->SetText(tmp);
+				this->dirty = true;
+			}
+			break;
+		case MENUFSYM:
+			if (Message->FindInt32("_firmaid", &item) == B_OK) {
+				odbiorca->id = item;
+				odbiorca->fetch();
+				for (i=0;i<=10;i++) {
+					if (i!=1)
+						data[i]->SetText(odbiorca->data[i].String());
+				}
+				this->dirty = true;
+			}
+			break;
+		case TERMCHANGE:
+			sql = "SELECT DATE('now', '0";
+			sql << ogol[7]->Text();
+			sql += " days')";
+			ogol[6]->SetText(execSQL(sql.String()));
+			break;
+	}
+}
+
+void tabFaktura::DoDeleteCurdata(void) {
+// XXX ask for confimation?
+	curdata->del();
+//XXX	curdataToTab();
+//XXX	RefreshIndexList();
 }
