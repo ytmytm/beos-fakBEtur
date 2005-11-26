@@ -10,10 +10,11 @@
 // obliczanie kwoty podatku:
 //	kwota vat: stawka*ilość*cenanetto czy wbrutto-wnetto? cf = to drugie: roznica
 //  dane przykładowe:
-// bazowa: 3.11, rabat 3 -> jednost. 3.02, vat 3 -> brutto 3.11, ilosc 1.04
-// w.netto 3.14, w.brutto 3.23
-// w.brutto = round(ilość*c.brutto) = round(ilość*round(c.netto*stawka)) = 3.23
-// w.brutto = round(stawka*ilość*c.netto) = 3.24 (3.235)
+// c.netto 3.02, vat 3 -> c.brutto 3.11
+// ilosc 1.04 -> w.netto 3.14, w.brutto 3.23
+// 1. jest poprawny? (spytać A. D.)
+// 1. w.brutto = round(ilość*c.brutto) = round(ilość*round(c.netto*stawka)) = 3.23
+// 2. w.brutto = round(stawka*ilość*c.netto) = 3.24 (3.235)
 //
 // testy przy dodawaniu towaru:
 // - towar o tej nazwie już jest
