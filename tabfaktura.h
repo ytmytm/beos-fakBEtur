@@ -39,6 +39,7 @@ class tabFaktura : public beFakTab {
 		void curdataFromTab(void);
 		void curdataToTab(void);
 		void updateTab(void);
+		void updateTab2(void);
 	private:
 		void initTab1(void);
 		void initTab2(void);
@@ -54,7 +55,7 @@ class tabFaktura : public beFakTab {
 
 		BTextControl *nazwa;
 		BTextControl *ogol[10], *data[11], *towar[6];
-		BStringView *suma[7];
+		BStringView *suma[6];
 		BTextView *uwagi;
 		BButton *cbut[5];
 		BCheckBox *cbzaplacono;
@@ -63,11 +64,15 @@ class tabFaktura : public beFakTab {
 		int *symbolIds, symbolRows;
 		BMenuItem **tsymbolMenuItems;
 		int *tsymbolIds, tsymbolRows;
+
+		BPopUpMenu *menuvat;
 		BMenuItem **vatMenuItems;
 		int *vatIds, vatRows;
+		int curtowarvatid;
 
 		firmadat *odbiorca;
 		fakturadat *curdata;
+		towardat *curtowar;
 		int *idlist;
 
 };

@@ -59,6 +59,8 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	idlist = NULL;
 	curdata = new fakturadat(db);
 	odbiorca = new firmadat(db);
+	curtowar = new towardat(db);
+	curtowarvatid = -1;
 	this->dirty = false;
 
 	this->tab->SetLabel("Faktury");
@@ -297,7 +299,7 @@ void tabFaktura::initTab2(void) {
 	tmenusymbolField->SetDivider(be_plain_font->StringWidth(tmenusymbolField->Label())+15);
 	box6->AddChild(tmenusymbolField);
 	// vat-menu
-	BPopUpMenu *menuvat = new BPopUpMenu("[wybierz]");
+	menuvat = new BPopUpMenu("[wybierz]");
 	sqlQuery = "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id";
 	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
@@ -402,6 +404,45 @@ void tabFaktura::updateTab(void) {
 	ogol[9]->SetText(validateDate(ogol[9]->Text()));
 }
 
+void tabFaktura::updateTab2(void) {
+	int i;
+	for (i=0;i<vatRows;i++) {
+		vatMenuItems[i]->SetMarked((vatIds[i] == curtowarvatid));
+	}
+	if (curtowarvatid < 0) {
+		menuvat->Superitem()->SetLabel("[wybierz]");
+		return;
+	}
+	// validate numeric fields
+	towar[2]->SetText(validateDecimal(towar[2]->Text()));
+	towar[3]->SetText(validateDecimal(towar[3]->Text()));
+	towar[4]->SetText(validateDecimal(towar[4]->Text()));
+	// calculate data for summary suma[]
+	BString sql, cnetto, cbrutto;
+	sql = "SELECT 0"; sql += towar[2]->Text();
+	sql += "*(100-0"; sql += towar[3]->Text(); sql += ")/100.0";
+	cnetto = decround(execSQL(sql.String())); // jednostkowa
+	suma[0]->SetText(cnetto.String());
+	sql = "SELECT 0"; sql += cnetto; sql +="*(100+stawka)/100.0 FROM stawka_vat WHERE id = ";
+	sql << curtowarvatid;
+	cbrutto = decround(execSQL(sql.String())); // brutto
+	suma[1]->SetText(cbrutto.String());
+	suma[2]->SetText(towar[4]->Text());
+	sql = "SELECT 0"; sql += cnetto; sql += "*0"; sql += towar[4]->Text();
+	suma[3]->SetText(decround(execSQL(sql.String())));
+	sql = "SELECT 0"; sql += cbrutto; sql += "*0"; sql += towar[4]->Text();
+	suma[5]->SetText(decround(execSQL(sql.String())));
+//	kwota vat: stawka*ilość*cenanetto czy wbrutto-wnetto?
+//  kiedy zaokrąglać? na końcu, czy już przy liczeniu brutto?
+	sql = "SELECT 0"; sql += suma[5]->Text(); sql += "-0"; sql += suma[3]->Text();
+	printf("-- = %s\n", decround(execSQL(sql.String())));
+	sql = "SELECT 0"; sql += towar[4]->Text(); sql += "*0"; sql += towar[2]->Text();
+	sql += "*stawka/100.0 FROM stawka_vat WHERE id = ";
+	sql << curtowarvatid;
+	printf("** = %s\n", decround(execSQL(sql.String())));
+
+}
+
 void tabFaktura::makeNewForm(void) {
 	curdata->clear();
 	// XXX refresh symbolmenu
@@ -485,6 +526,38 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			sql << ogol[7]->Text();
 			sql += " days')";
 			ogol[6]->SetText(execSQL(sql.String()));
+			break;
+// from tab2
+		case DCT:
+			this->dirty = true;
+			updateTab2();
+			break;
+		case MENUTSYM:
+			if (Message->FindInt32("_towarid", &item) == B_OK) {
+				curtowar->id = item;
+				curtowar->fetch();
+				towar[0]->SetText(curtowar->data[0].String());
+				towar[1]->SetText(curtowar->data[2].String());
+				towar[2]->SetText(curtowar->ceny[0].String());
+				towar[3]->SetText(curtowar->ceny[3].String());
+				towar[4]->SetText("0");
+				towar[5]->SetText(curtowar->data[3].String());
+				curtowarvatid = curtowar->vatid;
+				updateTab2();
+				this->dirty = true;
+			}
+		case MENUJM:
+			if (Message->FindString("_jm", &tmp) == B_OK) {
+				towar[5]->SetText(tmp);
+				this->dirty = true;
+			}
+			break;
+		case MENUVAT:
+			this->dirty = true;
+			if (Message->FindInt32("_vatid", &item) == B_OK) {
+				curtowarvatid = item;
+			}
+			updateTab2();
 			break;
 	}
 }
