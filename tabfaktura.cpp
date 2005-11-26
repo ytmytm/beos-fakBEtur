@@ -1,12 +1,25 @@
 //
 // dopisać:
-// domyślnie podana nazwa: '##/miesiac/rok'
+// domyślnie podawana nazwa: '##/miesiac/rok'
 //
 // druga karta - label z numerem? (może na tytuł okna?)
 //	lista: tablica klas towardat
 // wyrzucić uwagi i zastąpić całym podsumowaniem? podsumowanie na 3 karcie?
 // opcja faktury korygującej (jak? trzeba pamiętać co się zmieniło)
 //
+// obliczanie kwoty podatku:
+//	kwota vat: stawka*ilość*cenanetto czy wbrutto-wnetto? cf = to drugie: roznica
+//  dane przykładowe:
+// bazowa: 3.11, rabat 3 -> jednost. 3.02, vat 3 -> brutto 3.11, ilosc 1.04
+// w.netto 3.14, w.brutto 3.23
+// w.brutto = round(ilość*c.brutto) = round(ilość*round(c.netto*stawka)) = 3.23
+// w.brutto = round(stawka*ilość*c.netto) = 3.24 (3.235)
+//
+// testy przy dodawaniu towaru:
+// - towar o tej nazwie już jest
+// - czy dodać to do bazy towarów?
+// - ilość/cena wynosi 0
+// - nazwa, pkwiu, jm, stawka - nie wpisane
 
 #include "globals.h"
 #include "tabfaktura.h"
@@ -432,15 +445,12 @@ void tabFaktura::updateTab2(void) {
 	suma[3]->SetText(decround(execSQL(sql.String())));
 	sql = "SELECT 0"; sql += cbrutto; sql += "*0"; sql += towar[4]->Text();
 	suma[5]->SetText(decround(execSQL(sql.String())));
-//	kwota vat: stawka*ilość*cenanetto czy wbrutto-wnetto?
-//  kiedy zaokrąglać? na końcu, czy już przy liczeniu brutto?
 	sql = "SELECT 0"; sql += suma[5]->Text(); sql += "-0"; sql += suma[3]->Text();
-	printf("-- = %s\n", decround(execSQL(sql.String())));
-	sql = "SELECT 0"; sql += towar[4]->Text(); sql += "*0"; sql += towar[2]->Text();
-	sql += "*stawka/100.0 FROM stawka_vat WHERE id = ";
-	sql << curtowarvatid;
-	printf("** = %s\n", decround(execSQL(sql.String())));
-
+//  XXX alternative way, ask A. Dragun for clarification
+//	sql = "SELECT 0"; sql += towar[4]->Text(); sql += "*0"; sql += towar[2]->Text();
+//	sql += "*stawka/100.0 FROM stawka_vat WHERE id = ";
+//	sql << curtowarvatid;
+	suma[4]->SetText(decround(execSQL(sql.String())));
 }
 
 void tabFaktura::makeNewForm(void) {
