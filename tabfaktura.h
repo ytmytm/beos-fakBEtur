@@ -31,9 +31,11 @@ class tabFaktura : public beFakTab {
 		void DoFetchCurdata(void);
 		//
 		void RefreshIndexList(void);
+		void RefreshTowarList(void);
 		//
 		// make a new one, fill defaults
 		void makeNewForm(void);
+		void makeNewTowar(void);
 		//
 		// update - enable/disable widgets, parse msg (combo items)
 		// curdataTo - read data from curtab to widgets, call update
@@ -61,6 +63,7 @@ class tabFaktura : public beFakTab {
 		BTextView *uwagi;
 		BButton *cbut[5];
 		BCheckBox *cbzaplacono;
+		BListView *pozcolumn[11];	// columns
 
 		BMenuItem **symbolMenuItems;
 		int *symbolIds, symbolRows;
@@ -79,6 +82,8 @@ class tabFaktura : public beFakTab {
 		int *idlist;
 		int towarmark;
 
+		// to control many lists
+		int lasttowarsel;
 };
 
 class pozfakdata {
@@ -90,6 +95,7 @@ class pozfakdata {
 	BString data[12];
 	// lp, nazwa, pkwiu, ilosc, jm, rabat, cena jednostkowa, w.netto, vat,
 	// w.vat, w.brutto
+	int vatid;	// odp. stawce vat, być może zamiast w/w
 
 };
 

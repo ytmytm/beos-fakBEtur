@@ -23,11 +23,8 @@
 // - nazwa, pkwiu, jm, stawka - nie wpisane
 //
 // init listy
-// dodanie towaru do listy:
-// - addafter(zaznaczony), jeśli zaznaczony==-1 (brak zaznaczenia, to addlast)
+// zaznaczenie - przepisanie danych na dół, zaznaczenie wszystkich w wierszu
 // usunięcie - remove(zaznaczony)
-//
-// dump w scrollview
 //
 
 #include "globals.h"
@@ -70,11 +67,14 @@ const uint32 BUT_PDEL	= 'TFB2';
 const uint32 MENUTSYM	= 'TFMT';
 const uint32 MENUVAT	= 'TFMV';
 const uint32 MENUJM		= 'TFMJ';
+const uint32 PLIST_INV	= 'TFPI';
+const uint32 PLIST_SEL	= 'TFPS';
 
 const char *stransportu[] = { "własny sprzedawcy", "własny odbiorcy", NULL };
 const char *fplatnosci[] = { "gotówką", "przelewem", "czekiem", "kartą płatniczą", "kartą kredytową", NULL };
 extern const char *jmiary[];
-
+const char *plisthead[] = { "Lp", "Nazwa", "PKWiU", "Ilość", "Jm", "Rabat (%)", "Cena jedn.", "W. netto", "VAT", "W. VAT", "W. brutto", NULL };
+const int plistw[] = { 20, 90, 60, 40, 20, 50, 70, 70, 30, 60, 100, -1 };
 
 tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 
@@ -86,6 +86,8 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	curtowarvatid = -1;
 	towarmark = -1;
 	this->dirty = false;
+
+	lasttowarsel = -1;
 
 	this->tab->SetLabel("Faktury");
 	BRect r;
@@ -275,7 +277,9 @@ void tabFaktura::initTab1(void) {
 }
 
 void tabFaktura::initTab2(void) {
+	BRect r, s;
 	BMessage *msg;
+	int i;
 	// box5
 	box5 = new BBox(BRect(10,10,590,350),"tfbox5");
 	box5->SetLabel("Pozycje");
@@ -283,6 +287,16 @@ void tabFaktura::initTab2(void) {
 	// box5-stuff
 	viewtable = new BView(BRect(10,20,560,160), "tableview", B_FOLLOW_ALL_SIDES, 0);
 //	viewtable->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	r = viewtable->Bounds();
+	r.right = plistw[0];
+	for (i=0;i<=10;i++) {
+		pozcolumn[i] = new BListView(r, NULL);
+		pozcolumn[i]->SetInvocationMessage(new BMessage(PLIST_INV));
+		pozcolumn[i]->SetSelectionMessage(new BMessage(PLIST_SEL));
+		viewtable->AddChild(pozcolumn[i]);
+		r.OffsetBy(plistw[i],0);
+		r.right = r.left + plistw[i+1];
+	}
 	box5->AddChild(new BScrollView("ftablescroll", viewtable, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, true));
 	// box6
 	box6 = new BBox(BRect(10,170,570,250), "tfbox6");
@@ -360,7 +374,7 @@ void tabFaktura::initTab2(void) {
 	box5->AddChild(but_psave);
 	box5->AddChild(but_pimport);
 	box5->AddChild(but_pdel);
-	BRect r, s;
+
 	r.left = 10; r.right = 100; r.top = 290; r.bottom = 310;
 	s = r; s.OffsetBy(0,20);
 	box5->AddChild(new BStringView(r, "tf_ss0", "Cena jednostkowa")); r.OffsetBy(100,0);
@@ -392,6 +406,7 @@ void tabFaktura::initTab2(void) {
 	towar[1]->SetDivider(50);
 	towar[2]->SetDivider(90);
 	towar[4]->SetDivider(30);
+	RefreshTowarList();
 }
 
 void tabFaktura::curdataFromTab(void) {
@@ -477,7 +492,22 @@ void tabFaktura::makeNewForm(void) {
 	tmp << curdata->ogol[7].String();
 	tmp += " days')";
 	curdata->ogol[6] = execSQL(tmp.String());
+	uwagi->SetText("");
+	cbzaplacono->SetValue(B_CONTROL_OFF);
 	curdataToTab();
+}
+
+void tabFaktura::makeNewTowar(void) {
+	int i;
+	// XXX clear symbolmenu
+	for (i=0;i<=5;i++)
+		towar[i]->SetText("");
+	for (i=0;i<=5;i++)
+		suma[i]->SetText("");
+	curtowarvatid = -1;
+	// XXX un-mark list
+	towarmark = -1;
+	updateTab2();
 }
 
 void tabFaktura::MessageReceived(BMessage *Message) {
@@ -597,18 +627,54 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 					newdata->data[6] = suma[0]->Text();		// cena jedn. (po rabacie)
 					newdata->data[7] = suma[3]->Text();		// w.netto
 //					newdata->data[8] = "xx%"				// stawka vat
+					newdata->vatid = curtowarvatid;
 					newdata->data[9] = suma[4]->Text();		// kwota vat
 					newdata->data[10] = suma[5]->Text();	// w.brutto
 					sql = "SELECT stawka FROM stawka_vat WHERE id = "; sql << curtowarvatid;
 					newdata->data[8] = execSQL(sql.String());
 					// dodaj do listy
 					faklista->addlast(newdata);
+					// nowy towar, wyczyść pola
+					makeNewTowar();
 				}
 				// update listy
 				faklista->setlp();
 				// XXX update visuala
 				faklista->dump();
-				// XXX zrób NEWTOWAR, wyczyść TOWARMARK
+				RefreshTowarList();
+				break;
+			}
+		case PLIST_SEL:
+		case PLIST_INV:
+			{	int j;
+				void *ptr;
+				BListView *plist;
+
+					i = -1;
+					if (Message->FindPointer("source", &ptr) == B_OK) {
+						plist = static_cast<BListView*>(ptr);
+						i = plist->CurrentSelection(0);
+					}
+					if (i>=0) {
+//				printf("sel:%i,id=%i\n",i,idlist[i]);
+// XXX zmiana selekcji towaru!	ChangedSelection(idlist[i]);
+					}
+					if (i != lasttowarsel) {
+						lasttowarsel = i;
+						printf("newsel:%i\n",i);
+						if (lasttowarsel != 0) {
+							for (j=0; j<=10; j++) {
+								pozcolumn[j]->Select(i);
+								pozcolumn[j]->ScrollToSelection();
+							}
+						} else {
+							for (j=0; j<=10; j++) {
+								pozcolumn[j]->Select(0);
+								pozcolumn[j]->ScrollToSelection();
+								pozcolumn[j]->DeselectAll();
+							}
+						}
+					}
 				break;
 			}
 	}
@@ -678,6 +744,40 @@ void tabFaktura::RefreshIndexList(void) {
 		}
 	}
 	sqlite_free_table(result);
+}
+
+void tabFaktura::RefreshTowarList(void) {
+	// clear current lists
+	BListView *list;
+	BString tmp;
+	int i,j;
+
+	for (i=0;i<=10;i++) {
+		list = pozcolumn[i];
+		if (list->CountItems()>0) {
+			BStringItem *anItem;
+			for (int i=0; (anItem=(BStringItem*)list->ItemAt(i)); i++)
+				delete anItem;
+			if (!list->IsEmpty())
+				list->MakeEmpty();
+		}
+	}
+	// fill with current data
+	pozfakitem *cur = faklista->start;
+	for (i=0;i<=10;i++) {
+		pozcolumn[i]->AddItem(new BStringItem(plisthead[i]));
+	}
+
+	i = 1; // XXX not needed anyway
+	while (cur!=NULL) {
+		printf("[%i] %i - %s\n",i++,cur->lp, cur->data->data[1].String());
+		tmp = ""; tmp << cur->lp;
+		pozcolumn[0]->AddItem(new BStringItem(tmp.String()));
+		for (j=1;j<=10;j++) {
+			pozcolumn[j]->AddItem(new BStringItem(cur->data->data[j].String()));
+		}
+		cur = cur->nxt;
+	}
 }
 
 // data stuff, move to a separate file or sth
