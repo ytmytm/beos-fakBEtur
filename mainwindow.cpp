@@ -1,4 +1,7 @@
-
+//
+// TODO:
+// - menu z aboutprogram (balert)
+// - menu z drukowaniem (oryginal/kopia)
 //
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
