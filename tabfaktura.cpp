@@ -1,6 +1,5 @@
 //
 // TODO:
-// - stuby na obsługę guzików od kalendarza
 // - dialog z potwierdzeniem z commitcurtowardata
 // - menu z aboutprogram
 // - guzik 'nowy' na kartę z towarami
@@ -31,6 +30,7 @@
 #include "globals.h"
 #include "tabfaktura.h"
 
+#include <Alert.h>
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
@@ -288,7 +288,6 @@ void tabFaktura::initTab2(void) {
 	viewpozy->AddChild(box5);
 	// box5-stuff
 	viewtable = new BView(BRect(10,20,560,160), "tableview", B_FOLLOW_ALL_SIDES, 0);
-//	viewtable->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	r = viewtable->Bounds();
 	r.right = plistw[0];
 	for (i=0;i<=10;i++) {
@@ -487,7 +486,7 @@ void tabFaktura::makeNewForm(void) {
 	// XXX prepare new 'nazwa' for faktura
 	curdata->ogol[2] = execSQL("SELECT DATE('now')");
 	curdata->ogol[3] = execSQL("SELECT DATE('now')");
-	// XXX this is in TERMCHANGE handler
+	// XXX this is already in TERMCHANGE handler
 	curdata->ogol[7] = "30";
 	BString tmp;
 	tmp = "SELECT DATE('now', '0";
@@ -583,6 +582,14 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			sql += " days')";
 			ogol[6]->SetText(execSQL(sql.String()));
 			break;
+		case CBUT:
+			{	// XXX find source, get date from dialog, put into src
+				BAlert *calendar = new BAlert(APP_NAME, "Tutaj dialog z kalendarzem do wyboru daty", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
+				calendar->Go();
+				break;
+				// XXX if not canceled:
+				// this->dirty = true;
+			}
 // from tab2
 		case DCT:
 			this->dirty = true;
@@ -783,8 +790,7 @@ void tabFaktura::DoCommitTowardata(void) {
 	newdata->data[5] = towar[3]->Text();	// rabat %
 	newdata->data[6] = suma[0]->Text();		// cena jedn. (po rabacie)
 	newdata->data[7] = suma[3]->Text();		// w.netto
-//	newdata->data[8] = "xx%"				// stawka vat
-	newdata->vatid = curtowarvatid;
+	newdata->vatid = curtowarvatid;			// stawka vat, update data[8]
 	newdata->data[9] = suma[4]->Text();		// kwota vat
 	newdata->data[10] = suma[5]->Text();	// w.brutto
 	sql = "SELECT stawka FROM stawka_vat WHERE id = "; sql << curtowarvatid;
@@ -797,16 +803,14 @@ void tabFaktura::DoCommitTowardata(void) {
 	// update listy
 	faklista->setlp();
 	// update visuala
-	faklista->dump();
 	RefreshTowarList();
-	updateTab2();	// XXX already is in makenewtowar
 }
 
 void tabFaktura::RefreshTowarList(void) {
 	// clear current lists
 	BListView *list;
 	BString tmp;
-	int i,j;
+	int i;
 
 	for (i=0;i<=10;i++) {
 		list = pozcolumn[i];
@@ -824,13 +828,12 @@ void tabFaktura::RefreshTowarList(void) {
 		pozcolumn[i]->AddItem(new BStringItem(plisthead[i]));
 	}
 
-	i = 1; // XXX not needed anyway
 	while (cur!=NULL) {
-//		printf("[%i] %i - %s\n",i++,cur->lp, cur->data->data[1].String());
+//		printf("[%i] - %s\n",cur->lp, cur->data->data[1].String());
 		tmp = ""; tmp << cur->lp;
 		pozcolumn[0]->AddItem(new BStringItem(tmp.String()));
-		for (j=1;j<=10;j++) {
-			pozcolumn[j]->AddItem(new BStringItem(cur->data->data[j].String()));
+		for (i=1;i<=10;i++) {
+			pozcolumn[i]->AddItem(new BStringItem(cur->data->data[i].String()));
 		}
 		cur = cur->nxt;
 	}
