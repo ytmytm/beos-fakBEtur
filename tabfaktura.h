@@ -33,7 +33,8 @@ class tabFaktura : public beFakTab {
 		//
 		void RefreshIndexList(void);
 		//
-		void DoCommitTowardata(void);
+		bool CommitCurtowar(void);
+		bool DoCommitTowardata(void);
 		void RefreshTowarList(void);
 		//
 		// make a new one, fill defaults
@@ -57,7 +58,7 @@ class tabFaktura : public beFakTab {
 		BBox *box1, *box2, *box3, *box4, *box5, *box6, *box7;
 
 		BButton *but_new, *but_del, *but_restore, *but_save;
-		BButton *but_psave, *but_pimport, *but_pdel;
+		BButton *but_psave, *but_pnew, *but_pimport, *but_pdel;
 		BListView *list;
 
 		BTextControl *nazwa;

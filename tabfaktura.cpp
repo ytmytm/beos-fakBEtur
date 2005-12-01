@@ -1,7 +1,6 @@
 //
 // TODO:
 // - menu z aboutprogram
-// - guzik 'nowy' na kartę z towarami
 // - do konstruktora listy przekazac sqlite, metody na commit/fetch listy z bazy
 // - nazwa nowej faktury: '##/miesiac/rok', nie wiadomo skad brac ##?
 //
@@ -61,8 +60,9 @@ const uint32 TERMCHANGE	= 'TFCT';
 
 const uint32 DCT		= 'TFDD';
 const uint32 BUT_PSAVE	= 'TFB0';
-const uint32 BUT_PIMPORT= 'TFB1';
-const uint32 BUT_PDEL	= 'TFB2';
+const uint32 BUT_PNEW	= 'TFB1';
+const uint32 BUT_PIMPORT= 'TFB2';
+const uint32 BUT_PDEL	= 'TFB3';
 const uint32 MENUTSYM	= 'TFMT';
 const uint32 MENUVAT	= 'TFMV';
 const uint32 MENUJM		= 'TFMJ';
@@ -368,9 +368,11 @@ void tabFaktura::initTab2(void) {
 	box6->AddChild(menujmField);
 	// box5-stuff-cont
 	but_psave = new BButton(BRect(10,260,70,290), "tf_but_psave", "Zapisz", new BMessage(BUT_PSAVE));
+	but_pnew = new BButton(BRect(330,260,390,290), "tf_but_pnew", "Nowy", new BMessage(BUT_PNEW));
 	but_pimport = new BButton(BRect(400,260,480,290), "tf_but_pimport", "Import z innej", new BMessage(BUT_PIMPORT));
 	but_pdel = new BButton(BRect(490,260,560,290), "tf_but_pdel", "Usuń", new BMessage(BUT_PDEL));
 	box5->AddChild(but_psave);
+	box5->AddChild(but_pnew);
 	box5->AddChild(but_pimport);
 	box5->AddChild(but_pdel);
 
@@ -630,6 +632,11 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 //			printf("saving!\n");
 			DoCommitTowardata();
 			break;
+		case BUT_PNEW:
+			if (CommitCurtowar()) {
+				makeNewTowar();
+			}
+			break;
 		case BUT_PDEL:
 			i = pozcolumn[0]->CurrentSelection(0);
 			if (i>0) {
@@ -686,20 +693,9 @@ void tabFaktura::ChangedSelection(int newid) {
 }
 
 void tabFaktura::ChangedTowarSelection(int newid) {
-	if (towardirty) {
-		BAlert *ask = new BAlert(APP_NAME, "Zapisać zmiany w aktualnej pozycji?", "Tak", "Nie", "Anuluj", B_WIDTH_AS_USUAL, B_IDEA_ALERT);
-		int ret = ask->Go();
-		switch (ret) {
-			case 2:
-				// XXX po wybraniu tego pyta dwa razy!
-				return;
-			case 1:
-				makeNewTowar();
-				break;
-			case 0:
-				DoCommitTowardata();	// XXX if returns false - return now
-				break;
-		}
+
+	if (!(CommitCurtowar())) {
+		return;
 	}
 	towarmark = newid;
 	pozfakdata *item = faklista->itemat(newid);
@@ -778,12 +774,32 @@ void tabFaktura::RefreshIndexList(void) {
 	}
 	sqlite_free_table(result);
 }
+// ret. false -> cancel action and resume editing
+bool tabFaktura::CommitCurtowar(void) {
+	if (!towardirty)
+		return true;
+	BAlert *ask = new BAlert(APP_NAME, "Zapisać zmiany w aktualnej pozycji?", "Tak", "Nie", "Anuluj", B_WIDTH_AS_USUAL, B_IDEA_ALERT);
+	int ret = ask->Go();
+	switch (ret) {
+		case 2:
+			// XXX po wybraniu tego pyta dwa razy!
+			return false;
+		case 1:
+//			makeNewTowar();
+			break;
+		case 0:
+		default:
+			return DoCommitTowardata();	// XXX if returns false - return now
+			break;
+	}
+	return true;
+}
 
-void tabFaktura::DoCommitTowardata(void) {
+bool tabFaktura::DoCommitTowardata(void) {
 	pozfakdata *newdata;
 	BString sql;
 
-	// XXX tutaj wszystkie niezbędne testy, funkcja powinna zwracać bool
+	// XXX tutaj wszystkie niezbędne testy, w razie bledu - return false
 
 	if (towarmark < 0) {
 		// nowa pozycja
@@ -814,6 +830,7 @@ void tabFaktura::DoCommitTowardata(void) {
 	faklista->setlp();
 	// update visuala
 	RefreshTowarList();
+	return true;
 }
 
 void tabFaktura::RefreshTowarList(void) {
