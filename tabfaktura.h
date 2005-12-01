@@ -96,48 +96,53 @@ class tabFaktura : public beFakTab {
 
 class pozfakdata {
 	public:
-	// data holder
-	pozfakdata() { };
-	~pozfakdata() { };
+		// data holder
+		pozfakdata() { };
+		~pozfakdata() { };
 
-	BString data[12];
-	// lp, nazwa, pkwiu, ilosc, jm, rabat, cena jednostkowa, w.netto, vat,
-	// w.vat, w.brutto
-	int vatid;	// odp. stawce vat, być może zamiast w/w
-
+		BString data[12];
+		// lp, nazwa, pkwiu, ilosc, jm, rabat, cena jednostkowa, w.netto, vat,
+		// w.vat, w.brutto, [c.netto? 11th]
+		int vatid;	// odp. stawce vat, być może zamiast w/w
 };
 
 class pozfakitem {
 	public:
-	pozfakitem(pozfakdata *curdata, pozfakitem *prev = NULL, pozfakitem *next = NULL);
-	~pozfakitem() { delete data; };
+		pozfakitem(pozfakdata *curdata, pozfakitem *prev = NULL, pozfakitem *next = NULL);
+		~pozfakitem() { delete data; };
 
-	pozfakitem *nxt, *prv;	// list pointers
-	int lp;				//XXX liczba porzadkowa - tu, czy w data?
+		pozfakitem *nxt, *prv;	// list pointers
+		int lp;				//XXX liczba porzadkowa - tu, czy w data?
 
-	// data fields
-	pozfakdata *data;	// real data holder
+		// data fields
+		pozfakdata *data;	// real data holder
 };
 
 class pozfaklist {	// list object
 	public:
-	pozfaklist();
-	~pozfaklist();
+		pozfaklist(sqlite *db);
+		~pozfaklist();
 
-	void dump(void);
-	void setlp(void);
+		void dump(void);
+		void setlp(void);
 
-	void addlast(pozfakdata *data);
-	void addfirst(pozfakdata *data);
-	void addafter(pozfakdata *data, pozfakitem *afterme);
-	void addafter(pozfakdata *data, int offset);
+		void addlast(pozfakdata *data);
+		void addfirst(pozfakdata *data);
+		void addafter(pozfakdata *data, pozfakitem *afterme);
+		void addafter(pozfakdata *data, int offset);
 
-	pozfakdata *itemat(int offset);
+		pozfakdata *itemat(int offset);
 
-	void remove(int offset);
+		void remove(int offset);
 
-	pozfakitem *start;
-	pozfakitem *end;
+		// void commit(int fakturaid);
+		// void fetch(int fakturaid);
+
+		pozfakitem *start;
+		pozfakitem *end;
+	private:
+		sqlite *dbData;
+		char *dbErrMsg;
 };
 
 #endif

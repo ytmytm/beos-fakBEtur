@@ -1,6 +1,7 @@
 //
 // TODO:
-// - do konstruktora listy przekazac sqlite, metody na commit/fetch listy z bazy
+// - dodac do pozfakdata cene netto? (na razie mozna obliczac z jednostkowej)
+// - lista: metody na commit/fetch listy z bazy
 // - nazwa nowej faktury: '##/miesiac/rok', nie wiadomo skad brac ##?
 //
 // druga karta - label z numerem? (może na tytuł okna?)
@@ -908,8 +909,9 @@ void pozfaklist::setlp(void) {
 	}
 }
 
-pozfaklist::pozfaklist() {
+pozfaklist::pozfaklist(sqlite *db) {
 //	printf("constr\n");
+	dbData = db;
 	start = NULL;
 	end = start;
 }
