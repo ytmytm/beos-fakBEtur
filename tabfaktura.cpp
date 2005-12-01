@@ -1,5 +1,6 @@
 //
 // TODO:
+// - zerowac menu symbol w firmach i towarach (powtorka z vatid)
 // - menu z aboutprogram
 // - do konstruktora listy przekazac sqlite, metody na commit/fetch listy z bazy
 // - nazwa nowej faktury: '##/miesiac/rok', nie wiadomo skad brac ##?
