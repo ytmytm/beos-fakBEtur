@@ -25,12 +25,15 @@ class tabFaktura : public beFakTab {
 		~tabFaktura();
 		void MessageReceived(BMessage *Message);
 		void ChangedSelection(int newid);
+		void ChangedTowarSelection(int newid);
 		//
 		void DoCommitCurdata(void);
 		void DoDeleteCurdata(void);
 		void DoFetchCurdata(void);
 		//
 		void RefreshIndexList(void);
+		//
+		void DoCommitTowardata(void);
 		void RefreshTowarList(void);
 		//
 		// make a new one, fill defaults
@@ -81,6 +84,7 @@ class tabFaktura : public beFakTab {
 		pozfaklist *faklista;
 		int *idlist;
 		int towarmark;
+		bool towardirty;
 
 		// to control many lists
 		int lasttowarsel;
@@ -123,6 +127,8 @@ class pozfaklist {	// list object
 	void addfirst(pozfakdata *data);
 	void addafter(pozfakdata *data, pozfakitem *afterme);
 	void addafter(pozfakdata *data, int offset);
+
+	pozfakdata *itemat(int offset);
 
 	void remove(int offset);
 

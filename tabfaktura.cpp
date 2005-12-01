@@ -1,9 +1,14 @@
 //
-// dopisać:
-// domyślnie podawana nazwa: '##/miesiac/rok'
+// TODO:
+// - stuby na obsługę guzików od kalendarza
+// - dialog z potwierdzeniem z commitcurtowardata
+// - menu z aboutprogram
+// - guzik 'nowy' na kartę z towarami
+// - do konstruktora listy przekazac sqlite, metody na commit/fetch z bazy
+// - wlasna liste zastapic blist
+// - nazwa nowej faktury: '##/miesiac/rok', nie wiadomo skad brac ##?
 //
 // druga karta - label z numerem? (może na tytuł okna?)
-//	lista: tablica klas towardat
 // wyrzucić uwagi i zastąpić całym podsumowaniem? podsumowanie na 3 karcie?
 // opcja faktury korygującej (jak? trzeba pamiętać co się zmieniło)
 //
@@ -21,10 +26,6 @@
 // - czy dodać to do bazy towarów?
 // - ilość/cena wynosi 0
 // - nazwa, pkwiu, jm, stawka - nie wpisane
-//
-// init listy
-// zaznaczenie - przepisanie danych na dół, zaznaczenie wszystkich w wierszu
-// usunięcie - remove(zaznaczony)
 //
 
 #include "globals.h"
@@ -83,11 +84,12 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	odbiorca = new firmadat(db);
 	curtowar = new towardat(db);
 	faklista = new pozfaklist();
-	curtowarvatid = -1;
-	towarmark = -1;
 	this->dirty = false;
 
+	curtowarvatid = -1;
+	towarmark = -1;
 	lasttowarsel = -1;
+	towardirty = false;
 
 	this->tab->SetLabel("Faktury");
 	BRect r;
@@ -505,8 +507,11 @@ void tabFaktura::makeNewTowar(void) {
 	for (i=0;i<=5;i++)
 		suma[i]->SetText("");
 	curtowarvatid = -1;
-	// XXX un-mark list
+	towardirty = false;
+	// un-mark list
 	towarmark = -1;
+	for (i=0;i<=10;i++)
+		pozcolumn[i]->DeselectAll();
 	updateTab2();
 }
 
@@ -581,6 +586,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 // from tab2
 		case DCT:
 			this->dirty = true;
+			towardirty = true;
 			updateTab2();
 			break;
 		case MENUTSYM:
@@ -596,54 +602,29 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				curtowarvatid = curtowar->vatid;
 				updateTab2();
 				this->dirty = true;
+				towardirty = true;
 			}
 		case MENUJM:
 			if (Message->FindString("_jm", &tmp) == B_OK) {
 				towar[5]->SetText(tmp);
 				this->dirty = true;
+				towardirty = true;
 			}
 			break;
 		case MENUVAT:
 			this->dirty = true;
+			towardirty = true;
 			if (Message->FindInt32("_vatid", &item) == B_OK) {
 				curtowarvatid = item;
 			}
 			updateTab2();
 			break;
 		case BUT_PSAVE:
-			{
-				this->dirty = true;
-//				printf("saving!\n");
-				if (towarmark < 0) {
-					// nowa pozycja
-					pozfakdata *newdata = new pozfakdata();
-					// zapisz pola danych
-					newdata->data[0] = "0";					// lp
-					newdata->data[1] = towar[0]->Text();	// nazwa
-					newdata->data[2] = towar[1]->Text();	// pkwiu
-					newdata->data[3] = suma[2]->Text();		// ilosc
-					newdata->data[4] = towar[5]->Text();	// jm
-					newdata->data[5] = towar[3]->Text();	// rabat %
-					newdata->data[6] = suma[0]->Text();		// cena jedn. (po rabacie)
-					newdata->data[7] = suma[3]->Text();		// w.netto
-//					newdata->data[8] = "xx%"				// stawka vat
-					newdata->vatid = curtowarvatid;
-					newdata->data[9] = suma[4]->Text();		// kwota vat
-					newdata->data[10] = suma[5]->Text();	// w.brutto
-					sql = "SELECT stawka FROM stawka_vat WHERE id = "; sql << curtowarvatid;
-					newdata->data[8] = execSQL(sql.String());
-					// dodaj do listy
-					faklista->addlast(newdata);
-					// nowy towar, wyczyść pola
-					makeNewTowar();
-				}
-				// update listy
-				faklista->setlp();
-				// update visuala
-				faklista->dump();
-				RefreshTowarList();
-				break;
-			}
+			this->dirty = true;
+			towardirty = true;
+//			printf("saving!\n");
+			DoCommitTowardata();
+			break;
 		case BUT_PDEL:
 			i = pozcolumn[0]->CurrentSelection(0);
 			if (i>0) {
@@ -653,6 +634,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				faklista->setlp();
 				RefreshTowarList();
 			}
+			towardirty = true;
 			break;
 		case PLIST_SEL:
 		case PLIST_INV:
@@ -660,29 +642,29 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				void *ptr;
 				BListView *plist;
 
-					i = -1;
-					if (Message->FindPointer("source", &ptr) == B_OK) {
-						plist = static_cast<BListView*>(ptr);
-						i = plist->CurrentSelection(0);
-					}
-					if (i != lasttowarsel) {
-						lasttowarsel = i;
-						printf("newsel:%i\n",i);
-						//XXX zmiana selekcji towaru!
-						//XXX ChangedTowarSelection(i);
-						if (lasttowarsel != 0) {
-							for (j=0; j<=10; j++) {
-								pozcolumn[j]->Select(i);
-								pozcolumn[j]->ScrollToSelection();
-							}
-						} else {
-							for (j=0; j<=10; j++) {
-								pozcolumn[j]->Select(0);
-								pozcolumn[j]->ScrollToSelection();
-								pozcolumn[j]->DeselectAll();
-							}
+				i = -1;
+				if (Message->FindPointer("source", &ptr) == B_OK) {
+					plist = static_cast<BListView*>(ptr);
+					i = plist->CurrentSelection(0);
+				}
+				if (i != lasttowarsel) {
+					lasttowarsel = i;
+					printf("newsel:%i\n",i);
+					// zmiana wybranego towaru!
+					ChangedTowarSelection(lasttowarsel);
+					if (lasttowarsel != 0) {
+						for (j=0; j<=10; j++) {
+							pozcolumn[j]->Select(i);
+							pozcolumn[j]->ScrollToSelection();
+						}
+					} else {
+						for (j=0; j<=10; j++) {
+							pozcolumn[j]->Select(0);
+							pozcolumn[j]->ScrollToSelection();
+							pozcolumn[j]->DeselectAll();
 						}
 					}
+				}
 				break;
 			}
 	}
@@ -696,6 +678,34 @@ void tabFaktura::ChangedSelection(int newid) {
 	// fetch and store into new data
 	curdata->id = newid;
 	DoFetchCurdata();
+}
+
+void tabFaktura::ChangedTowarSelection(int newid) {
+	// XXX commit current and proceed or abort
+	if (towardirty) {
+		printf("ask to save?");
+	}
+	// XXX check answer and quit or not
+	towarmark = newid;
+	pozfakdata *item = faklista->itemat(newid);
+	if (item != NULL) {
+		// fetch data into widgets
+		towar[0]->SetText(item->data[1].String());	// nazwa
+		towar[1]->SetText(item->data[2].String());	// pkwiu
+		towar[4]->SetText(item->data[3].String());	// ilosc
+		towar[5]->SetText(item->data[4].String());	// jm
+		towar[3]->SetText(item->data[5].String());	// rabat
+		curtowarvatid = item->vatid;				// vatid
+		// cena netto z jednostkowej przed rabatem
+		BString sql;
+		sql = "SELECT 0"; sql += item->data[6];
+		sql += "/(1-0"; sql += item->data[5]; sql += "/100.0)";
+		towar[2]->SetText(execSQL(sql.String()));
+		updateTab2();
+	} else {
+//		printf("null item after selchg, happens after all-delete\n");
+	}
+	towardirty = false;
 }
 
 void tabFaktura::DoCommitCurdata(void) {
@@ -752,6 +762,44 @@ void tabFaktura::RefreshIndexList(void) {
 		}
 	}
 	sqlite_free_table(result);
+}
+
+void tabFaktura::DoCommitTowardata(void) {
+	pozfakdata *newdata;
+	BString sql;
+
+	if (towarmark < 0) {
+		// nowa pozycja
+		newdata = new pozfakdata();
+	} else {
+		newdata = faklista->itemat(towarmark);
+	}
+	// zapisz pola danych
+	newdata->data[0] = "0";					// lp
+	newdata->data[1] = towar[0]->Text();	// nazwa
+	newdata->data[2] = towar[1]->Text();	// pkwiu
+	newdata->data[3] = towar[4]->Text();	// ilosc
+	newdata->data[4] = towar[5]->Text();	// jm
+	newdata->data[5] = towar[3]->Text();	// rabat %
+	newdata->data[6] = suma[0]->Text();		// cena jedn. (po rabacie)
+	newdata->data[7] = suma[3]->Text();		// w.netto
+//	newdata->data[8] = "xx%"				// stawka vat
+	newdata->vatid = curtowarvatid;
+	newdata->data[9] = suma[4]->Text();		// kwota vat
+	newdata->data[10] = suma[5]->Text();	// w.brutto
+	sql = "SELECT stawka FROM stawka_vat WHERE id = "; sql << curtowarvatid;
+	newdata->data[8] = execSQL(sql.String());
+	// dodaj do listy
+	if (towarmark < 0)
+		faklista->addlast(newdata);
+	// nowy towar, wyczyść pola
+	makeNewTowar();
+	// update listy
+	faklista->setlp();
+	// update visuala
+	faklista->dump();
+	RefreshTowarList();
+	updateTab2();	// XXX already is in makenewtowar
 }
 
 void tabFaktura::RefreshTowarList(void) {
@@ -882,4 +930,17 @@ void pozfaklist::remove(int offset) {
 			end = cur->nxt;
 		delete cur;
 	}
+}
+
+pozfakdata *pozfaklist::itemat(int offset) {
+	pozfakitem *cur = start;
+	offset--;
+	while ((offset>0) && (cur!=NULL)) {
+		offset--;
+//		printf("skip [%i], %s\n", offset, cur->data->data[1].String());
+		cur = cur->nxt;
+	}
+	if (cur != NULL)
+		return cur->data;
+	return NULL;
 }
