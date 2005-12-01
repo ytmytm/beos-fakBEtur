@@ -21,6 +21,14 @@
 // - czy dodać to do bazy towarów?
 // - ilość/cena wynosi 0
 // - nazwa, pkwiu, jm, stawka - nie wpisane
+//
+// init listy
+// dodanie towaru do listy:
+// - addafter(zaznaczony), jeśli zaznaczony==-1 (brak zaznaczenia, to addlast)
+// usunięcie - remove(zaznaczony)
+//
+// dump w scrollview
+//
 
 #include "globals.h"
 #include "tabfaktura.h"
@@ -74,7 +82,9 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	curdata = new fakturadat(db);
 	odbiorca = new firmadat(db);
 	curtowar = new towardat(db);
+	faklista = new pozfaklist();
 	curtowarvatid = -1;
+	towarmark = -1;
 	this->dirty = false;
 
 	this->tab->SetLabel("Faktury");
@@ -570,6 +580,37 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			}
 			updateTab2();
 			break;
+		case BUT_PSAVE:
+			{
+				this->dirty = true;
+				printf("saving!\n");
+				if (towarmark < 0) {
+					// nowa pozycja
+					pozfakdata *newdata = new pozfakdata();
+					// zapisz pola danych
+					newdata->data[0] = "0";					// lp
+					newdata->data[1] = towar[0]->Text();	// nazwa
+					newdata->data[2] = towar[1]->Text();	// pkwiu
+					newdata->data[3] = suma[2]->Text();		// ilosc
+					newdata->data[4] = towar[5]->Text();	// jm
+					newdata->data[5] = towar[3]->Text();	// rabat %
+					newdata->data[6] = suma[0]->Text();		// cena jedn. (po rabacie)
+					newdata->data[7] = suma[3]->Text();		// w.netto
+//					newdata->data[8] = "xx%"				// stawka vat
+					newdata->data[9] = suma[4]->Text();		// kwota vat
+					newdata->data[10] = suma[5]->Text();	// w.brutto
+					sql = "SELECT stawka FROM stawka_vat WHERE id = "; sql << curtowarvatid;
+					newdata->data[8] = execSQL(sql.String());
+					// dodaj do listy
+					faklista->addlast(newdata);
+				}
+				// update listy
+				faklista->setlp();
+				// XXX update visuala
+				faklista->dump();
+				// XXX zrób NEWTOWAR, wyczyść TOWARMARK
+				break;
+			}
 	}
 }
 
@@ -637,4 +678,100 @@ void tabFaktura::RefreshIndexList(void) {
 		}
 	}
 	sqlite_free_table(result);
+}
+
+// data stuff, move to a separate file or sth
+
+pozfakitem::pozfakitem(pozfakdata *curdata, pozfakitem *prev, pozfakitem *next) {
+	data = curdata;
+	nxt = next;
+	prv = prev;
+	// alloc and/or init data
+	printf("init\n");
+	lp = 0;
+}
+
+void pozfaklist::dump(void) {
+	pozfakitem *cur = start;
+	int i = 1;
+
+	while (cur!=NULL) {
+		printf("[%i] %i - %s\n",i++,cur->lp, cur->data->data[1].String());
+		cur = cur->nxt;
+	}
+}
+
+void pozfaklist::setlp(void) {
+	pozfakitem *cur = start;
+	int i = 1;
+	while (cur!=NULL) {
+		cur->lp = i++;
+		cur = cur->nxt;
+	}
+}
+
+pozfaklist::pozfaklist() {
+	printf("constr\n");
+	start = NULL;
+	end = start;
+}
+
+void pozfaklist::addlast(pozfakdata *data) {
+	pozfakitem *newone = new pozfakitem(data,end,NULL);
+	if (end != NULL)
+		end->nxt = newone;
+	else
+		start = newone;
+	end = newone;
+}
+
+void pozfaklist::addfirst(pozfakdata *data) {
+	pozfakitem *newone = new pozfakitem(data,NULL,start);
+	if (start != NULL)
+		start->prv = newone;
+	else
+		end = newone;
+	start = newone;
+}
+
+void pozfaklist::addafter(pozfakdata *data, pozfakitem *afterme) {
+	pozfakitem *newone = new pozfakitem(data,afterme,afterme->nxt);
+	if (afterme != NULL) {
+		if (afterme->nxt != NULL)
+			afterme->nxt->prv = newone;
+		afterme->nxt = newone;
+	}
+}
+
+void pozfaklist::addafter(pozfakdata *data, int offset) {
+	pozfakitem *cur = start;
+	offset--;
+	while ((offset>0) && (cur!=NULL)) {
+		offset--;
+		printf("skip [%i], %s\n", offset, cur->data->data[1].String());
+		cur = cur->nxt;
+	}
+	if (cur!=NULL)
+			addafter(data, cur);
+}
+
+void pozfaklist::remove(int offset) {
+	pozfakitem *cur = start;
+	offset--;
+	while ((offset>0) && (cur!=NULL)) {
+		offset--;
+		printf("skip [%i], %s\n", offset, cur->data->data[1].String());
+		cur = cur->nxt;
+	}
+	if (cur != NULL) {
+		if (cur->prv != NULL)
+			cur->prv->nxt = cur->nxt;
+		else
+			start = cur->nxt;
+		if (cur->nxt != NULL)
+			cur->nxt->prv = cur->prv;
+		else
+			end = cur->nxt;
+//		delete cur;	/// XXX why not?
+	}
 }
