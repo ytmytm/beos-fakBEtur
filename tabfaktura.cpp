@@ -1,10 +1,8 @@
 //
 // TODO:
-// - dialog z potwierdzeniem z commitcurtowardata
 // - menu z aboutprogram
 // - guzik 'nowy' na kartę z towarami
-// - do konstruktora listy przekazac sqlite, metody na commit/fetch z bazy
-// - wlasna liste zastapic blist
+// - do konstruktora listy przekazac sqlite, metody na commit/fetch listy z bazy
 // - nazwa nowej faktury: '##/miesiac/rok', nie wiadomo skad brac ##?
 //
 // druga karta - label z numerem? (może na tytuł okna?)
@@ -20,7 +18,7 @@
 // 1. w.brutto = round(ilość*c.brutto) = round(ilość*round(c.netto*stawka)) = 3.23
 // 2. w.brutto = round(stawka*ilość*c.netto) = 3.24 (3.235)
 //
-// testy przy dodawaniu towaru:
+// testy w docommitcurtowardata
 // - towar o tej nazwie już jest
 // - czy dodać to do bazy towarów?
 // - ilość/cena wynosi 0
@@ -656,12 +654,12 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				}
 				if (i != lasttowarsel) {
 					lasttowarsel = i;
-					printf("newsel:%i\n",i);
-					// zmiana wybranego towaru!
+//					printf("newsel:%i\n",i);
+					// zmiana wybranego towaru, uaktualnienie towarmark
 					ChangedTowarSelection(lasttowarsel);
-					if (lasttowarsel != 0) {
+					if (towarmark != 0) {
 						for (j=0; j<=10; j++) {
-							pozcolumn[j]->Select(i);
+							pozcolumn[j]->Select(towarmark);
 							pozcolumn[j]->ScrollToSelection();
 						}
 					} else {
@@ -688,11 +686,21 @@ void tabFaktura::ChangedSelection(int newid) {
 }
 
 void tabFaktura::ChangedTowarSelection(int newid) {
-	// XXX commit current and proceed or abort
 	if (towardirty) {
-		printf("ask to save?");
+		BAlert *ask = new BAlert(APP_NAME, "Zapisać zmiany w aktualnej pozycji?", "Tak", "Nie", "Anuluj", B_WIDTH_AS_USUAL, B_IDEA_ALERT);
+		int ret = ask->Go();
+		switch (ret) {
+			case 2:
+				// XXX po wybraniu tego pyta dwa razy!
+				return;
+			case 1:
+				makeNewTowar();
+				break;
+			case 0:
+				DoCommitTowardata();	// XXX if returns false - return now
+				break;
+		}
 	}
-	// XXX check answer and quit or not
 	towarmark = newid;
 	pozfakdata *item = faklista->itemat(newid);
 	if (item != NULL) {
@@ -774,6 +782,8 @@ void tabFaktura::RefreshIndexList(void) {
 void tabFaktura::DoCommitTowardata(void) {
 	pozfakdata *newdata;
 	BString sql;
+
+	// XXX tutaj wszystkie niezbędne testy, funkcja powinna zwracać bool
 
 	if (towarmark < 0) {
 		// nowa pozycja
