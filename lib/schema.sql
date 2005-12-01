@@ -100,7 +100,7 @@ CREATE TABLE pozycjafakt (
 	id		INTEGER NOT NULL,
 	fakturaid	INTEGER NOT NULL,
 	lp		INTEGER NOT NULL,
-	ilosc		INTEGER NOT NULL,
+	ilosc		TEXT NOT NULL,
 
 	--- towar - kopia struktury z towar
 	nazwa		TEXT,
