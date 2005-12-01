@@ -90,7 +90,7 @@ class pozfakdata {
 	public:
 	// data holder
 	pozfakdata() { };
-	~pozfakdata();
+	~pozfakdata() { };
 
 	BString data[12];
 	// lp, nazwa, pkwiu, ilosc, jm, rabat, cena jednostkowa, w.netto, vat,
@@ -102,7 +102,7 @@ class pozfakdata {
 class pozfakitem {
 	public:
 	pozfakitem(pozfakdata *curdata, pozfakitem *prev = NULL, pozfakitem *next = NULL);
-	~pozfakitem();
+	~pozfakitem() { delete data; };
 
 	pozfakitem *nxt, *prv;	// list pointers
 	int lp;				//XXX liczba porzadkowa - tu, czy w data?

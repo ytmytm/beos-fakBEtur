@@ -613,7 +613,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 		case BUT_PSAVE:
 			{
 				this->dirty = true;
-				printf("saving!\n");
+//				printf("saving!\n");
 				if (towarmark < 0) {
 					// nowa pozycja
 					pozfakdata *newdata = new pozfakdata();
@@ -639,11 +639,21 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				}
 				// update listy
 				faklista->setlp();
-				// XXX update visuala
+				// update visuala
 				faklista->dump();
 				RefreshTowarList();
 				break;
 			}
+		case BUT_PDEL:
+			i = pozcolumn[0]->CurrentSelection(0);
+			if (i>0) {
+//				printf("delete %i-th\n",i);
+				faklista->remove(i);
+				makeNewTowar();
+				faklista->setlp();
+				RefreshTowarList();
+			}
+			break;
 		case PLIST_SEL:
 		case PLIST_INV:
 			{	int j;
@@ -655,13 +665,11 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 						plist = static_cast<BListView*>(ptr);
 						i = plist->CurrentSelection(0);
 					}
-					if (i>=0) {
-//				printf("sel:%i,id=%i\n",i,idlist[i]);
-// XXX zmiana selekcji towaru!	ChangedSelection(idlist[i]);
-					}
 					if (i != lasttowarsel) {
 						lasttowarsel = i;
 						printf("newsel:%i\n",i);
+						//XXX zmiana selekcji towaru!
+						//XXX ChangedTowarSelection(i);
 						if (lasttowarsel != 0) {
 							for (j=0; j<=10; j++) {
 								pozcolumn[j]->Select(i);
@@ -770,7 +778,7 @@ void tabFaktura::RefreshTowarList(void) {
 
 	i = 1; // XXX not needed anyway
 	while (cur!=NULL) {
-		printf("[%i] %i - %s\n",i++,cur->lp, cur->data->data[1].String());
+//		printf("[%i] %i - %s\n",i++,cur->lp, cur->data->data[1].String());
 		tmp = ""; tmp << cur->lp;
 		pozcolumn[0]->AddItem(new BStringItem(tmp.String()));
 		for (j=1;j<=10;j++) {
@@ -787,7 +795,7 @@ pozfakitem::pozfakitem(pozfakdata *curdata, pozfakitem *prev, pozfakitem *next) 
 	nxt = next;
 	prv = prev;
 	// alloc and/or init data
-	printf("init\n");
+//	printf("init\n");
 	lp = 0;
 }
 
@@ -811,7 +819,7 @@ void pozfaklist::setlp(void) {
 }
 
 pozfaklist::pozfaklist() {
-	printf("constr\n");
+//	printf("constr\n");
 	start = NULL;
 	end = start;
 }
@@ -848,7 +856,7 @@ void pozfaklist::addafter(pozfakdata *data, int offset) {
 	offset--;
 	while ((offset>0) && (cur!=NULL)) {
 		offset--;
-		printf("skip [%i], %s\n", offset, cur->data->data[1].String());
+//		printf("skip [%i], %s\n", offset, cur->data->data[1].String());
 		cur = cur->nxt;
 	}
 	if (cur!=NULL)
@@ -860,7 +868,7 @@ void pozfaklist::remove(int offset) {
 	offset--;
 	while ((offset>0) && (cur!=NULL)) {
 		offset--;
-		printf("skip [%i], %s\n", offset, cur->data->data[1].String());
+//		printf("skip [%i], %s\n", offset, cur->data->data[1].String());
 		cur = cur->nxt;
 	}
 	if (cur != NULL) {
@@ -872,6 +880,6 @@ void pozfaklist::remove(int offset) {
 			cur->nxt->prv = cur->prv;
 		else
 			end = cur->nxt;
-//		delete cur;	/// XXX why not?
+		delete cur;
 	}
 }
