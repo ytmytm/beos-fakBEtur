@@ -69,8 +69,11 @@ class tabFaktura : public beFakTab {
 		BCheckBox *cbzaplacono;
 		BListView *pozcolumn[11];	// columns
 
+		BPopUpMenu *menusymbol;
 		BMenuItem **symbolMenuItems;
 		int *symbolIds, symbolRows;
+
+		BPopUpMenu *tmenusymbol;
 		BMenuItem **tsymbolMenuItems;
 		int *tsymbolIds, tsymbolRows;
 

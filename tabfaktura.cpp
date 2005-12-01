@@ -1,7 +1,5 @@
 //
 // TODO:
-// - zerowac menu symbol w firmach i towarach (powtorka z vatid)
-// - menu z aboutprogram
 // - do konstruktora listy przekazac sqlite, metody na commit/fetch listy z bazy
 // - nazwa nowej faktury: '##/miesiac/rok', nie wiadomo skad brac ##?
 //
@@ -252,7 +250,7 @@ void tabFaktura::initTab1(void) {
 	data[7]->SetDivider(50); data[8]->SetDivider(50);
 	data[9]->SetDivider(50); data[10]->SetDivider(50);
 	// firma-symbole
-	BPopUpMenu *menusymbol = new BPopUpMenu("[wybierz]");
+	menusymbol = new BPopUpMenu("[wybierz]");
 	int nRows, nCols;
 	char **result;
 	BString sqlQuery;
@@ -313,7 +311,7 @@ void tabFaktura::initTab2(void) {
 	box6->AddChild(towar[2]); box6->AddChild(towar[3]);
 	box6->AddChild(towar[4]); box6->AddChild(towar[5]);
 	// towar-symbole
-	BPopUpMenu *tmenusymbol = new BPopUpMenu("[wybierz]");
+	tmenusymbol = new BPopUpMenu("[wybierz]");
 	int nRows, nCols;
 	char **result;
 	BString sqlQuery;
@@ -483,6 +481,11 @@ void tabFaktura::updateTab2(void) {
 
 void tabFaktura::makeNewForm(void) {
 	curdata->clear();
+	// unselect symbolmenu
+	for (int i=0;i<symbolRows;i++) {
+		symbolMenuItems[i]->SetMarked(false);
+	}
+	menusymbol->Superitem()->SetLabel("[wybierz]");
 	// XXX refresh symbolmenu
 	// XXX prepare new 'nazwa' for faktura
 	curdata->ogol[2] = execSQL("SELECT DATE('now')");
@@ -494,6 +497,7 @@ void tabFaktura::makeNewForm(void) {
 	tmp << curdata->ogol[7].String();
 	tmp += " days')";
 	curdata->ogol[6] = execSQL(tmp.String());
+	// 
 	uwagi->SetText("");
 	cbzaplacono->SetValue(B_CONTROL_OFF);
 	curdataToTab();
@@ -501,7 +505,12 @@ void tabFaktura::makeNewForm(void) {
 
 void tabFaktura::makeNewTowar(void) {
 	int i;
-	// XXX clear symbolmenu
+	// clear symbolmenu
+	for (i=0;i<tsymbolRows;i++) {
+		tsymbolMenuItems[i]->SetMarked(false);
+	}
+	tmenusymbol->Superitem()->SetLabel("[wybierz]");
+	// clear widgets
 	for (i=0;i<=5;i++)
 		towar[i]->SetText("");
 	for (i=0;i<=5;i++)
@@ -688,6 +697,8 @@ void tabFaktura::ChangedSelection(int newid) {
 		// XXX do nothing if cancel, restore old selection?
 		return;
 	}
+	// initialize
+	makeNewForm();
 	// fetch and store into new data
 	curdata->id = newid;
 	DoFetchCurdata();
