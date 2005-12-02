@@ -1,7 +1,8 @@
 //
 // TODO:
 // - dodac do pozfakdata id! generowac! uaktualniac! czyscic!
-// - lista: metody na commit/fetch listy z bazy
+//	 lub: usuwać wszystkie przed commit i dodawać na nowo (wygodne)
+// - lista: metoda na fetch listy z bazy
 // - nazwa nowej faktury: '##/miesiac/rok', nie wiadomo skad brac ##?
 //
 // druga karta - label z numerem? (może na tytuł okna?)
@@ -1022,6 +1023,7 @@ void pozfaklist::commititem(int fakturaid, pozfakitem *item) {
 	int ret, id;
 
 	/// XXX ids for existing should be already known!!!
+	/// XXX remove all existing and insert new? convenient!
 	id = generate_id();
 	sql = "INSERT INTO pozycjafakt ( ";
 	sql += "id, fakturaid, lp, ilosc";
