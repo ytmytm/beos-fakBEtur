@@ -1,6 +1,7 @@
 //
 // TODO:
 // - jesli nie ma pliku bazy danych - stworzyc z wbudowanego schema
+// - konfiguracja - osobna tabela w bazie
 // - przy pierwszym uruchomieniu sprawdzic istnienie konfiguracji
 //	 - nie ma -> wywolac dialog
 // - menu z dialogiem konfiguracji (moja firma, inne opcje)
