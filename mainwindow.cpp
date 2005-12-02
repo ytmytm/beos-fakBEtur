@@ -1,9 +1,10 @@
 //
 // TODO:
 // - jesli nie ma pliku bazy danych - stworzyc z wbudowanego schema
+// - menu z dialogiem konfiguracji (moja firma, inne opcje)
 // - menu z aboutprogram (balert)
-// - menu z drukowaniem (oryginal/kopia)
-// - nazwa towaru/faktury w pasku tytułu
+// - menu z drukowaniem (oryginal/kopia), wydruk, eksport html etc.
+// - nazwa towaru/faktury/kontrahenta w pasku tytułu (przyjąć msg od child?)
 //
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
