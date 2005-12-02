@@ -2,6 +2,7 @@
 // TODO:
 // - menu z aboutprogram (balert)
 // - menu z drukowaniem (oryginal/kopia)
+// - nazwa towaru/faktury w pasku tytułu
 //
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
@@ -63,7 +64,7 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 
 	// initialize datawidgets
 	initTabs(tabView);
-	tabView->Select(2);
+	tabView->Select(0);
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
@@ -71,9 +72,9 @@ BeFAKMainWindow::~BeFAKMainWindow() {
 }
 
 void BeFAKMainWindow::initTabs(BTabView *tv) {
-	tabs[0] = new tabFirma(tv, dbData);
+	tabs[0] = new tabFaktura(tv, dbData);
 	tabs[1] = new tabTowar(tv, dbData);
-	tabs[2] = new tabFaktura(tv, dbData);
+	tabs[2] = new tabFirma(tv, dbData);
 }
 
 void BeFAKMainWindow::MessageReceived(BMessage *Message) {
