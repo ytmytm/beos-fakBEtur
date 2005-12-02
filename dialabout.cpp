@@ -4,6 +4,7 @@
 dialView::dialView(BRect rect, const char *name, const char *title) : BView(
 	rect, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW) {
 
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	appname = title;
 }
 
