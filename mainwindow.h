@@ -45,7 +45,4 @@
 			char *dbErrMsg;
 	};
 
-// helper
-int toint(const char *input);
-
 #endif
