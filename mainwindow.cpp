@@ -26,7 +26,12 @@
 
 #include <stdio.h>
 
-const uint32 MENU_DEFMSG 	= 'M000';
+const uint32 MENU_PRINTO	= 'MPOR';
+const uint32 MENU_PRINTC	= 'MPKO';
+const uint32 MENU_PRINTD	= 'MPKD';
+const uint32 MENU_CONFFIRMA	= 'MKOF';
+const uint32 MENU_CONFPRINT	= 'MKOP';
+const uint32 MENU_ABOUT		= 'MABO';
 
 BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	BRect(100, 100, 900, 700), windowTitle, B_DOCUMENT_WINDOW, B_OUTLINE_RESIZE, B_CURRENT_WORKSPACE ) {
@@ -51,8 +56,23 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	menu = new BMenu("Plik", B_ITEMS_IN_COLUMN);
 	((SpLocaleApp*)be_app)->AddToFileMenu(menu,false,false,false);
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Item", new BMessage(MENU_DEFMSG), 0, 0));
+//	menu->AddItem(new BMenuItem("Item", new BMessage(MENU_DEFMSG), 0, 0));
 	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
+	menuBar->AddItem(menu);
+
+	menu = new BMenu("Wydruk", B_ITEMS_IN_COLUMN);
+	menu->AddItem(new BMenuItem("Oryginał", new BMessage(MENU_PRINTO)));
+	menu->AddItem(new BMenuItem("Kopia", new BMessage(MENU_PRINTC)));
+	menu->AddItem(new BMenuItem("Duplikat", new BMessage(MENU_PRINTD)));
+	menuBar->AddItem(menu);
+
+	menu = new BMenu("Opcje", B_ITEMS_IN_COLUMN);
+	menu->AddItem(new BMenuItem("Dane firmy", new BMessage(MENU_CONFFIRMA)));
+	menu->AddItem(new BMenuItem("Wydruki", new BMessage(MENU_CONFPRINT)));
+	menuBar->AddItem(menu);
+
+	menu = new BMenu("Pomoc", B_ITEMS_IN_COLUMN);
+	menu->AddItem(new BMenuItem("O programie", new BMessage(MENU_ABOUT)));
 	menuBar->AddItem(menu);
 
 	// tabview
@@ -85,8 +105,6 @@ void BeFAKMainWindow::initTabs(BTabView *tv) {
 void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 	this->DisableUpdates();
 	switch (Message->what) {
-		case MENU_DEFMSG:
-			break;
 		default:
 			curTab = tabs[tabView->Selection()];
 			curTab->MessageReceived(Message);
