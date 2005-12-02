@@ -114,3 +114,24 @@ CREATE TABLE pozycjafakt (
 	PRIMARY KEY(id,fakturaid)
 );
 
+CREATE TABLE konfiguracja (
+--- dane firmy
+	nazwa TEXT,
+	adres TEXT,
+	kod TEXT,
+	miejscowosc TEXT,
+	telefon TEXT,
+	email TEXT,
+	nip TEXT,
+	regon TEXT,
+	bank TEXT,
+	konto TEXT,
+--- konfiguracja wydruku
+	liczbakopii INTEGER NOT NULL DEFAULT 1,
+--- konfiguracja faktur
+	ostatni_nr INTEGER,
+	num_prosta INTEGER,
+--- marker, potrzebny w ogole?
+	zrobiona INTEGER DEFAULT 1
+);
+
