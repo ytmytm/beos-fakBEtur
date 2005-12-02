@@ -12,15 +12,17 @@ const uint32 DC			= 'FIDC';
 const uint32 BUT_OK		= 'FIOK';
 const uint32 BUT_CANCEL	= 'FICA';
 
-dialFirma::dialFirma(const char *title, sqlite *db) : BWindow(
-	BRect(100, 100, 100+460, 100+330+40),
-	"Informacje o firmie",
+dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
+	BRect(120, 120, 120+460, 120+330+40),
+	"Informacje o Twojej firmie",
 	B_TITLED_WINDOW,
 	B_NOT_RESIZABLE ) {
 
 	dbData = db;
 
-	view = new BView(Bounds(), "firmaView", B_FOLLOW_ALL_SIDES, 0);
+	this->SetFeel(B_FLOATING_APP_WINDOW_FEEL);
+
+	view = new BView(this->Bounds(), "firmaView", B_FOLLOW_ALL_SIDES, 0);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	this->AddChild(view);
 	// powtorz boxy z tabfirma
@@ -66,8 +68,10 @@ dialFirma::dialFirma(const char *title, sqlite *db) : BWindow(
 	// XXX end of ripped stuff
 	// buttons - OK, CANCEL
 	but_ok = new BButton(BRect(400,340,450,360), "firma_butok", "OK", new BMessage(BUT_OK));
-	but_cancel = new BButton(BRect(10,340,60,360), "firma_butcancel", "Anuluj", new BMessage(BUT_CANCEL));
-	view->AddChild(but_cancel);
+	if (cancancel) {
+		but_cancel = new BButton(BRect(10,340,60,360), "firma_butcancel", "Anuluj", new BMessage(BUT_CANCEL));
+		view->AddChild(but_cancel);
+	}
 	view->AddChild(but_ok);
 	// fetch i wypelnij boxy danymi
 	int i, j;

@@ -13,7 +13,7 @@ class BView;
 
 class dialFirma : public BWindow {
 	public:
-		dialFirma(const char *title, sqlite *db);
+		dialFirma(const char *title, sqlite *db, bool cancancel);
 		virtual void MessageReceived(BMessage *Message);
 
 	private:
