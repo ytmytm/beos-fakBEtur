@@ -1,6 +1,8 @@
 //
 // TODO:
 // - jesli nie ma pliku bazy danych - stworzyc z wbudowanego schema
+// - przy pierwszym uruchomieniu sprawdzic istnienie konfiguracji
+//	 - nie ma -> wywolac dialog
 // - menu z dialogiem konfiguracji (moja firma, inne opcje)
 // - menu z aboutprogram (balert)
 // - menu z drukowaniem (oryginal/kopia), wydruk, eksport html etc.
