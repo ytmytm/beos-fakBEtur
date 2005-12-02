@@ -13,14 +13,12 @@
 // wyrzucić uwagi i zastąpić całym podsumowaniem? podsumowanie na 3 karcie?
 // opcja faktury korygującej (jak? trzeba pamiętać co się zmieniło)
 //
-// obliczanie kwoty podatku:
-//	kwota vat: stawka*ilość*cenanetto czy wbrutto-wnetto? cf = to drugie: roznica
-//  dane przykładowe:
-// c.netto 3.02, vat 3 -> c.brutto 3.11
-// ilosc 1.04 -> w.netto 3.14, w.brutto 3.23
-// 1. jest poprawny? (spytać A. D.)
+// obliczanie:
 // 1. w.brutto = round(ilość*c.brutto) = round(ilość*round(c.netto*stawka)) = 3.23
 // 2. w.brutto = round(stawka*ilość*c.netto) = 3.24 (3.235)
+//
+// 2. jest poprawny (wtedy w.netto*stawka = w.brutto!)
+// kwota vat = wbrutto-wnetto
 //
 // testy w commitfaktura
 // - data/sposób płatności
@@ -473,19 +471,23 @@ void tabFaktura::updateTab2(void) {
 	BString sql, cnetto, cbrutto;
 	sql = "SELECT 0"; sql += towar[2]->Text();
 	sql += "*(100-0"; sql += towar[3]->Text(); sql += ")/100.0";
-	cnetto = decround(execSQL(sql.String())); // jednostkowa
+	cnetto = decround(execSQL(sql.String()));	// cnettojednostkowa
 	suma[0]->SetText(cnetto.String());
+	// cbrutto = cnettojedn*stawka
 	sql = "SELECT 0"; sql += cnetto; sql +="*(100+stawka)/100.0 FROM stawka_vat WHERE id = ";
 	sql << curtowarvatid;
-	cbrutto = decround(execSQL(sql.String())); // brutto
-	suma[1]->SetText(cbrutto.String());
-	suma[2]->SetText(towar[4]->Text());
+	suma[1]->SetText(decround(execSQL(sql.String())));	// cbrutto
+	suma[2]->SetText(towar[4]->Text());					// ilosc
+	// wnetto = cnettojedn*ilosc
 	sql = "SELECT 0"; sql += cnetto; sql += "*0"; sql += towar[4]->Text();
-	suma[3]->SetText(decround(execSQL(sql.String())));
-	sql = "SELECT 0"; sql += cbrutto; sql += "*0"; sql += towar[4]->Text();
-	suma[5]->SetText(decround(execSQL(sql.String())));
+	suma[3]->SetText(decround(execSQL(sql.String())));	// wnetto
+	// wbrutto = cnettojedn*ilosc*stawka = wnetto*stawka
+	sql = "SELECT 0"; sql += suma[3]->Text();
+	sql += "*(100+stawka)/100.0 FROM stawka_vat WHERE id = "; sql << curtowarvatid;
+	suma[5]->SetText(decround(execSQL(sql.String())));	// wbrutto
+	// wvat = wbrutto - wnetto
 	sql = "SELECT 0"; sql += suma[5]->Text(); sql += "-0"; sql += suma[3]->Text();
-	suma[4]->SetText(decround(execSQL(sql.String())));
+	suma[4]->SetText(decround(execSQL(sql.String())));	// wvat
 }
 
 void tabFaktura::makeNewForm(void) {
@@ -1131,9 +1133,9 @@ printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 		// vat = stawka
 		sql = "SELECT stawka FROM stawka_vat WHERE id = "; sql << data->vatid;
 		data->data[8] = execSQL(sql.String());
-		// w.brutto = cbrutto*ilosc
-		sql = "SELECT 0"; sql += cbrutto;
-		sql += "*0"; sql += data->data[3];
+		// w.brutto = w.netto*stawka
+		sql = "SELECT 0"; sql += data->data[7];
+		sql += "*(100+stawka)/100.0 FROM stawka_vat WHERE id = "; sql << data->vatid;
 		data->data[10] = decround(execSQL(sql.String()));	// w.brutto
 		// w.vat = w.brutto-w.netto
 		sql = "SELECT 0"; sql += data->data[10];
