@@ -100,7 +100,7 @@ CREATE TABLE pozycjafakt (
 	id		INTEGER NOT NULL,
 	fakturaid	INTEGER NOT NULL,
 	lp		INTEGER NOT NULL,
-	ilosc		TEXT NOT NULL,
+	ilosc		DECIMAL(12,2) NOT NULL,
 
 	--- towar - kopia struktury z towar
 	nazwa		TEXT,
@@ -108,8 +108,8 @@ CREATE TABLE pozycjafakt (
 	jm		TEXT,
 
 	vatid		INTEGER,
-	netto		INTEGER,
-	rabat		INTEGER,
+	netto		DECIMAL(12,2),
+	rabat		DECIMAL(12,2),
 
 	PRIMARY KEY(id,fakturaid)
 );
