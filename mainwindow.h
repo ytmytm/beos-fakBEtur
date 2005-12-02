@@ -8,6 +8,7 @@
 	#include "globals.h"
 
 	class beFakTab;
+	class dialAbout;
 	class BButton;
 	class BCheckBox;
 	class BListView;
@@ -25,6 +26,7 @@
 //			virtual void DispatchMessage(BMessage *message, BHandler *handler);
 			virtual bool QuitRequested();
 //			virtual void RefsReceived(BMessage *Message);
+			void DoAbout(void);
 		private:
 			// database handlers
 			int OpenDatabase(void);
@@ -36,6 +38,8 @@
 			BMenuBar *menuBar;
 			BMenu *menu;
 			BTabView *tabView;
+			// dialogs
+			dialAbout *aboutDialog;
 
 			// tabs
 			beFakTab *curTab, *tabs[3];

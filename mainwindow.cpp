@@ -5,7 +5,6 @@
 // - przy pierwszym uruchomieniu sprawdzic istnienie konfiguracji
 //	 - nie ma -> wywolac dialog
 // - menu z dialogiem konfiguracji (moja firma, inne opcje)
-// - menu z aboutprogram (balert)
 // - menu z drukowaniem (oryginal/kopia), wydruk, eksport html etc.
 // - nazwa towaru/faktury/kontrahenta w pasku tytułu (przyjąć msg od child?)
 //
@@ -14,6 +13,7 @@
 //
 
 #include "mainwindow.h"
+#include "dialabout.h"
 #include "tabfirma.h"
 #include "tabtowar.h"
 #include "tabfaktura.h"
@@ -56,8 +56,7 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	menu = new BMenu("Plik", B_ITEMS_IN_COLUMN);
 	((SpLocaleApp*)be_app)->AddToFileMenu(menu,false,false,false);
 	menu->AddSeparatorItem();
-//	menu->AddItem(new BMenuItem("Item", new BMessage(MENU_DEFMSG), 0, 0));
-	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
+	menu->AddItem(new BMenuItem("Zamknij", new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
 
 	menu = new BMenu("Wydruk", B_ITEMS_IN_COLUMN);
@@ -102,9 +101,16 @@ void BeFAKMainWindow::initTabs(BTabView *tv) {
 	tabs[2] = new tabFirma(tv, dbData);
 }
 
+void BeFAKMainWindow::DoAbout(void) {
+	aboutDialog = new dialAbout(APP_NAME);
+}
+
 void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 	this->DisableUpdates();
 	switch (Message->what) {
+		case MENU_ABOUT:
+			DoAbout();
+			break;
 		default:
 			curTab = tabs[tabView->Selection()];
 			curTab->MessageReceived(Message);
@@ -117,7 +123,8 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 bool BeFAKMainWindow::QuitRequested() {
 //	config->position = this->Frame();
 //	config->save();
-	curTab->CommitCurdata(false);
+	// XXX cannot commit! object doesn't exist here!!!
+//	curTab->CommitCurdata(false);
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return BWindow::QuitRequested();
 }
