@@ -1,5 +1,6 @@
 //
 // TODO:
+// - jesli nie ma pliku bazy danych - stworzyc z wbudowanego schema
 // - menu z aboutprogram (balert)
 // - menu z drukowaniem (oryginal/kopia)
 // - nazwa towaru/faktury w pasku tytułu
