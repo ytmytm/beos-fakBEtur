@@ -28,7 +28,8 @@
 			virtual bool QuitRequested();
 //			virtual void RefsReceived(BMessage *Message);
 			void DoAbout(void);
-			void DoConfigFirma(void);
+			void DoConfigFirma(bool cancancel = true);
+			void DoCheckConfig(void);
 		private:
 			// database handlers
 			int OpenDatabase(void);

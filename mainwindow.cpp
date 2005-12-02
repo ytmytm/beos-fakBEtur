@@ -1,10 +1,12 @@
 //
 // TODO:
+// - obsluga drukowania/eksportu 
+//		- commit current faktura
+//		- przekazanie parametrow:
+//			fakturaid, kopia/orig/dupl, # kopii, wydruk/eksport HTML/text
+//		- w zaleznosci od typu wydruku nowy obiekt (dziedziczy z tego samego?)
 // - jesli nie ma pliku bazy danych - stworzyc z wbudowanego schema
-// - przy pierwszym uruchomieniu sprawdzic istnienie konfiguracji
-//	 - nie ma -> wywolac dialog
 // - menu z dialogiem konfiguracji wydruku (liczba kopii, ?)
-// - menu z drukowaniem (oryginal/kopia), wydruk, eksport html etc.
 // - nazwa towaru/faktury/kontrahenta w pasku tytułu (przyjąć msg od child?)
 //
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
@@ -89,6 +91,9 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	// initialize datawidgets
 	initTabs(tabView);
 	tabView->Select(0);
+
+	// check if configuration is there
+	DoCheckConfig();
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
@@ -105,8 +110,27 @@ void BeFAKMainWindow::DoAbout(void) {
 	aboutDialog = new dialAbout(APP_NAME);
 }
 
-void BeFAKMainWindow::DoConfigFirma(void) {
-	firmaDialog = new dialFirma(APP_NAME, dbData);
+void BeFAKMainWindow::DoConfigFirma(bool cancancel) {
+	firmaDialog = new dialFirma(APP_NAME, dbData, cancancel);
+}
+
+void BeFAKMainWindow::DoCheckConfig(void) {
+	int nRows, nCols;
+	char **result;
+	BString sql;
+	// XXX select other interesting data too
+	sql = "SELECT nazwa FROM konfiguracja WHERE zrobiona = 1";
+//printf("sql:%s\n",sql.String());
+	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+//printf ("got:%ix%i\n", nRows, nCols);
+	if (nRows < 1) {
+//		printf("initial\n");
+		DoConfigFirma(false);
+		// XXX wait until firmaDialog is closed (possible???)
+		// XXX config is stored, update it with other defaults
+	} else {
+		// XXX read interesting config pieces from result
+	}
 }
 
 void BeFAKMainWindow::MessageReceived(BMessage *Message) {
