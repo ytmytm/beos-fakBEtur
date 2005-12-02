@@ -1,8 +1,9 @@
 //
 // TODO:
-// - pole uwagi nie reaguje na zmiany!
 // IDEAS:
-// - obliczac wartosci i ceny w jednym miejscu (np. suma[] i data->data w pozfakdata)
+// - pole uwagi nie reaguje na zmiany! (sprawdzac UndoState?)
+// - obliczac wartosci i ceny w jednym miejscu
+//	 (np. suma[] i data->data w pozfakdata oraz (fut!) wydruk)
 // - usunac kopiowanie kodu (execsql, inne kawalki)
 // - nazwa nowej faktury: '##/miesiac/rok', nie wiadomo skad brac ##?
 // - zamiast usuwać/dodawać wszystkie pozitems - może pamiętać ich id?
@@ -705,6 +706,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 
 void tabFaktura::ChangedSelection(int newid) {
 // XXX make return bool so can ignore changesel and do nothing?
+
 	if (!(CommitCurtowar())) {
 		return;
 	}
