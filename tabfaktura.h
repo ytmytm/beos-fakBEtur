@@ -136,10 +136,11 @@ class pozfaklist {	// list object
 
 		void remove(int offset);
 
-		int generate_id(void);	// XXX already in fakturadat
+		int generate_id(void);
 		void commit(int fakturaid);
 		void commititem(int fakturaid, pozfakitem *data);
 		void fetch(int fakturaid);
+		const char *execSQL(const char *input);	// XXX dupe from befaktab!
 
 		pozfakitem *start;
 		pozfakitem *end;

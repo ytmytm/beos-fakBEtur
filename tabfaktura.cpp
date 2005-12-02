@@ -1,8 +1,9 @@
 //
 // TODO:
 // - pole uwagi nie reaguje na zmiany!
-// - obliczać brakujące pola dla data[] w pozfakdata po fetch
 // IDEAS:
+// - obliczac wartosci i ceny w jednym miejscu (np. suma[] i data->data w pozfakdata)
+// - usunac kopiowanie kodu (execsql, inne kawalki)
 // - nazwa nowej faktury: '##/miesiac/rok', nie wiadomo skad brac ##?
 // - zamiast usuwać/dodawać wszystkie pozitems - może pamiętać ich id?
 //	 generować, uaktualniać, czyścić
@@ -484,10 +485,6 @@ void tabFaktura::updateTab2(void) {
 	sql = "SELECT 0"; sql += cbrutto; sql += "*0"; sql += towar[4]->Text();
 	suma[5]->SetText(decround(execSQL(sql.String())));
 	sql = "SELECT 0"; sql += suma[5]->Text(); sql += "-0"; sql += suma[3]->Text();
-//  XXX alternative way, ask A. Dragun for clarification
-//	sql = "SELECT 0"; sql += towar[4]->Text(); sql += "*0"; sql += towar[2]->Text();
-//	sql += "*stawka/100.0 FROM stawka_vat WHERE id = ";
-//	sql << curtowarvatid;
 	suma[4]->SetText(decround(execSQL(sql.String())));
 }
 
@@ -705,6 +702,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 }
 
 void tabFaktura::ChangedSelection(int newid) {
+// XXX make return bool so can ignore changesel and do nothing?
 	if (!(CommitCurtowar())) {
 		return;
 	}
@@ -1085,7 +1083,7 @@ printf("fetchpozfak id=%i\n", fakturaid);
 	int i, j;
 	int nRows, nCols;
 	char **result;
-	BString sql;	
+	BString sql, cbrutto;	
 
 	// clear current list!
 	clear();
@@ -1116,8 +1114,47 @@ printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 		data->data[11] = result[i++];	// c.netto
 		data->data[5] = result[i++];	// rabat
 		addlast(data);
-		//XXX recalculate missing data!
+		// XXX duplicated calculations from updateTab2 on suma[]
+		// 6, 7, 8, 9, 10 - cjednost, w.netto, vat, wvat, wbrutto
+		// cjednostk = cnetto*(100-rabat)/100
+		sql = "SELECT 0"; sql += data->data[11];
+		sql += "*(100-0"; sql += data->data[5]; sql += ")/100.0";
+		data->data[6] = decround(execSQL(sql.String()));	// c.jednostkowa
+		// cbrutto = cjednostk*(100+stawka)/100
+		sql = "SELECT 0"; sql += data->data[6];
+		sql += "*(100+stawka)/100.0 FROM stawka_vat WHERE id = "; sql << data->vatid;
+		cbrutto = decround(execSQL(sql.String()));			// c.brutto
+		// w.netto = cjednostkowanetto*ilosc
+		sql = "SELECT 0"; sql += data->data[6];
+		sql += "*0"; sql += data->data[3];
+		data->data[7] = decround(execSQL(sql.String()));	// w.netto
+		// vat = stawka
+		sql = "SELECT stawka FROM stawka_vat WHERE id = "; sql << data->vatid;
+		data->data[8] = execSQL(sql.String());
+		// w.brutto = cbrutto*ilosc
+		sql = "SELECT 0"; sql += cbrutto;
+		sql += "*0"; sql += data->data[3];
+		data->data[10] = decround(execSQL(sql.String()));	// w.brutto
+		// w.vat = w.brutto-w.netto
+		sql = "SELECT 0"; sql += data->data[10];
+		sql += "-0"; sql += data->data[7];
+		data->data[9] = decround(execSQL(sql.String()));	// w.vat
 		j++;							// next row
 	}
 	setlp();							// reset lp
+}
+
+// XXX this is duplicated in befaktab!
+const char *pozfaklist::execSQL(const char *input) {
+	int nRows, nCols;
+	char **result;
+	static BString res;
+//printf("sql=[%s]\n",sql.String());
+	sqlite_get_table(dbData, input, &result, &nRows, &nCols, &dbErrMsg);
+//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
+	if (nRows < 1)
+		res = "";
+	else
+		res = result[1];
+	return res.String();
 }
