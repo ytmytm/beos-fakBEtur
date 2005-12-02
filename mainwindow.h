@@ -9,6 +9,7 @@
 
 	class beFakTab;
 	class dialAbout;
+	class dialFirma;
 	class BButton;
 	class BCheckBox;
 	class BListView;
@@ -27,6 +28,7 @@
 			virtual bool QuitRequested();
 //			virtual void RefsReceived(BMessage *Message);
 			void DoAbout(void);
+			void DoConfigFirma(void);
 		private:
 			// database handlers
 			int OpenDatabase(void);
@@ -40,6 +42,7 @@
 			BTabView *tabView;
 			// dialogs
 			dialAbout *aboutDialog;
+			dialFirma *firmaDialog;
 
 			// tabs
 			beFakTab *curTab, *tabs[3];

@@ -1,10 +1,9 @@
 //
 // TODO:
 // - jesli nie ma pliku bazy danych - stworzyc z wbudowanego schema
-// - konfiguracja - osobna tabela w bazie
 // - przy pierwszym uruchomieniu sprawdzic istnienie konfiguracji
 //	 - nie ma -> wywolac dialog
-// - menu z dialogiem konfiguracji (moja firma, inne opcje)
+// - menu z dialogiem konfiguracji wydruku (liczba kopii, ?)
 // - menu z drukowaniem (oryginal/kopia), wydruk, eksport html etc.
 // - nazwa towaru/faktury/kontrahenta w pasku tytułu (przyjąć msg od child?)
 //
@@ -14,6 +13,7 @@
 
 #include "mainwindow.h"
 #include "dialabout.h"
+#include "dialfirma.h"
 #include "tabfirma.h"
 #include "tabtowar.h"
 #include "tabfaktura.h"
@@ -105,11 +105,18 @@ void BeFAKMainWindow::DoAbout(void) {
 	aboutDialog = new dialAbout(APP_NAME);
 }
 
+void BeFAKMainWindow::DoConfigFirma(void) {
+	firmaDialog = new dialFirma(APP_NAME, dbData);
+}
+
 void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 	this->DisableUpdates();
 	switch (Message->what) {
 		case MENU_ABOUT:
 			DoAbout();
+			break;
+		case MENU_CONFFIRMA:
+			DoConfigFirma();
 			break;
 		default:
 			curTab = tabs[tabView->Selection()];
