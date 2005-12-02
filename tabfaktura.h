@@ -102,7 +102,7 @@ class pozfakdata {
 
 		BString data[12];
 		// lp, nazwa, pkwiu, ilosc, jm, rabat, cena jednostkowa, w.netto, vat,
-		// w.vat, w.brutto, [c.netto? 11th]
+		// w.vat, w.brutto, c.netto
 		int vatid;	// odp. stawce vat, być może zamiast w/w
 };
 
@@ -135,7 +135,9 @@ class pozfaklist {	// list object
 
 		void remove(int offset);
 
-		// void commit(int fakturaid);
+		int generate_id(void);	// XXX already in fakturadat
+		void commit(int fakturaid);
+		void commititem(int fakturaid, pozfakitem *data);
 		// void fetch(int fakturaid);
 
 		pozfakitem *start;

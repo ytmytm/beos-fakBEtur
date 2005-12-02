@@ -1,6 +1,6 @@
 //
 // TODO:
-// - dodac do pozfakdata cene netto? (na razie mozna obliczac z jednostkowej)
+// - dodac do pozfakdata id! generowac! uaktualniac! czyscic!
 // - lista: metody na commit/fetch listy z bazy
 // - nazwa nowej faktury: '##/miesiac/rok', nie wiadomo skad brac ##?
 //
@@ -81,7 +81,7 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
 	curdata = new fakturadat(db);
 	odbiorca = new firmadat(db);
 	curtowar = new towardat(db);
-	faklista = new pozfaklist();
+	faklista = new pozfaklist(db);
 	this->dirty = false;
 
 	curtowarvatid = -1;
@@ -720,11 +720,12 @@ void tabFaktura::ChangedTowarSelection(int newid) {
 		towar[5]->SetText(item->data[4].String());	// jm
 		towar[3]->SetText(item->data[5].String());	// rabat
 		curtowarvatid = item->vatid;				// vatid
-		// cena netto z jednostkowej przed rabatem
-		BString sql;
-		sql = "SELECT 0"; sql += item->data[6];
-		sql += "/(1-0"; sql += item->data[5]; sql += "/100.0)";
-		towar[2]->SetText(execSQL(sql.String()));
+		towar[2]->SetText(item->data[11].String());	// cnetto
+//		// cena netto z jednostkowej przed rabatem
+//		BString sql;
+//		sql = "SELECT 0"; sql += item->data[6];
+//		sql += "/(1-0"; sql += item->data[5]; sql += "/100.0)";
+//		towar[2]->SetText(execSQL(sql.String()));
 		updateTab2();
 	} else {
 //		printf("null item after selchg, happens after all-delete\n");
@@ -735,6 +736,7 @@ void tabFaktura::ChangedTowarSelection(int newid) {
 void tabFaktura::DoCommitCurdata(void) {
 	// XXX perform all checks against supplied data
 	curdata->commit();
+	faklista->commit(curdata->id);
 	this->dirty = false;
 	RefreshIndexList();
 }
@@ -832,6 +834,7 @@ bool tabFaktura::DoCommitTowardata(void) {
 	newdata->vatid = curtowarvatid;			// stawka vat, update data[8]
 	newdata->data[9] = suma[4]->Text();		// kwota vat
 	newdata->data[10] = suma[5]->Text();	// w.brutto
+	newdata->data[11] = towar[2]->Text();	// c.netto
 	sql = "SELECT stawka FROM stawka_vat WHERE id = "; sql << curtowarvatid;
 	newdata->data[8] = execSQL(sql.String());
 	// dodaj do listy
@@ -987,4 +990,51 @@ pozfakdata *pozfaklist::itemat(int offset) {
 	if (cur != NULL)
 		return cur->data;
 	return NULL;
+}
+
+// ----------------- db stuff below
+
+int pozfaklist::generate_id(void) {
+	int newid = 1;
+	int nRows, nCols;
+	char **result;
+	sqlite_get_table(dbData, "SELECT MAX(id) FROM pozycjafakt", &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows > 0) {
+		// there is something in db
+		newid = toint(result[1]) + 1;
+	}
+	sqlite_free_table(result);
+	return newid;
+}
+
+void pozfaklist::commit(int fakturaid) {
+	// iterate through list, commit items
+	pozfakitem *cur = start;
+	while (cur!=NULL) {
+		commititem(fakturaid, cur);
+		cur = cur->nxt;
+	}
+}
+
+void pozfaklist::commititem(int fakturaid, pozfakitem *item) {
+	BString sql;
+	pozfakdata *data = item->data;
+	int ret, id;
+
+	/// XXX ids for existing should be already known!!!
+	id = generate_id();
+	sql = "INSERT INTO pozycjafakt ( ";
+	sql += "id, fakturaid, lp, ilosc";
+	sql += ", nazwa, pkwiu, jm, vatid, netto, rabat";
+	sql += " ) VALUES ( ";
+	sql += "%i, %i, %i, %Q";
+	sql += ", %Q, %Q, %Q, %i, %Q, %Q";
+	sql += " )";
+printf("commit for %i #%i\n", id, fakturaid);
+printf("sql:[%s]\n",sql.String());
+	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
+		id, fakturaid, item->lp, data->data[3].String(),
+		data->data[1].String(), data->data[2].String(), data->data[4].String(), data->vatid, data->data[11].String(), data->data[5].String()
+	);
+printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
