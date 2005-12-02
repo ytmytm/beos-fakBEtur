@@ -1,9 +1,12 @@
 //
 // TODO:
-// - dodac do pozfakdata id! generowac! uaktualniac! czyscic!
-//	 lub: usuwać wszystkie przed commit i dodawać na nowo (wygodne)
-// - lista: metoda na fetch listy z bazy
+// - pole uwagi nie reaguje na zmiany!
+// - obliczać brakujące pola dla data[] w pozfakdata po fetch
+// IDEAS:
 // - nazwa nowej faktury: '##/miesiac/rok', nie wiadomo skad brac ##?
+// - zamiast usuwać/dodawać wszystkie pozitems - może pamiętać ich id?
+//	 generować, uaktualniać, czyścić
+//	 (problem: które UPDATE, które INSERT, a które DELETE)
 //
 // druga karta - label z numerem? (może na tytuł okna?)
 // wyrzucić uwagi i zastąpić całym podsumowaniem? podsumowanie na 3 karcie?
@@ -420,6 +423,7 @@ void tabFaktura::curdataFromTab(void) {
 		if (i!=1)
 			curdata->odata[i]=data[i]->Text();
 	curdata->zaplacono = (cbzaplacono->Value() == B_CONTROL_ON);
+	curdata->uwagi = uwagi->Text();
 }
 
 void tabFaktura::curdataToTab(void) {
@@ -431,6 +435,7 @@ void tabFaktura::curdataToTab(void) {
 		if (i!=1)
 			data[i]->SetText(curdata->odata[i].String());
 	cbzaplacono->SetValue(curdata->zaplacono ? B_CONTROL_ON : B_CONTROL_OFF);
+	uwagi->SetText(curdata->uwagi.String());
 	updateTab();
 }
 
@@ -695,12 +700,16 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 }
 
 void tabFaktura::ChangedSelection(int newid) {
+	if (!(CommitCurtowar())) {
+		return;
+	}
 	if (!(CommitCurdata())) {
 		// XXX do nothing if cancel, restore old selection?
 		return;
 	}
 	// initialize
 	makeNewForm();
+	makeNewTowar();
 	// fetch and store into new data
 	curdata->id = newid;
 	DoFetchCurdata();
@@ -739,6 +748,7 @@ void tabFaktura::DoCommitCurdata(void) {
 	curdata->commit();
 	faklista->commit(curdata->id);
 	this->dirty = false;
+	towardirty = false;
 	RefreshIndexList();
 }
 
@@ -746,13 +756,19 @@ void tabFaktura::DoDeleteCurdata(void) {
 // XXX ask for confimation?
 	curdata->del();
 	curdataToTab();
+	faklista->clear();
+	towardirty = false;
+	RefreshTowarList();
 	RefreshIndexList();
 }
 
 void tabFaktura::DoFetchCurdata(void) {
 	if (curdata->id >=0) {
 		curdata->fetch();
+		faklista->fetch(curdata->id);
 		this->dirty = false;
+		towardirty = false;
+		RefreshTowarList();
 		curdataToTab();
 	}
 }
@@ -883,7 +899,7 @@ void tabFaktura::RefreshTowarList(void) {
 	}
 }
 
-// data stuff, move to a separate file or sth
+// data handling stuff, move to a separate file or sth
 
 pozfakitem::pozfakitem(pozfakdata *curdata, pozfakitem *prev, pozfakitem *next) {
 	data = curdata;
@@ -892,6 +908,25 @@ pozfakitem::pozfakitem(pozfakdata *curdata, pozfakitem *prev, pozfakitem *next) 
 	// alloc and/or init data
 //	printf("init\n");
 	lp = 0;
+}
+
+pozfaklist::pozfaklist(sqlite *db) {
+//	printf("constr\n");
+	dbData = db;
+	start = NULL;
+	end = start;
+}
+
+void pozfaklist::clear(void) {
+	pozfakitem *nxt, *cur = start;
+
+	while (cur!=NULL) {
+		nxt = cur->nxt;
+		delete cur;
+		cur = nxt;
+	}
+	start = NULL;
+	end = start;
 }
 
 void pozfaklist::dump(void) {
@@ -911,13 +946,6 @@ void pozfaklist::setlp(void) {
 		cur->lp = i++;
 		cur = cur->nxt;
 	}
-}
-
-pozfaklist::pozfaklist(sqlite *db) {
-//	printf("constr\n");
-	dbData = db;
-	start = NULL;
-	end = start;
 }
 
 void pozfaklist::addlast(pozfakdata *data) {
@@ -1009,6 +1037,12 @@ int pozfaklist::generate_id(void) {
 }
 
 void pozfaklist::commit(int fakturaid) {
+	int ret;
+	/// XXX ids for existing should be already known!!!
+	/// XXX remove all existing and insert new? convenient!
+	ret = sqlite_exec_printf(dbData, "DELETE FROM pozycjafakt WHERE fakturaid = %i", 0, 0, &dbErrMsg, fakturaid);
+printf("result: %i, %s;\n", ret, dbErrMsg);
+
 	// iterate through list, commit items
 	pozfakitem *cur = start;
 	while (cur!=NULL) {
@@ -1021,22 +1055,64 @@ void pozfaklist::commititem(int fakturaid, pozfakitem *item) {
 	BString sql;
 	pozfakdata *data = item->data;
 	int ret, id;
-
-	/// XXX ids for existing should be already known!!!
-	/// XXX remove all existing and insert new? convenient!
+	/// XXX really INSERT only?
 	id = generate_id();
 	sql = "INSERT INTO pozycjafakt ( ";
-	sql += "id, fakturaid, lp, ilosc";
+	sql += "id, lp, ilosc";
 	sql += ", nazwa, pkwiu, jm, vatid, netto, rabat";
-	sql += " ) VALUES ( ";
-	sql += "%i, %i, %i, %Q";
+	sql += ", fakturaid ) VALUES ( ";
+	sql += "%i, %i, %Q";
 	sql += ", %Q, %Q, %Q, %i, %Q, %Q";
-	sql += " )";
+	sql += ", %i )";
 printf("commit for %i #%i\n", id, fakturaid);
 printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
-		id, fakturaid, item->lp, data->data[3].String(),
-		data->data[1].String(), data->data[2].String(), data->data[4].String(), data->vatid, data->data[11].String(), data->data[5].String()
+		id, item->lp, data->data[3].String(),
+		data->data[1].String(), data->data[2].String(), data->data[4].String(), data->vatid, data->data[11].String(), data->data[5].String(),
+		fakturaid
 	);
 printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
+}
+
+void pozfaklist::fetch(int fakturaid) {
+printf("fetchpozfak id=%i\n", fakturaid);
+	pozfakdata *data;
+	int i, j;
+	int nRows, nCols;
+	char **result;
+	BString sql;	
+
+	// clear current list!
+	clear();
+
+	sql = "SELECT ";
+	sql += "id, lp, ilosc";
+	sql += ", nazwa, pkwiu, jm, vatid, netto, rabat";
+	sql += " FROM pozycjafakt WHERE fakturaid = ";
+	sql << fakturaid;
+	sql += " ORDER BY lp";
+printf("sql:%s\n",sql.String());
+	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
+	if (nRows < 1)
+		return;
+	// readout data
+	i = nCols;
+	j = 1;
+	while (j <= nRows) {
+		data = new pozfakdata();
+		i++;							// id, unused
+		data->data[0] = result[i++];	// lp, unused
+		data->data[3] = result[i++];	// ilosc
+		data->data[1] = result[i++];	// nazwa
+		data->data[2] = result[i++];	// pkwiu
+		data->data[4] = result[i++];	// jm
+		data->vatid = toint(result[i++]); //vatid
+		data->data[11] = result[i++];	// c.netto
+		data->data[5] = result[i++];	// rabat
+		addlast(data);
+		//XXX recalculate missing data!
+		j++;							// next row
+	}
+	setlp();							// reset lp
 }

@@ -123,6 +123,7 @@ class pozfaklist {	// list object
 		pozfaklist(sqlite *db);
 		~pozfaklist();
 
+		void clear(void);
 		void dump(void);
 		void setlp(void);
 
@@ -138,7 +139,7 @@ class pozfaklist {	// list object
 		int generate_id(void);	// XXX already in fakturadat
 		void commit(int fakturaid);
 		void commititem(int fakturaid, pozfakitem *data);
-		// void fetch(int fakturaid);
+		void fetch(int fakturaid);
 
 		pozfakitem *start;
 		pozfakitem *end;

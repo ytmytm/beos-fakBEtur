@@ -56,14 +56,13 @@
 			void clear(void);
 			// data management
 			int generate_id(void);
-			int generate_pozid(void);
 			void commit(void);
 			void fetch(void);
 			void del(void);
 			// data holders
 			int id;
 			// data itself
-			BString nazwa;
+			BString nazwa, uwagi;
 			BString ogol[10], odata[11];
 			bool zaplacono;
 		private:

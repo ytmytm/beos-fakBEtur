@@ -280,6 +280,7 @@ void fakturadat::clear(void) {
 	for (i=0;i<=10;i++)
 		odata[i] = "";
 	zaplacono = false;
+	uwagi = "";
 }
 
 int fakturadat::generate_id(void) {
@@ -287,19 +288,6 @@ int fakturadat::generate_id(void) {
 	int nRows, nCols;
 	char **result;
 	sqlite_get_table(dbData, "SELECT MAX(id) FROM faktura", &result, &nRows, &nCols, &dbErrMsg);
-	if (nRows > 0) {
-		// there is something in db
-		newid = toint(result[1]) + 1;
-	}
-	sqlite_free_table(result);
-	return newid;
-}
-
-int fakturadat::generate_pozid(void) {
-	int newid = 1;
-	int nRows, nCols;
-	char **result;
-	sqlite_get_table(dbData, "SELECT MAX(id) FROM pozycjafakt", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows > 0) {
 		// there is something in db
 		newid = toint(result[1]) + 1;
@@ -317,7 +305,7 @@ printf("in commit with %i\n",id);
 		sql += "nazwa = %Q";
 		sql += ", miejsce_wystawienia = %Q, wystawil = %Q, data_wystawienia = %Q, data_sprzedazy = %Q";
 		sql += ", srodek_transportu = %Q, sposob_zaplaty = %Q, termin_zaplaty = %Q",
-		sql += ", zapl_kwota = %Q, zapl_dnia = %Q, zaplacono = %i";
+		sql += ", zapl_kwota = %Q, zapl_dnia = %Q, zaplacono = %i, uwagi = %Q";
 		sql += ", onazwa = %Q, oadres = %Q, okod = %Q, omiejscowosc = %Q, otelefon = %Q, oemail = %Q";
 		sql += ", onip = %Q, oregon = %Q, obank = %Q, okonto = %Q";
 		sql += " WHERE id = %i";
@@ -327,14 +315,14 @@ printf("in commit with %i\n",id);
 		sql += "nazwa";
 		sql += ", miejsce_wystawienia, wystawil, data_wystawienia, data_sprzedazy";
 		sql += ", srodek_transportu, sposob_zaplaty, termin_zaplaty";
-		sql += ", zapl_kwota, zapl_dnia, zaplacono";
+		sql += ", zapl_kwota, zapl_dnia, zaplacono, uwagi";
 		sql += ", onazwa, oadres, okod, omiejscowosc, otelefon, oemail";
 		sql += ", onip, oregon, obank, okonto";
 		sql += ", id ) VALUES ( ";
 		sql += "%Q";
 		sql += ", %Q, %Q, %Q, %Q";
 		sql += ", %Q, %Q, %Q";
-		sql += ", %Q, %Q, %i";
+		sql += ", %Q, %Q, %i, %Q";
 		sql += ", %Q, %Q, %Q, %Q, %Q, %Q";
 		sql += ", %Q, %Q, %Q, %Q";
 		sql += ", %i)";
@@ -343,7 +331,7 @@ printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		nazwa.String(), ogol[0].String(), ogol[1].String(), ogol[2].String(), ogol[3].String(),
 		ogol[4].String(), ogol[5].String(), ogol[6].String(),
-		ogol[8].String(), ogol[9].String(), zaplacono,
+		ogol[8].String(), ogol[9].String(), zaplacono, uwagi.String(),
 		odata[0].String(), odata[2].String(), odata[3].String(), odata[4].String(), odata[5].String(), odata[6].String(),
 		odata[7].String(), odata[8].String(), odata[9].String(), odata[10].String(),
 		id);
@@ -360,7 +348,7 @@ printf("in fetchcurdata with %i\n",id);
 	sql += "nazwa";
 	sql += ", miejsce_wystawienia, wystawil, data_wystawienia, data_sprzedazy";
 	sql += ", srodek_transportu, sposob_zaplaty, termin_zaplaty";
-	sql += ", zapl_kwota, zapl_dnia, zaplacono";
+	sql += ", zapl_kwota, zapl_dnia, zaplacono, uwagi";
 	sql += ", onazwa, oadres, okod, omiejscowosc, otelefon, oemail";
 	sql += ", onip, oregon, obank, okonto";
 	sql += " FROM faktura WHERE id = ";
@@ -377,6 +365,7 @@ printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	ogol[8] = result[i++];
 	ogol[9] = result[i++];
 	zaplacono = toint(result[i++]);
+	uwagi = result[i++];
 	odata[0] = result[i++];
 	for (j=2;j<=10;j++) {
 		odata[j] = result[i++];
