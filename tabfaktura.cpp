@@ -21,6 +21,11 @@
 // 1. w.brutto = round(ilość*c.brutto) = round(ilość*round(c.netto*stawka)) = 3.23
 // 2. w.brutto = round(stawka*ilość*c.netto) = 3.24 (3.235)
 //
+// testy w commitfaktura
+// - data/sposób płatności
+// - brak adresu odbiorcy
+// - kto wystawił?
+// - lista towarów pusta
 // testy w docommitcurtowardata
 // - towar o tej nazwie już jest
 // - czy dodać to do bazy towarów?
