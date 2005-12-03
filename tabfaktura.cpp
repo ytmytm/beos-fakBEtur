@@ -1,16 +1,15 @@
 //
 // TODO:
+// - nazwa nowej faktury: '##/miesiac/rok', ## brac z konf, ale kiedy uaktualniac?
 // IDEAS:
 // - pole uwagi nie reaguje na zmiany! (sprawdzac UndoState?)
 // - obliczac wartosci i ceny w jednym miejscu
 //	 (np. suma[] i data->data w pozfakdata oraz (fut!) wydruk)
 // - usunac kopiowanie kodu (execsql, inne kawalki)
-// - nazwa nowej faktury: '##/miesiac/rok', nie wiadomo skad brac ##?
 // - zamiast usuwać/dodawać wszystkie pozitems - może pamiętać ich id?
 //	 generować, uaktualniać, czyścić
 //	 (problem: które UPDATE, które INSERT, a które DELETE)
 //
-// druga karta - label z numerem? (może na tytuł okna?)
 // wyrzucić uwagi i zastąpić całym podsumowaniem? podsumowanie na 3 karcie?
 // opcja faktury korygującej (jak? trzeba pamiętać co się zmieniło)
 //
