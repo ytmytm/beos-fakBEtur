@@ -2,6 +2,7 @@
 #ifndef _DIALABOUT_H
 #define _DIALABOUT_H
 
+#include <String.h>
 #include <View.h>
 #include <Window.h>
 
@@ -15,7 +16,7 @@ class dialView : public BView {
 		dialView(BRect frame, const char *name, const char *title);
 		virtual void Draw(BRect updateRect);
 	private:
-		const char *appname;
+		BString appname;
 };
 
 #endif
