@@ -47,6 +47,8 @@ class tabFaktura : public beFakTab {
 		void curdataToTab(void);
 		void updateTab(void);
 		void updateTab2(void);
+		//
+		void printCurrent(void);
 	private:
 		void initTab1(void);
 		void initTab2(void);
@@ -56,7 +58,7 @@ class tabFaktura : public beFakTab {
 		BTabView *tv2;
 		BBox *box1, *box2, *box3, *box4, *box5, *box6, *box7;
 
-		BButton *but_new, *but_del, *but_restore, *but_save;
+		BButton *but_new, *but_del, *but_restore, *but_save, *but_print;
 		BButton *but_psave, *but_pnew, *but_pimport, *but_pdel;
 		BListView *list;
 

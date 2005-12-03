@@ -2,7 +2,6 @@
 // TODO:
 // - nazwa nowej faktury: '##/miesiac/rok', ## brac z konf, ale kiedy uaktualniac?
 // IDEAS:
-// - button 'wydruk' wygodnie na dole?
 // - pole uwagi nie reaguje na zmiany! (sprawdzac UndoState?)
 // - obliczac wartosci i ceny w jednym miejscu
 //	 (np. suma[] i data->data w pozfakdata oraz (fut!) wydruk)
@@ -59,6 +58,7 @@ const uint32 BUT_NEW	= 'TFBN';
 const uint32 BUT_DEL	= 'TFBD';
 const uint32 BUT_RESTORE= 'TFBR';
 const uint32 BUT_SAVE	= 'TFBS';
+const uint32 BUT_PRINT	= 'TFBP';
 const uint32 DC			= 'TFDC';
 
 const uint32 CBUT		= 'TFCB';
@@ -113,10 +113,12 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db
 	but_del = new BButton(BRect(40,510,130,534), "tf_but_del", "Usuń zaznaczone", new BMessage(BUT_DEL), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
 	but_restore = new BButton(BRect(235,510,325,534), "tf_but_restore", "Przywróć", new BMessage(BUT_RESTORE), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
 	but_save = new BButton(BRect(580,510,670,534), "tf_but_save", "Zapisz", new BMessage(BUT_SAVE), B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
+	but_print = new BButton(BRect(405,510,485,534), "tf_but_print", "Drukuj", new BMessage(BUT_PRINT), B_FOLLOW_LEFT_RIGHT|B_FOLLOW_BOTTOM);
 	this->view->AddChild(but_new);
 	this->view->AddChild(but_del);
 	this->view->AddChild(but_restore);
 	this->view->AddChild(but_save);
+	this->view->AddChild(but_print);
 
 	BTabView *tbv2 = new BTabView(BRect(180,0,790,500), "tftbv2");
 	this->view->AddChild(tbv2);
@@ -568,6 +570,13 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			DoCommitCurdata();
 			curdataToTab();
 			break;
+		case BUT_PRINT:
+			curdataFromTab();
+			DoCommitCurdata();
+			curdataToTab();
+			// XXX prepare default params
+			printCurrent();
+			break;
 		case LIST_SEL:
 		case LIST_INV:
 //			printf("list selection/invoc\n");
@@ -706,6 +715,10 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				}
 				break;
 			}
+		case MSG_ORDERPRINT:
+			// XXX read params from msg
+			printCurrent();
+			break;
 	}
 }
 
@@ -909,4 +922,8 @@ void tabFaktura::RefreshTowarList(void) {
 		}
 		cur = cur->nxt;
 	}
+}
+
+void tabFaktura::printCurrent(void) {
+	printf("do printing stuff\n");
 }

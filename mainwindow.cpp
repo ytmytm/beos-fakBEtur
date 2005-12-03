@@ -149,6 +149,15 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 
 	this->DisableUpdates();
 	switch (Message->what) {
+		case MENU_PRINTO:
+		case MENU_PRINTC:
+		case MENU_PRINTD:
+			{	BMessage *msg;
+				msg = new BMessage(MSG_ORDERPRINT);
+				// XXX fit msg with additional print params
+				curTab->MessageReceived(msg);
+				break;
+			}
 		case MENU_ABOUT:
 			DoAbout();
 			break;
