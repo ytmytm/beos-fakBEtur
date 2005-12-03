@@ -2,6 +2,7 @@
 // TODO:
 // - nazwa nowej faktury: '##/miesiac/rok', ## brac z konf, ale kiedy uaktualniac?
 // IDEAS:
+// - button 'wydruk' wygodnie na dole?
 // - pole uwagi nie reaguje na zmiany! (sprawdzac UndoState?)
 // - obliczac wartosci i ceny w jednym miejscu
 //	 (np. suma[] i data->data w pozfakdata oraz (fut!) wydruk)
