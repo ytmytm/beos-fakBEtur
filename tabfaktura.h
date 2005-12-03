@@ -17,8 +17,6 @@ class BTextView;
 class BStringView;
 class BView;
 
-class pozfaklist;	// XXX move
-
 class tabFaktura : public beFakTab {
 
 	public:
@@ -93,61 +91,6 @@ class tabFaktura : public beFakTab {
 
 		// to control many lists
 		int lasttowarsel;
-};
-
-class pozfakdata {
-	public:
-		// data holder
-		pozfakdata() { };
-		~pozfakdata() { };
-
-		BString data[12];
-		// lp, nazwa, pkwiu, ilosc, jm, rabat, cena jednostkowa, w.netto, vat,
-		// w.vat, w.brutto, c.netto
-		int vatid;	// odp. stawce vat, być może zamiast w/w
-};
-
-class pozfakitem {
-	public:
-		pozfakitem(pozfakdata *curdata, pozfakitem *prev = NULL, pozfakitem *next = NULL);
-		~pozfakitem() { delete data; };
-
-		pozfakitem *nxt, *prv;	// list pointers
-		int lp;				//XXX liczba porzadkowa - tu, czy w data?
-
-		// data fields
-		pozfakdata *data;	// real data holder
-};
-
-class pozfaklist {	// list object
-	public:
-		pozfaklist(sqlite *db);
-		~pozfaklist();
-
-		void clear(void);
-		void dump(void);
-		void setlp(void);
-
-		void addlast(pozfakdata *data);
-		void addfirst(pozfakdata *data);
-		void addafter(pozfakdata *data, pozfakitem *afterme);
-		void addafter(pozfakdata *data, int offset);
-
-		pozfakdata *itemat(int offset);
-
-		void remove(int offset);
-
-		int generate_id(void);
-		void commit(int fakturaid);
-		void commititem(int fakturaid, pozfakitem *data);
-		void fetch(int fakturaid);
-		const char *execSQL(const char *input);	// XXX dupe from befaktab!
-
-		pozfakitem *start;
-		pozfakitem *end;
-	private:
-		sqlite *dbData;
-		char *dbErrMsg;
 };
 
 #endif
