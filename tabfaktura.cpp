@@ -2,6 +2,7 @@
 // TODO:
 // - nazwa nowej faktury: '##/miesiac/rok', ## brac z konf, ale kiedy uaktualniac?
 // IDEAS:
+// - pewnego słonecznego dnia wrzucić do destruktora listę z delete...
 // - pole uwagi nie reaguje na zmiany! (sprawdzac UndoState?)
 // - obliczac wartosci i ceny w jednym miejscu
 //	 (np. suma[] i data->data w pozfakdata oraz (fut!) wydruk)
@@ -34,6 +35,7 @@
 
 #include "globals.h"
 #include "tabfaktura.h"
+#include "befakprint.h"
 
 #include <Alert.h>
 #include <Box.h>
@@ -926,4 +928,8 @@ void tabFaktura::RefreshTowarList(void) {
 
 void tabFaktura::printCurrent(void) {
 	printf("do printing stuff\n");
+	beFakPrint *print = new beFakPrint(curdata->id, this->dbData);
+	print->Go();
+	printf("launched printing job\n");
+	delete print;
 }
