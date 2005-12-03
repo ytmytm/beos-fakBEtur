@@ -1,4 +1,17 @@
 
+//
+// ogolne:
+//		wygenerowanie podsumowania z rozbiciem na stawki
+//		obliczenie sumy do zaplaty
+//		slownie
+// text:
+//		generowanie tabelki
+//			szerokosci na sztywno dla 80/136
+//			truncate wszystko
+//		RAZEM osobno, zeby moglo zajsc na sume/slownie
+//
+
+
 #include "befakprint.h"
 
 #include <stdio.h>
@@ -153,6 +166,7 @@ BString tmp, out, line;
 	//[17] [wolna]
 	out += ELINE;
 	// [tabela], [podsumowanie]
+
 	//[] [wolna]
 	out += ELINE;
 	//[] Do zapłaty: [kwota], lub polaczone z RAZEM |
