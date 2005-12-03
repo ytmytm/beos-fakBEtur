@@ -5,10 +5,8 @@
 //		- przekazanie parametrow:
 //			fakturaid, kopia/orig/dupl, # kopii, wydruk/eksport HTML/text
 //		- w zaleznosci od typu wydruku nowy obiekt (dziedziczy z tego samego?)
-// - jesli nie ma pliku bazy danych - stworzyc z wbudowanego schema, INSERT defconf
 // - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)
 // - dummy menu ze statystykami
-// - baza na sztywno w /boot/home/share/fakbetur.db
 // - na koniec - usunac printfy z debugiem
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
@@ -24,6 +22,7 @@
 #include "mainwindow.h"
 #include "dialabout.h"
 #include "dialfirma.h"
+#include "sqlschema.h"
 #include "tabfirma.h"
 #include "tabtowar.h"
 #include "tabfaktura.h"
@@ -86,7 +85,6 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 
 	// tabview
 	r = mainView->Bounds();
-//	r.left = 150; r.top = 20; r.bottom = r.bottom - 50;
 	r.top = 20;
 	tabView = new BTabView(r, "tabView");
 	mainView->AddChild(tabView);
@@ -95,14 +93,12 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	int ret = OpenDatabase();
 	if (ret < 0)
 		exit(1);
-// XXX if db is a newfile -> CREATE schema and INSERT defaults for config
-
-	// initialize datawidgets
-	initTabs(tabView);
-	tabView->Select(0);
 
 	// check if configuration is there
 	DoCheckConfig();
+	// initialize datawidgets
+	initTabs(tabView);
+	tabView->Select(0);
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
@@ -116,7 +112,7 @@ void BeFAKMainWindow::initTabs(BTabView *tv) {
 }
 
 void BeFAKMainWindow::DoAbout(void) {
-	aboutDialog = new dialAbout(APP_NAME);
+	aboutDialog = new dialAbout(APP_NAME "  " APP_VERSION);
 }
 
 void BeFAKMainWindow::DoConfigFirma(bool cancancel) {
@@ -142,6 +138,7 @@ void BeFAKMainWindow::DoCheckConfig(void) {
 		// read other config data from result
 		liczbakopii = toint(result[i++]);
 		ostatni_nr = toint(result[i++]);
+//		printf("ostatninr = %i\n",ostatni_nr);
 		num_prosta = toint(result[i++]);
 	}
 }
@@ -176,7 +173,7 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 bool BeFAKMainWindow::QuitRequested() {
 //	config->position = this->Frame();
 //	config->save();
-	// XXX cannot commit! object doesn't exist here!!!
+	// XXX cannot commit upon exit! object doesn't exist here!!!
 //	curTab->CommitCurdata(false);
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return BWindow::QuitRequested();
@@ -186,17 +183,32 @@ bool BeFAKMainWindow::QuitRequested() {
 // database stuff, abstract it?
 
 int BeFAKMainWindow::OpenDatabase(void) {
-	// XXX port BSAP solution for non-existing db
-	dbData = sqlite_open("faktury.sq2", 0666, &dbErrMsg);
+	// BFile test wouldn't be necessary if sqlite_open retured file not found
+	// error as advertised
+	BFile fData;
+	int fResult = fData.SetTo(DATABASE_PATHNAME, B_READ_ONLY);
+	// open database anyway - new or existing
+	dbData = sqlite_open(DATABASE_PATHNAME, 0666, &dbErrMsg);
 	if ((dbData==0)||(dbErrMsg!=0)) {
-		printf("database not found\n");	// XXX alert!
+		// due to sqlite problems - this code is never reached; pity
+//		printf("database not found\n");
 		return -1;
 	}
-	sqlite_exec(dbData, "VACUUM", 0, 0, &dbErrMsg);
-	return 0;
+	if (fResult != B_OK) {
+		// file wasn't there - new database has been created
+		// populate it with schema and default configuration
+		InitDatabase();
+	}
+	// if VACUUM fails on DB there is another error, we can't handle it
+	return sqlite_exec(dbData, "VACUUM", 0, 0, &dbErrMsg);
 }
 
 void BeFAKMainWindow::CloseDatabase(void) {
 	sqlite_exec(dbData, "VACUUM", 0, 0, &dbErrMsg);
 	sqlite_close(dbData);
+}
+
+void BeFAKMainWindow::InitDatabase(void) {
+//	printf("new database, fill with schema\n");
+	sqlite_exec(dbData, sql_schema, 0, 0, &dbErrMsg);
 }

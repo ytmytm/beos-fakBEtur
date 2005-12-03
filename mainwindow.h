@@ -34,6 +34,7 @@
 			// database handlers
 			int OpenDatabase(void);
 			void CloseDatabase(void);
+			void InitDatabase(void);
 			// tab handlers
 			void initTabs(BTabView *tv);
 
