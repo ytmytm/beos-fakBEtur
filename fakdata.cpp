@@ -399,6 +399,10 @@ pozfaklist::pozfaklist(sqlite *db) {
 	end = start;
 }
 
+pozfaklist::~pozfaklist() {
+	clear();
+}
+
 void pozfaklist::clear(void) {
 	pozfakitem *nxt, *cur = start;
 
