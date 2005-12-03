@@ -8,6 +8,7 @@
 class BBox;
 class BButton;
 class BCheckBox;
+class BHandler;
 class BListView;
 class BTab;
 class BTabView;
@@ -21,7 +22,7 @@ class pozfaklist;	// XXX move
 class tabFaktura : public beFakTab {
 
 	public:
-		tabFaktura(BTabView *tv, sqlite *db);
+		tabFaktura(BTabView *tv, sqlite *db, BHandler *hr);
 		~tabFaktura();
 		void MessageReceived(BMessage *Message);
 		void ChangedSelection(int newid);

@@ -84,7 +84,7 @@ extern const char *jmiary[];
 const char *plisthead[] = { "Lp", "Nazwa", "PKWiU", "Ilość", "Jm", "Rabat (%)", "Cena jedn.", "W. netto", "VAT", "W. VAT", "W. brutto", NULL };
 const int plistw[] = { 20, 90, 60, 40, 20, 50, 70, 70, 30, 60, 100, -1 };
 
-tabFaktura::tabFaktura(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
+tabFaktura::tabFaktura(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr) {
 
 	idlist = NULL;
 	curdata = new fakturadat(db);
@@ -445,6 +445,10 @@ void tabFaktura::curdataToTab(void) {
 }
 
 void tabFaktura::updateTab(void) {
+	BMessage *msg = new BMessage(MSG_NAMECHANGE);
+	msg->AddString("_newtitle", nazwa->Text());
+	handler->Looper()->PostMessage(msg);
+
 	bool state = (cbzaplacono->Value() == B_CONTROL_ON);
 	ogol[8]->SetEnabled(state);
 	ogol[9]->SetEnabled(state);
@@ -500,6 +504,7 @@ void tabFaktura::makeNewForm(void) {
 	menusymbol->Superitem()->SetLabel("[wybierz]");
 	// XXX refresh symbolmenu
 	// XXX prepare new 'nazwa' for faktura
+	// XXX notify mainwindow about change
 	curdata->ogol[2] = execSQL("SELECT DATE('now')");
 	curdata->ogol[3] = execSQL("SELECT DATE('now')");
 	// XXX this is already in TERMCHANGE handler

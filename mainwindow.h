@@ -51,6 +51,10 @@
 			// database
 			sqlite *dbData;
 			char *dbErrMsg;
+			// configuration
+			int liczbakopii;	// # kopii do wydruku
+			int ostatni_nr;		// nr ostatniej faktury // XXX a nie w faktab?
+			bool num_prosta;	// numeracja uproszczona - bez miesiaca - nr/rok
 	};
 
 #endif

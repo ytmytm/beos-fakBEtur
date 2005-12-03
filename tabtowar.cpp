@@ -48,7 +48,7 @@ const uint32 MENUVAT	= 'TTMV';
 
 const char *jmiary[] = { "szt.", "kg", "kpl.", "m", "mb", "m2", "km", "l", NULL };
 
-tabTowar::tabTowar(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
+tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr) {
 
 	idlist = NULL;
 	curdata = new towardat(db);
@@ -208,6 +208,9 @@ void tabTowar::curdataToTab(void) {
 }
 
 void tabTowar::updateTab(void) {
+	BMessage *msg = new BMessage(MSG_NAMECHANGE);
+	msg->AddString("_newtitle", data[0]->Text());
+	handler->Looper()->PostMessage(msg);
 	int i;
 	for (i=0;i<=5;i++) {
 		ceny[i]->SetText(validateDecimal(ceny[i]->Text()));

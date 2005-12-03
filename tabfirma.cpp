@@ -13,6 +13,7 @@
 #include <Button.h>
 #include <CheckBox.h>
 #include <ListView.h>
+#include <Looper.h>
 #include <ScrollView.h>
 #include <TabView.h>
 #include <TextControl.h>
@@ -26,7 +27,7 @@ const uint32 BUT_RESTORE= 'TFBR';
 const uint32 BUT_SAVE	= 'TFBS';
 const uint32 DC			= 'TFDC';
 
-tabFirma::tabFirma(BTabView *tv, sqlite *db) : beFakTab(tv, db) {
+tabFirma::tabFirma(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr) {
 
 	idlist = NULL;
 	curdata = new firmadat(db);
@@ -136,6 +137,9 @@ void tabFirma::curdataToTab(void) {
 
 void tabFirma::updateTab(void) {
 	bool state = (zablokowany->Value() != B_CONTROL_ON);
+	BMessage *msg = new BMessage(MSG_NAMECHANGE);
+	msg->AddString("_newtitle", data[0]->Text());
+	handler->Looper()->PostMessage(msg);
 
 	int i;
 	for (i=0;i<=10;i++) {

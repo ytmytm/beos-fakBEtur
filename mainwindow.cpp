@@ -5,13 +5,21 @@
 //		- przekazanie parametrow:
 //			fakturaid, kopia/orig/dupl, # kopii, wydruk/eksport HTML/text
 //		- w zaleznosci od typu wydruku nowy obiekt (dziedziczy z tego samego?)
-// - jesli nie ma pliku bazy danych - stworzyc z wbudowanego schema
-// - menu z dialogiem konfiguracji wydruku (liczba kopii, ?)
-// - nazwa towaru/faktury/kontrahenta w pasku tytułu (przyjąć msg od child?)
-//
+// - jesli nie ma pliku bazy danych - stworzyc z wbudowanego schema, INSERT defconf
+// - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)
+// - dummy menu ze statystykami
+// - baza na sztywno w /boot/home/share/fakbetur.db
+// - na koniec - usunac printfy z debugiem
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
 //
+// wydruk:
+//	- jedna bazowa klasa do drukowania, przyjmuje parametry (k/o/d, #kopii), oblicza brakujace
+//	  dane itp. pozfakdata+faktura+konfiguracja powinny wystarczyc
+//	  klasy pochodne - generowanie naglowka, tabelki i stopki
+//	  	html - wypelnienie szablonu, zapis do pliku
+//		print - wyrysowanie bview, pochodna z bview, printjob
+//		txt - wypisanie i sformatowanie tekstu na 80/130(?) kolumn, zapis do pliku lub na lp
 
 #include "mainwindow.h"
 #include "dialabout.h"
@@ -87,6 +95,7 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	int ret = OpenDatabase();
 	if (ret < 0)
 		exit(1);
+// XXX if db is a newfile -> CREATE schema and INSERT defaults for config
 
 	// initialize datawidgets
 	initTabs(tabView);
@@ -101,9 +110,9 @@ BeFAKMainWindow::~BeFAKMainWindow() {
 }
 
 void BeFAKMainWindow::initTabs(BTabView *tv) {
-	tabs[0] = new tabFaktura(tv, dbData);
-	tabs[1] = new tabTowar(tv, dbData);
-	tabs[2] = new tabFirma(tv, dbData);
+	tabs[0] = new tabFaktura(tv, dbData, this);
+	tabs[1] = new tabTowar(tv, dbData, this);
+	tabs[2] = new tabFirma(tv, dbData, this);
 }
 
 void BeFAKMainWindow::DoAbout(void) {
@@ -118,22 +127,29 @@ void BeFAKMainWindow::DoCheckConfig(void) {
 	int nRows, nCols;
 	char **result;
 	BString sql;
-	// XXX select other interesting data too
-	sql = "SELECT nazwa FROM konfiguracja WHERE zrobiona = 1";
+	// select NAZWA and all config data
+	sql = "SELECT nazwa, liczbakopii, ostatni_nr, num_prosta FROM konfiguracja WHERE zrobiona = 1";
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i\n", nRows, nCols);
 	if (nRows < 1) {
-//		printf("initial\n");
-		DoConfigFirma(false);
-		// XXX wait until firmaDialog is closed (possible???)
-		// XXX config is stored, update it with other defaults
+		DoConfigFirma(false);	// should never happen
 	} else {
-		// XXX read interesting config pieces from result
+		int i = nCols;
+		sql = result[i++];	// test for 'nazwa' not ""
+		if (sql.Length() == 0)
+			DoConfigFirma(false);
+		// read other config data from result
+		liczbakopii = toint(result[i++]);
+		ostatni_nr = toint(result[i++]);
+		num_prosta = toint(result[i++]);
 	}
 }
 
 void BeFAKMainWindow::MessageReceived(BMessage *Message) {
+	BString title;
+	const char *tmp;
+
 	this->DisableUpdates();
 	switch (Message->what) {
 		case MENU_ABOUT:
@@ -141,6 +157,12 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 			break;
 		case MENU_CONFFIRMA:
 			DoConfigFirma();
+			break;
+		case MSG_NAMECHANGE:
+			if (Message->FindString("_newtitle", &tmp) == B_OK) {
+				title = APP_NAME; title += " : "; title += tmp;
+				this->SetTitle(title.String());
+			}
 			break;
 		default:
 			curTab = tabs[tabView->Selection()];

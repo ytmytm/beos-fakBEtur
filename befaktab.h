@@ -4,6 +4,7 @@
 
 #include <sqlite.h>
 
+class BHandler;
 class BMessage;
 class BTab;
 class BTabView;
@@ -11,7 +12,7 @@ class BView;
 
 class beFakTab {
 	public:
-		beFakTab(BTabView *tv, sqlite *db);
+		beFakTab(BTabView *tv, sqlite *db, BHandler *hr);
 		virtual ~beFakTab();
 
 		virtual void MessageReceived(BMessage *Message);
@@ -26,6 +27,7 @@ class beFakTab {
 		const char *validateDecimal(const char *input);
 		const char *validateDate(const char *input);
 
+		BHandler *handler;
 		BView *view;
 		BTab *tab;
 
@@ -35,5 +37,7 @@ class beFakTab {
 	protected:
 		bool dirty;
 };
+
+#define MSG_NAMECHANGE	'BFNC'
 
 #endif

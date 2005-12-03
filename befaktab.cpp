@@ -9,9 +9,10 @@
 #include <View.h>
 #include <stdio.h>
 
-beFakTab::beFakTab(BTabView *tv, sqlite *db) {
+beFakTab::beFakTab(BTabView *tv, sqlite *db, BHandler *hr) {
 
 	dbData = db;
+	handler = hr;	
 
 	BRect r;
 

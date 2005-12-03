@@ -8,6 +8,7 @@
 class BBox;
 class BButton;
 class BCheckBox;
+class BHandler;
 class BListView;
 class BMessage;
 class BPopUpMenu;
@@ -18,7 +19,7 @@ class BTextView;
 class tabTowar : public beFakTab {
 
 	public:
-		tabTowar(BTabView *tv, sqlite *db);
+		tabTowar(BTabView *tv, sqlite *db, BHandler *hr);
 		~tabTowar();
 		void MessageReceived(BMessage *Message);
 		void ChangedSelection(int newid);
