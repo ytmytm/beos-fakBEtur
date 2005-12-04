@@ -21,7 +21,8 @@ void firmadat::clear(void) {
 	for (int i=0;i<=10;i++) {
 		data[i] = "";
 	}
-	odbiorca = dostawca = aktywny = zablokowany = false;
+	odbiorca = dostawca = zablokowany = false;
+	aktywny = true;
 }
 
 int firmadat::generate_id(void) {

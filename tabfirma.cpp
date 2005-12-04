@@ -103,7 +103,7 @@ tabFirma::tabFirma(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	data[3]->SetDivider(50); data[5]->SetDivider(50);
 	data[7]->SetDivider(50); data[8]->SetDivider(50);
 	data[9]->SetDivider(50); data[10]->SetDivider(50);
-	updateTab();
+	curdataToTab();
 
 	RefreshIndexList();
 }
