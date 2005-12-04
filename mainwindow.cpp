@@ -41,7 +41,9 @@ const uint32 MENU_PRINTO	= 'MPOR';
 const uint32 MENU_PRINTC	= 'MPKO';
 const uint32 MENU_PRINTD	= 'MPKD';
 const uint32 MENU_CONFFIRMA	= 'MKOF';
-const uint32 MENU_CONFPRINT	= 'MKOP';
+const uint32 MENU_PRINTT80	= 'MPT8';
+const uint32 MENU_PRINTT136 = 'MPT1';
+const uint32 MENU_PRINTHTML = 'MPHT';
 const uint32 MENU_ABOUT		= 'MABO';
 
 BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
@@ -70,16 +72,21 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	menu->AddItem(new BMenuItem("Zamknij", new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
 
-	menu = new BMenu("Wydruk", B_ITEMS_IN_COLUMN);
-	menu->AddItem(new BMenuItem("Oryginał", new BMessage(MENU_PRINTO)));
-	menu->AddItem(new BMenuItem("Kopia", new BMessage(MENU_PRINTC)));
-	menu->AddItem(new BMenuItem("Duplikat", new BMessage(MENU_PRINTD)));
+	menu = new BMenu("Dokument", B_ITEMS_IN_COLUMN);
+	menu->AddItem(pmenuo = new BMenuItem("Oryginał", new BMessage(MENU_PRINTO)));
+	menu->AddItem(pmenuc = new BMenuItem("Kopia", new BMessage(MENU_PRINTC)));
+	menu->AddItem(pmenud = new BMenuItem("Duplikat", new BMessage(MENU_PRINTD)));
 	menuBar->AddItem(menu);
 
 	menu = new BMenu("Opcje", B_ITEMS_IN_COLUMN);
 	menu->AddItem(new BMenuItem("Dane firmy", new BMessage(MENU_CONFFIRMA)));
-	menu->AddItem(new BMenuItem("Wydruki", new BMessage(MENU_CONFPRINT)));
+	BMenu *printmenu = new BMenu("Rodzaj wydruku", B_ITEMS_IN_COLUMN);
+	menu->AddItem(printmenu);
 	menuBar->AddItem(menu);
+
+	printmenu->AddItem(pmenut80  = new BMenuItem("Tekst (80 kol.)", new BMessage(MENU_PRINTT80)));
+	printmenu->AddItem(pmenut136 = new BMenuItem("Tekst (136 kol.)", new BMessage(MENU_PRINTT136)));
+	printmenu->AddItem(pmenuhtml = new BMenuItem("HTML", new BMessage(MENU_PRINTHTML)));
 
 	menu = new BMenu("Pomoc", B_ITEMS_IN_COLUMN);
 	menu->AddItem(new BMenuItem("O programie", new BMessage(MENU_ABOUT)));
@@ -101,6 +108,8 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	// initialize datawidgets
 	initTabs(tabView);
 	tabView->Select(0);
+	curTab = tabs[0];
+	updateMenus();
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
@@ -143,6 +152,28 @@ void BeFAKMainWindow::DoCheckConfig(void) {
 //		printf("ostatninr = %i\n",ostatni_nr);
 		num_prosta = toint(result[i++]);
 	}
+	/// XXX store these in config?
+	ptyp = 0;
+	pmode = 1;
+	pwide = 0;
+}
+
+void BeFAKMainWindow::updateMenus(void) {
+	pmenuo->SetMarked(ptyp == 0);
+	pmenuc->SetMarked(ptyp == 1);
+	pmenud->SetMarked(ptyp == 2);
+	pmenut80->SetMarked( (pmode==1) && (pwide==0) );
+	pmenut136->SetMarked( (pmode==1) && (pwide==1) );
+	pmenuhtml->SetMarked(pmode == 2);
+	BMessage *msg;
+	msg = new BMessage(MSG_PRINTCONF);
+	msg->AddInt32("_ptyp", ptyp);
+	msg->AddInt32("_pmode", pmode);
+	msg->AddInt32("_pwide", pwide);
+	if (curTab!=NULL)
+		curTab->MessageReceived(msg);
+// needed?
+	delete msg;
 }
 
 void BeFAKMainWindow::MessageReceived(BMessage *Message) {
@@ -152,14 +183,31 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 	this->DisableUpdates();
 	switch (Message->what) {
 		case MENU_PRINTO:
+			ptyp = 0;
+			updateMenus();
+			break;
 		case MENU_PRINTC:
+			ptyp = 1;
+			updateMenus();
+			break;
 		case MENU_PRINTD:
-			{	BMessage *msg;
-				msg = new BMessage(MSG_ORDERPRINT);
-				// XXX fit msg with additional print params
-				curTab->MessageReceived(msg);
-				break;
-			}
+			ptyp = 2;
+			updateMenus();
+			break;
+		case MENU_PRINTT80:
+			pmode = 1;
+			pwide = 0;
+			updateMenus();
+			break;
+		case MENU_PRINTT136:
+			pmode = 1;
+			pwide = 1;
+			updateMenus();
+			break;
+		case MENU_PRINTHTML:
+			pmode = 2;
+			updateMenus();
+			break;
 		case MENU_ABOUT:
 			DoAbout();
 			break;

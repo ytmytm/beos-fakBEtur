@@ -7,10 +7,10 @@
 class printText : public beFakPrint {
 
 	public:
-		printText(int id, sqlite *db);
+		printText(int id, sqlite *db, int t, int p);
 //		virtual ~beFakPrint();
 		void Go(void);
-		// tylko dla tekstowego
+	private:
 		bool wide;	// tryb szerokiego druku (136) vs (80) kolumn
 		int ncols;	// liczba kolumn
 

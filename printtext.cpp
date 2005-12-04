@@ -7,10 +7,14 @@
 //
 
 #include "printtext.h"
+#include "globals.h"
 #include <stdio.h>
 
-printText::printText(int id, sqlite *db) : beFakPrint(id,db) {
-	wide = false;	// XXX parametr!
+#include <Alert.h>
+#include <File.h>
+
+printText::printText(int id, sqlite *db, int t, int p) : beFakPrint(id,db,t,p) {
+	wide = (param == 1);
 	ncols = wide ? 136 : 80;
 }
 
@@ -18,7 +22,6 @@ void printText::Go(void) {
 	BString tmp, out, line, hline, hline2;
 
 	out = ""; line="", tmp = "";
-printf("--------------------\n");
 	//[1] nazwasprzedawcy .... miejscewyst,datawyst
 	line = own[0].String();
 	tmp = fdata->ogol[0].String(); tmp += ", "; tmp += fdata->ogol[2];
@@ -248,8 +251,19 @@ printf("--------------------\n");
 	out += line;
 	//[] wolna
 	out += ELINE;
-printf("%s",out.String());
-printf("---------------------\n");
+//printf("---------------------\n");
+//printf("%s",out.String());
+//printf("---------------------\n");
+	// XXX dupe from printhtml!
+	// XXX dialog z savename?
+	tmp = "/boot/home/faktura-"; tmp += makeName(); tmp += ".txt";
+	BFile *savefile = new BFile(tmp.String(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	savefile->Write(out.String(),out.Length());
+	savefile->Unset();
+	// podsumowanie dla usera
+	tmp.Prepend("Zapisano plik ");
+	BAlert *saveinfo = new BAlert(APP_NAME, tmp.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
+	saveinfo->Go();
 }
 
 const char *printText::rightAlign(const BString line, const BString right) {

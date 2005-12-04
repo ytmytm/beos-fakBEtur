@@ -39,6 +39,6 @@ class beFakTab {
 };
 
 #define MSG_NAMECHANGE	'BFNC'
-#define MSG_ORDERPRINT	'BFOP'
+#define MSG_PRINTCONF	'BFCP'
 
 #endif

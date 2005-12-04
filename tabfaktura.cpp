@@ -718,9 +718,10 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				}
 				break;
 			}
-		case MSG_ORDERPRINT:
-			// XXX read params from msg
-			printCurrent();
+		case MSG_PRINTCONF:
+			if (Message->FindInt32("_ptyp", &item) == B_OK) ptyp = item;
+			if (Message->FindInt32("_pmode", &item) == B_OK) pmode = item;
+			if (Message->FindInt32("_pwide", &item) == B_OK) pwide = item;
 			break;
 	}
 }
@@ -928,9 +929,17 @@ void tabFaktura::RefreshTowarList(void) {
 }
 
 void tabFaktura::printCurrent(void) {
+	beFakPrint *print;
 	printf("do printing stuff\n");
-//	beFakPrint *print = new printText(curdata->id, this->dbData);
-	beFakPrint *print = new printHTML(curdata->id, this->dbData);
+	switch(pmode) {
+		case 2:
+			print = new printHTML(curdata->id, this->dbData, ptyp, pwide);
+			break;
+		case 1:
+		default:
+			print = new printText(curdata->id, this->dbData, ptyp, pwide);
+			break;
+	}
 	print->Go();
 	printf("launched printing job\n");
 	delete print;

@@ -10,15 +10,18 @@
 //		konfiguracja - nazwa pliku szablonu
 //
 
+#include "globals.h"
 #include "printhtml.h"
 
+#include <Alert.h>
 #include <File.h>
 #include <stdio.h>
 
 // XXX parametr
 #define SZABLON_PATH "/boot/home/vatszablon.html"
 
-printHTML::printHTML(int id, sqlite *db) : beFakPrint(id,db) {
+printHTML::printHTML(int id, sqlite *db, int t, int p) : beFakPrint(id,db,t,p) {
+	// parametry ignorowane
 }
 
 void printHTML::Go(void) {
@@ -33,17 +36,22 @@ void printHTML::Go(void) {
 	szablon = new BFile();
 	r = szablon->SetTo(SZABLON_PATH, B_READ_ONLY);
 	if (r != B_OK) {
-		printf("nie ma szablonu???\n");
+		tmp = "Nie znaleziono pliku szablonu: "; tmp += SZABLON_PATH;
+		BAlert *error = new BAlert(APP_NAME, tmp.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		error->Go();
 		return;
 	}
 	// wczytaj szablon
 	szablon->GetSize(&size);
 	buf = new char[size+1];
 	if ((l = szablon->Read((void*)buf,size)) < 0) {
-		printf("read error\n");
+		tmp = "Błąd przy czytaniu pliku szablonu: "; tmp += SZABLON_PATH;
+		BAlert *error = new BAlert(APP_NAME, tmp.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		error->Go();
 		return;
 	}
 	buf[l] = '\0';
+	szablon->Unset();
 	out = buf;
 	delete buf;
 	tmp = "";
@@ -137,8 +145,16 @@ void printHTML::Go(void) {
 	out.ReplaceAll("@DOZAPLATY@", razem.summa[3].String());
 	out.ReplaceAll("@SLOWNIE@", slownie(razem.summa[3].String()));
 	// zapisz HTML do pliku wyjściowego
-printf("----------\n");
-printf("%s\n",out.String());
-printf("----------\n");
-	// wywołaj hey?
+//printf("----------\n");
+//printf("%s\n",out.String());
+//printf("----------\n");
+	// XXX dialog z savename?
+	tmp = "/boot/home/faktura-"; tmp += makeName(); tmp += ".html";
+	BFile *savefile = new BFile(tmp.String(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	savefile->Write(out.String(),out.Length());
+	savefile->Unset();
+	// podsumowanie dla usera
+	tmp.Prepend("Zapisano plik ");
+	BAlert *saveinfo = new BAlert(APP_NAME, tmp.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
+	saveinfo->Go();
 }

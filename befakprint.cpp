@@ -1,3 +1,6 @@
+//
+// TODO:
+//
 
 #include "befakprint.h"
 
@@ -5,7 +8,7 @@
 
 // baseclass with stuff, inherit to print/export/whatever
 
-beFakPrint::beFakPrint(int id, sqlite *db) {
+beFakPrint::beFakPrint(int id, sqlite *db, int t, int p) {
 
 	if (id<1) {
 		printf("illegal id!\n");
@@ -14,7 +17,8 @@ beFakPrint::beFakPrint(int id, sqlite *db) {
 
 	dbData = db;
 	fakturaid = id;
-	typ = 0;		// XXX parametr!
+	typ = t;
+	param = p;
 
 	switch (typ) {
 		case 2:
@@ -212,6 +216,16 @@ const char *beFakPrint::slownie(const char *input) {
 		tmp += "gr";
 	}
 
+	return tmp.String();
+}
+
+const char *beFakPrint::makeName(void) {
+	static BString tmp;
+	tmp = fdata->nazwa;
+	// prepare a safe filename
+	tmp.ReplaceAll("/","-");
+	tmp.ReplaceAll("\\","-");
+	tmp.ReplaceAll(" ","");
 	return tmp.String();
 }
 

@@ -8,15 +8,17 @@
 
 class beFakPrint {
 	public:
-		beFakPrint(int id, sqlite *db);
+		beFakPrint(int id, sqlite *db, int t, int p);
 		// if destructor override -> call it at the end of own
 		virtual ~beFakPrint();
 		virtual void Go(void);
 		void makeSummary(void);
 		void updateSummary(const BString wnetto, const int vatid, const BString wvat, const BString wbrutto);
 		const char *slownie(const char *input);
+		const char *makeName(void);
 
 		int typ;	// 0 - oryginal, 1 - kopia, 2 - duplikat
+		int param;	// dla text - 80/136
 
 	private:
 		const char *rozbij_tysiac(int val);
