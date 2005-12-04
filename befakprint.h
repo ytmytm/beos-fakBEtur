@@ -9,16 +9,19 @@
 class beFakPrint {
 	public:
 		beFakPrint(int id, sqlite *db);
+		// if destructor override -> call it at the end of own
 		virtual ~beFakPrint();
 		virtual void Go(void);
 		void makeSummary(void);
+		void updateSummary(const BString wnetto, const int vatid, const BString wvat, const BString wbrutto);
+		const char *slownie(const char *input);
 
 		int typ;	// 0 - oryginal, 1 - kopia, 2 - duplikat
-		// tylko dla tekstowego
-		bool wide;	// tryb szerokiego druku (136) vs (80) kolumn
-		int ncols;	// liczba kolumn
 
 	private:
+		const char *rozbij_tysiac(int val);
+
+	protected:
 		// data holders
 		fakturadat *fdata;
 		pozfaklist *flist;
@@ -31,20 +34,12 @@ class beFakPrint {
 		summary razem;
 		int fsummarows;
 		BString typfaktury;
-
 		//
 		int fakturaid;
-		BString own[11];
+		BString own[11];	// informacje o wlasnej firmie
 		// db stuff
 		sqlite *dbData;
 		char *dbErrMsg;
-		// tylko dla tekstowego
-		const char *rightAlign(const BString line, const BString right);
-		const char *centerAlign(const BString line);
-		const char *halfAlign(const BString line, const BString right);
-		const char *fitAlignR(const BString line, int len, bool space = false);
-		const char *fitAlignL(const BString line, int len, bool space = false);
-		const char *leftFill(const BString line, int spaces);
 };
 
 #endif
