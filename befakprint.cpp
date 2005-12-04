@@ -19,6 +19,21 @@ beFakPrint::beFakPrint(int id, sqlite *db) {
 	dbData = db;
 	fakturaid = id;
 	typ = 0;		// XXX parametr!
+
+	switch (typ) {
+		case 2:
+			typfaktury = "Duplikat";
+			break;
+		case 1:
+			typfaktury = "Kopia";
+			break;
+		case 0:
+		default:
+			typfaktury = "Oryginał";
+			break;
+	}
+
+	// XXX for text
 	wide = false;	// XXX parametr!
 	ncols = wide ? 136 : 80;
 
@@ -249,19 +264,7 @@ int ret;
 	line = centerAlign(line); line += ELINE;
 	out += line;
 	//[9] ...[typ faktury]...
-	switch (typ) {
-		case 2:
-			line = "Duplikat";
-			break;
-		case 1:
-			line = "Kopia";
-			break;
-		case 0:
-		default:
-			line = "Oryginał";
-			break;
-	}
-	line = centerAlign(line); line += ELINE;
+	line = centerAlign(typfaktury); line += ELINE;
 	out += line;
 	//[10] [wolna]
 	out += ELINE;

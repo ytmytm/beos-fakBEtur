@@ -30,6 +30,7 @@ class beFakPrint {
 		summary *fsumma;
 		summary razem;
 		int fsummarows;
+		BString typfaktury;
 
 		//
 		int fakturaid;
