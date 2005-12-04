@@ -1,5 +1,6 @@
 //
 // TODO:
+// - menu w/ ticks do wyboru eksportu: tekst(80/136) / html
 // - obsluga drukowania/eksportu 
 //		- commit current faktura
 //		- przekazanie parametrow:
@@ -10,7 +11,8 @@
 // - na koniec - usunac printfy z debugiem
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
-// - daleka przyszlosc: przepisac ROUND() w sqlite tak, by dzialalo prawidlowo
+// - nie tak daleka przyszlosc: przepisac ROUND() w sqlite tak, by dzialalo prawidlowo
+//		- wyrzucic wlasne decround, poprawic wszystkie kwerendy
 // wydruk:
 //	- jedna bazowa klasa do drukowania, przyjmuje parametry (k/o/d, #kopii), oblicza brakujace
 //	  dane itp. pozfakdata+faktura+konfiguracja powinny wystarczyc
