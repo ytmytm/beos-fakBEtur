@@ -361,7 +361,6 @@ int ret;
 			line += fitAlignR(cur->data->data[10],8); line += "|";
 		}
 		// wstawic podsumowanie do tymczasowej tabeli
-		// INSERT INTO sumawydruk (wnetto,vatid,wvat,wbrutto) VALUES ( %Q, %i, %Q, %Q );
 		tmp = "INSERT INTO sumawydruk (wnetto,vatid,wvat,wbrutto) VALUES ( %Q, %i, %Q, %Q )";
 		ret = sqlite_exec_printf(dbData, tmp.String(), 0, 0, &dbErrMsg,
 			cur->data->data[7].String(), cur->data->vatid, cur->data->data[9].String(), cur->data->data[10].String() );
