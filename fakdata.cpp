@@ -624,6 +624,7 @@ printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 		data->data[9] = decround(execSQL(sql.String()));	// w.vat
 		j++;							// next row
 	}
+	sqlite_free_table(result);
 	setlp();							// reset lp
 }
 
