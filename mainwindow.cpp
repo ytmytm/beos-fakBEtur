@@ -10,7 +10,7 @@
 // - na koniec - usunac printfy z debugiem
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
-//
+// - daleka przyszlosc: przepisac ROUND() w sqlite tak, by dzialalo prawidlowo
 // wydruk:
 //	- jedna bazowa klasa do drukowania, przyjmuje parametry (k/o/d, #kopii), oblicza brakujace
 //	  dane itp. pozfakdata+faktura+konfiguracja powinny wystarczyc
