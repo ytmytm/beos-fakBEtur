@@ -1,0 +1,107 @@
+
+fakBEtur 0.1 (20051204)
+(c) Maciej Witkowiak <ytm@elysium.pl>
+http://members.elysium.pl/html/beos.html
+
+fakBEtur to program wspomagający wystawianie faktur. Program korzysta z własnej bazy
+danych, w której umieszcza informacje o wydanych dokumentach. Baza służy również do
+przechowywania danych kontrahentów i towarów.
+
+
+
+LICENCJA
+Programu wolno używać w dowolny sposób w celu testowania na potrzeby konkursu
+zorganizowanego przez portal http://www.haiku-os.pl/
+
+NOTATKI DO WERSJI 0.1
+Program nie potrafi samodzielnie drukować, jest możliwy jedynie eksport do pliku tekstowego
+(80/136 kolumn) lub HTML. Nazwa pliku generowana jest z nazwy faktury.
+Dane nie są sprawdzane pod względem poprawności, ścieżki do plików i niektóre parametry
+są ustalone na stałe.
+Nie działają żadne skróty klawiaturowe, nie ma kalendarza do wyboru daty, nie ma statystyk.
+Przy dodawaniu pozycji czasem trzeba dwa razy kliknąć 'Nowa'.
+Aby był widoczny symbol kontrahenta musi on mieć zaznaczone pole 'Aktywny'.
+
+
+
+WYMAGANIA
+Program wymaga skonfigurowania BeOSa do obsługi polskiego układu klawiatury oraz
+instalacji czcionek z polskimi znakami.
+Program wymaga zainstalowanej biblioteki SpLocale. http://bebits.com/app/1869
+Do eksportu HTML niezbędny jest szablon, przykładowy szablon został dołączony do
+programu. Należy go umieścić w katalogu domowym
+
+
+
+INSTALACJA
+Program można rozpakować gdziekolwiek, do eksportu w HTML niezbędny jest szablon.
+Szablon należy umieścić w pliku: /boot/home/vatszablon.html
+
+
+
+KONFIGURACJA
+Przy pierwszym uruchomieniu program utworzy bazę danych i ustali domyślną konfigurację.
+Zostanie otwarty dialog, w którym należy podać dane firmy wystawiającej faktury.
+
+
+
+OBSŁUGA
+Pole 'SYMBOL' obecne w spisie kontrahentów i towarów służy do wprowadzenia skróconej
+nazwy, dzięki której możliwe jest szybkie odnajdywanie rekordów i wypełnianie pól faktury.
+Na wszystkich zakładkach pola 'Nazwa' i 'SYMBOL' muszą być wypełnione.
+
+W polach numerycznych można wpisywać proste działania, jednak aby uniknąć błędnego
+zaokrąglenia należy po liczbach zawsze dodawać w postaci ułamka dzisiętnego. Np. zamiast
+pisać "3/7" należy wpisać "3.0/7.0".
+
+a) MENU
+Menu 'Dokument' służy do wyboru rodzaju drukowanego dokumentu.
+W menu 'Opcje' można wybrać metodę drukowania i zmienić parametry firmy.
+
+b) TOWARY
+PW zakładce towary umieszczono prosty kalkulator umożliwiający obliczanie cen znaczenie
+przycisków:
+- Cena sprzedaży - na podstawie ceny zakupu i rabatu oblicza nową cenę sprzedaży netto
+- Marża - na podstawie ceny zakupu, rabatu oraz ceny sprzedaży netto oblicza marżę
+- Import - na podstawie kursu waluty, ceny zakupu (jednostką jest wówczas obca waluta),
+  cła, marży oraz rabatu oblicza cenę sprzedaży
+
+c) KONTRAHENCI
+Pola odbiorca/dostawca nie mają obecnie żadnego znaczenia.
+Pole 'Aktywny' kontroluje czy symbol kontrahenta ma być możliwy do wyboru w zakładce
+faktur.
+Pole 'Zablokowany' blokuje możliwość edycji danych kontrahenta.
+
+c) FAKTURY
+NALEŻY wypełnić pole "Nr faktury"!
+W polach 'Płatność' można wpisać datę płatności lub liczbę dni od daty sprzedaży, w drugim
+przypadku data zostanie uaktualniona automatycznie.
+Przy dodawaniu/edycji pozycji należy zawsze kliknąć 'Zapisz' (w ramce pozycji faktury)
+oraz 'Zapisz' na dole - aby zapisać całą informację o fakturze.
+
+
+
+
+WYDRUK
+Aby wydrukować dokument należy wybrać rodzaj dokumentu z menu 'Dokument' oraz
+sposób drukowania z menu 'Opcje', następnie przejść na zakładkę 'FAKTURY', wybrać
+fakturę z listy i kliknąć u dołu 'Drukuj'.
+
+
+
+EKSPORT HTML
+Wszelkich zmian wyglądu można dokonać korzystając z przykładowego szablonu. Teksty
+otoczone znakami @, np. @FNAZWA@ zostaną zamienione na odpowiednie dane z
+faktury. Pole @TABELA@ zostanie zamienione na ciąg wierszy tabeli HTML, bez dodatkowych atrybutów, podobnie pole @TABSUMA@.
+
+
+
+ARCHIWIZACJA
+Do wykonania archiwum bazy danych wystarczy zachować w bezpieczny sposób plik
+bazy: /boot/home/config/share/befaktur.db
+
+
+
+DEINSTALACJA
+Usunąć program, plik z szablonem HTML oraz plik bazy danych
+/boot/home/config/share/befaktur.db
