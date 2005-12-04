@@ -16,6 +16,11 @@
 
 beFakPrint::beFakPrint(int id, sqlite *db) {
 
+	if (id<1) {
+		printf("illegal id!\n");
+		return;
+	}
+
 	dbData = db;
 	fakturaid = id;
 	typ = 0;		// XXX parametr!
@@ -37,12 +42,8 @@ beFakPrint::beFakPrint(int id, sqlite *db) {
 	wide = false;	// XXX parametr!
 	ncols = wide ? 136 : 80;
 
-	if (id<1) {
-		printf("illegal id!\n");
-		return;
-	}
 	// readout stuff
-printf("reading stuff for id=%i\n",fakturaid);
+//printf("reading stuff for id=%i\n",fakturaid);
 	fdata = new fakturadat(db);
 	flist = new pozfaklist(db);
 
@@ -76,7 +77,7 @@ printf("reading stuff for id=%i\n",fakturaid);
 	// tabela pomocnicza do podsumowania
 	flist->execSQL("CREATE TEMPORARY TABLE sumawydruk ( wnetto DECIMAL(12,2), vatid INTEGER, wvat DECIMAL(12,2), wbrutto DECIMAL(12,2) )");
 
-	printf("stuff in memory, do sth with it\n");
+//	printf("stuff in memory, do sth with it\n");
 }
 
 void beFakPrint::makeSummary(void) {
@@ -108,9 +109,9 @@ void beFakPrint::makeSummary(void) {
 	sqlite_free_table(result);
 	// obliczyc RAZEM
 	sql = "SELECT SUM(s.wnetto), v.nazwa, SUM(s.wvat), SUM(s.wbrutto) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid";
-printf("sql:[%s]\n",sql.String());
+//printf("sql:[%s]\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
+//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	if (nRows < 1) {
 		// nothin'?
 	} else {
