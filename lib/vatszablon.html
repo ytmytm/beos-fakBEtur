@@ -1,0 +1,57 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Faktura VAT nr @FNUMER@, @FTYP@</title>
+</head>
+<BODY bgcolor="white" text="black">
+<font size="-2">
+<TABLE width="100%" border="0">
+  <tr><td><strong>@SNAZWA@</strong></td><td align="right">@FMIEJSCEW@, @FDATAW@</td></tr>
+  <tr><td>@SKOD@ @SMIEJSCE@, @SADRES@</td><td></td></tr>
+  <tr><td>tel. @STEL@, <A href="mailto:@SEMAIL@">@SEMAIL@</A></td><td></td></tr>
+  <tr><td>@SBANK@ @SKONTO@</td><td></td></tr>
+  <tr><td>@SREGON@, @SNIP@</td><td></td></tr>
+</TABLE>
+</font>
+<br><br><br>
+<h1><div align="center">Faktura VAT nr @FNUMER@<br>@FTYP@<br></div></h1>
+<br><br><br>
+<font size="-2">
+<TABLE width="100%">
+  <tr><td align="right">Nabywca:</td><td><strong>@NNAZWA@</strong></td></tr>
+  <tr><td align="right">Adres:</td><td>@NADRES@, @NKOD@ @NMIEJSCE@</td></tr>
+  <tr><td></td><td>tel. @NTEL@, <A href="mailto:@NEMAIL@">@NEMAIL@</A></td></tr>
+  <tr><td></td><td>@NREGON@, @NNIP@</td></tr>
+</TABLE>
+<br>
+<TABLE width="100%">
+  <tr><td align="right">Sposób zapłaty:</td><td>@FSPOSOBZ@</td><td align="right">Termin zapłaty:</td><td><strong>@FTERMINZ@</strong></td></tr>
+  <tr><td align="right">Data sprzedaży:</td><td>@FDATAS@</td><td align="right">Środek transportu:</td><td>@FSRODEKT@</td></tr>
+</TABLE>
+</font>
+<br><br>
+<font size="-2">
+<TABLE width="100%">
+  <tr><td><strong>Lp.</strong></td><td><strong>Nazwa towaru/usługi</strong></td><td><strong>PKWiU</strong></td><td><strong>Ilość</strong></td><td><strong>J.m.</strong></td><td><strong>Rabat (%)</strong></td><td><strong>Cena z rabatem</strong></td><td><strong>Wartość netto</strong></td><td><strong>VAT</strong></td><td><strong>Wartość VAT</strong></td><td><strong>Wartość brutto</strong></td></tr>
+@TABELA@
+@TABSUMA@
+</TABLE>
+</font>
+<br>
+<font size="-2">
+<TABLE width="90%" align="center">
+  <tr><strong><td align="right">Do zapłaty zł:</td><td>@DOZAPLATY@</td></strong></tr>
+  <tr><strong><td align="right">Słownie:</td></strong><td>@SLOWNIE@</td></tr>
+</TABLE>
+<br><br><br>
+<TABLE width="80%" align="center">
+  <tr><td align="right">wystawił:</td><td>@FWYSTAWIL@</td><td align="right">odebrał:</td><td></td></tr>
+  <tr></tr>
+  <tr><td></td><td>--------------------</td><td></td><td>--------------------</td></tr>
+  <tr><td></td><small><td>podpis osoby upow.</td></small><td></td><small><td>podpis osoby upow.</td></small></tr>
+</TABLE>
+</font>
+<br>
+</BODY>
+</html>
