@@ -77,11 +77,62 @@ printf("reading stuff for id=%i\n",fakturaid);
 			own[j] = result[i++];
 		}
 	}
+	// tabela pomocnicza do podsumowania
+	flist->execSQL("CREATE TEMPORARY TABLE sumawydruk ( wnetto DECIMAL(12,2), vatid INTEGER, wvat DECIMAL(12,2), wbrutto DECIMAL(12,2) )");
+
 	printf("stuff in memory, do sth with it\n");
+}
+
+void beFakPrint::makeSummary(void) {
+	int i, j;
+	int nRows, nCols;
+	char **result;
+	BString sql;
+
+	// suma z rozbiciem na stawki
+	sql = "SELECT SUM(s.wnetto), v.nazwa, SUM(s.wvat), SUM(s.wbrutto) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid GROUP BY s.vatid ORDER BY v.nazwa";
+//printf("sql:[%s]\n",sql.String());
+	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
+	if (nRows < 1) {
+		// nothin'?
+	} else {
+		i = nCols;
+		j = 1;
+		fsummarows = nRows;
+		fsumma = new summary[nRows];
+		while (j <= nRows) {
+			fsumma[j-1].summa[0] = decround(result[i++]);
+			fsumma[j-1].summa[1] = result[i++];
+			fsumma[j-1].summa[2] = decround(result[i++]);
+			fsumma[j-1].summa[3] = decround(result[i++]);
+			j++;
+		}
+	}
+	sqlite_free_table(result);
+	// obliczyc RAZEM
+	sql = "SELECT SUM(s.wnetto), v.nazwa, SUM(s.wvat), SUM(s.wbrutto) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid";
+printf("sql:[%s]\n",sql.String());
+	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
+	if (nRows < 1) {
+		// nothin'?
+	} else {
+		i = nCols;
+		razem.summa[0] = decround(result[i++]);
+		razem.summa[1] = result[i++];
+		razem.summa[2] = decround(result[i++]);
+		razem.summa[3] = decround(result[i++]);
+	}
+	sqlite_free_table(result);
 }
 
 beFakPrint::~beFakPrint() {
 printf("at the end call destructor from baseclass\n");
+
+	flist->execSQL("DROP TABLE sumawydruk");
+	delete [] fsumma;
+
 	delete flist;
 	delete fdata;
 }
@@ -179,8 +230,8 @@ const char *slownie(const char *input) {
 void beFakPrint::Go(void) {
 	printf("override and do sth with data, then killyourself\n");
 // text dump
-// lewy górny: tabliczka firmy, prawy 1 wiersz: miejsce, data wydania
-BString tmp, out, line, hline;
+BString tmp, out, line, hline, hline2;
+int ret;
 	out = ""; line="", tmp = "";
 	printf("--------------------\n");
 	//[1] nazwasprzedawcy .... miejscewyst,datawyst
@@ -266,7 +317,7 @@ BString tmp, out, line, hline;
 	out += line;
 	//[17] [wolna]
 	out += ELINE;
-	// [tabela], [podsumowanie]
+	//[] [tabela]
 	// [naglowek]
 	if (wide) {
 	} else {
@@ -309,22 +360,62 @@ BString tmp, out, line, hline;
 			// w.brutto
 			line += fitAlignR(cur->data->data[10],8); line += "|";
 		}
+		// wstawic podsumowanie do tymczasowej tabeli
+		// INSERT INTO sumawydruk (wnetto,vatid,wvat,wbrutto) VALUES ( %Q, %i, %Q, %Q );
+		tmp = "INSERT INTO sumawydruk (wnetto,vatid,wvat,wbrutto) VALUES ( %Q, %i, %Q, %Q )";
+		ret = sqlite_exec_printf(dbData, tmp.String(), 0, 0, &dbErrMsg,
+			cur->data->data[7].String(), cur->data->vatid, cur->data->data[9].String(), cur->data->data[10].String() );
+//		printf("result: %i, %s\n", ret, dbErrMsg);
 		cur = cur->nxt;
 		line += ELINE;
 		out += line;
 	}
-	// stopka
+	//[] stopka
+	out += hline;
+	// podsumuj
+	makeSummary();
+	//[] wypisac podsumowanie
+	for (int i=0;i<fsummarows;i++) {
+		if (wide) {
+		} else {
+			line = "                                                |";
+			line += fitAlignR(fsumma[i].summa[0],8); line += "|";
+			line += fitAlignR(fsumma[i].summa[1],3); line += "|";
+			line += fitAlignR(fsumma[i].summa[2],8); line += "|";
+			line += fitAlignR(fsumma[i].summa[3],8); line += "|";
+		}
+		line += ELINE;
+		out += line;
+	}
+	//[] oddzielenie od podsumowania
 	if (wide) {
 	} else {
-		out += hline;	
+		hline2 = "                                                +--------+---+--------+--------+"; hline2 += ELINE;
 	}
-	// podsumowanie
-	// oblicz podsumowanie, oblicz do zaplaty
-
-	//[] [wolna]
+	out += hline2;
+	//[] RAZEM
+	if (wide) {
+	} else {
+		line = "                                         RAZEM: |";
+		line += fitAlignR(razem.summa[0],8); line += "|";
+		line += fitAlignR(razem.summa[1],3); line += "|";
+		line += fitAlignR(razem.summa[2],8); line += "|";
+		line += fitAlignR(razem.summa[3],8); line += "|";
+	}
+	line += ELINE;
+	out += line;
+	//[] stopka
+	out += hline2;
+	//[] wolna
 	out += ELINE;
 	//[] Do zapłaty: [kwota], lub polaczone z RAZEM |
+	line = " Do zapłaty zł: "; line += razem.summa[3]; line += ELINE;
+	out += line;
 	//[] Słownie: [kwota]     lib polaczone z +---+---+ pod razem
+	line = "       Słownie: "; line += slownie(razem.summa[3].String()); line += ELINE;
+	out += line;
+	//[] wolna x 3
+	out += ELINE; out += ELINE; out += ELINE;
 	//[] uwagi: [uwagi, multiline, wrap!]
 	//[] wystawil: [wystawil]...odebral:
 	line = "    wystawił: "; line += fdata->ogol[1];
@@ -347,7 +438,6 @@ BString tmp, out, line, hline;
 	//[] wolna
 	out += ELINE;
 	printf("%s",out.String());
-	printf("%s\n", slownie("15234.34"));
 	printf("---------------------\n");
 }
 

@@ -11,6 +11,7 @@ class beFakPrint {
 		beFakPrint(int id, sqlite *db);
 		virtual ~beFakPrint();
 		virtual void Go(void);
+		void makeSummary(void);
 
 		int typ;	// 0 - oryginal, 1 - kopia, 2 - duplikat
 		// tylko dla tekstowego
@@ -21,6 +22,15 @@ class beFakPrint {
 		// data holders
 		fakturadat *fdata;
 		pozfaklist *flist;
+
+		struct summary {
+			BString summa[4];
+		};
+
+		summary *fsumma;
+		summary razem;
+		int fsummarows;
+
 		//
 		int fakturaid;
 		BString own[11];
