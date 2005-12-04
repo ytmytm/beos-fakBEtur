@@ -36,6 +36,7 @@
 #include "globals.h"
 #include "tabfaktura.h"
 #include "printtext.h"
+#include "printhtml.h"
 
 #include <Alert.h>
 #include <Box.h>
@@ -928,7 +929,8 @@ void tabFaktura::RefreshTowarList(void) {
 
 void tabFaktura::printCurrent(void) {
 	printf("do printing stuff\n");
-	beFakPrint *print = new printText(curdata->id, this->dbData);
+//	beFakPrint *print = new printText(curdata->id, this->dbData);
+	beFakPrint *print = new printHTML(curdata->id, this->dbData);
 	print->Go();
 	printf("launched printing job\n");
 	delete print;
