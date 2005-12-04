@@ -378,7 +378,7 @@ int ret;
 	for (int i=0;i<fsummarows;i++) {
 		if (wide) {
 		} else {
-			line = "                                                |";
+			line = leftFill("|", 48);
 			line += fitAlignR(fsumma[i].summa[0],8); line += "|";
 			line += fitAlignR(fsumma[i].summa[1],3); line += "|";
 			line += fitAlignR(fsumma[i].summa[2],8); line += "|";
@@ -390,13 +390,13 @@ int ret;
 	//[] oddzielenie od podsumowania
 	if (wide) {
 	} else {
-		hline2 = "                                                +--------+---+--------+--------+"; hline2 += ELINE;
+		hline2 = leftFill("+--------+---+--------+--------+", 48); hline2 += ELINE;
 	}
 	out += hline2;
 	//[] RAZEM
 	if (wide) {
 	} else {
-		line = "                                         RAZEM: |";
+		line = leftFill("RAZEM: |", 48-7);
 		line += fitAlignR(razem.summa[0],8); line += "|";
 		line += fitAlignR(razem.summa[1],3); line += "|";
 		line += fitAlignR(razem.summa[2],8); line += "|";
@@ -505,5 +505,16 @@ const char *beFakPrint::fitAlignL(const BString line, int len, bool space = fals
 	tmp.Truncate(len);
 	if (space)
 		tmp.Prepend(" ");
+	return tmp.String();
+}
+
+const char *beFakPrint::leftFill(const BString line, int spaces) {
+	static BString tmp;
+	int j;
+
+	tmp = "";
+	j = spaces;
+	while (j>0) { tmp.Append(" "); j--; }
+	tmp += line;
 	return tmp.String();
 }

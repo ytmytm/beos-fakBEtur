@@ -43,6 +43,7 @@ class beFakPrint {
 		const char *halfAlign(const BString line, const BString right);
 		const char *fitAlignR(const BString line, int len, bool space = false);
 		const char *fitAlignL(const BString line, int len, bool space = false);
+		const char *leftFill(const BString line, int spaces);
 };
 
 #endif
