@@ -327,7 +327,7 @@ int ret;
 		out += line;
 		line = "|Lp| Nazwa | PKWiU  | Ilosc | Jm | Rab.| Cena z | Wartosc|VAT| Wartosc| Wartosc|"; line += ELINE;
 		out += line;
-		line = "|  |       |        |       |    | (%) |  rab.  |  netto |(%)|   VAT  | brutto |"; line += ELINE;
+		line = "|  |       |        |       |    | (%) |  rab.  |  netto |   |   VAT  | brutto |"; line += ELINE;
 		out += line;
 		out += hline;
 	}
