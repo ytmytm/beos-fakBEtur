@@ -1,9 +1,10 @@
 
+// TODO:
+//	- wlaczyc slownie do klasy?
 //
 // ogolne:
 //		wygenerowanie podsumowania z rozbiciem na stawki
 //		obliczenie sumy do zaplaty
-//		slownie
 // text:
 //		generowanie tabelki
 //			szerokosci na sztywno dla 80/136
@@ -62,10 +63,97 @@ printf("reading stuff for id=%i\n",fakturaid);
 }
 
 beFakPrint::~beFakPrint() {
-printf("at the and call destructor from baseclass\n");
+printf("at the end call destructor from baseclass\n");
 	delete flist;
 	delete fdata;
 }
+
+const char *setki[] = { "", "sto ", "dwieście ", "trzysta ", "czterysta ", "pięćset ", "sześćset ", "siedemset ", "osiemset ", "dziewięćset " };
+const char *dziesiatki[] = { "", "", "dwadzieścia ", "trzydzieści ", "czterdzieści ", "pięćdziesiąt ", "sześćdziesiąt", "siedemdziesiąt ", "osiemdziesiąt ", "dziewięćdziesiąt " };
+const char *nascie[] = { "dziesięć ", "jedenaście ", "dwanaście ", "trzynaście ", "czternaście ", "piętnaście ", "szesnaście ", "siedemnaście ", "osiemnaście ", "dziewiętnaście " };
+const char *jednosci[] = { "", "jeden ", "dwa ", "trzy ", "cztery ", "pięć ", "sześć ", "siedem ", "osiem ", "dziewięć " };
+
+const char *rozbij_tysiac(int val) {
+	static BString tmp;
+	int i;
+	int t = val;
+
+	tmp = "";
+	i = t / 100;
+	tmp += setki[i];
+	t = t % 100;
+	i = t / 10;
+	t = t % 10;
+	if (i!=1) {
+		tmp += dziesiatki[i];
+		tmp += jednosci[t];
+	} else {
+		tmp += nascie[t];
+	}
+	return tmp.String();
+}
+
+const char *slownie(const char *input) {
+	static BString tmp;
+
+	int i = 0;
+	int l = strlen(input);
+	char c;
+
+	int z = 0;		// zlote
+	int g = 0;		// grosze
+	int w = 0;		// wykladnik
+	bool grosze = false;
+
+	while (i<l) {
+		c = input[i++];
+		if (c == '.')
+			grosze = true;
+		else
+		if (!grosze)
+			z = z*10+c-'0';
+		else {
+			w++;
+			if (w<3)
+				g=g*10+c-'0';
+		}
+	}
+	if (w==1) g*=10;
+
+	i = z / 1000000;
+	if (i!=0) {
+		tmp += rozbij_tysiac(i);
+		tmp += "mln. ";
+	}
+	z = z % 1000000;
+
+	i = z / 1000;
+	if (i!=0) {
+		tmp += rozbij_tysiac(i);
+		tmp += "tys. ";
+	}
+	z = z % 1000;
+
+	i = z;
+	if (i!=0) {
+		tmp += rozbij_tysiac(i);
+	}
+	if ((tmp.Length()==0) && (g==0))
+		tmp = "zero ";
+	if (tmp.Length()!=0)
+		tmp += "zł ";
+
+	i = g;
+	if (i!=0) {
+		tmp += rozbij_tysiac(i);
+		tmp += "gr";
+	}
+
+	return tmp.String();
+}
+
+//----------------------
+// sample implementation
 
 #define NCOLS	80		// liczba znaków w wierszu tekstowym
 #define ELINE	"\n"	// znak końca linii
@@ -193,6 +281,7 @@ BString tmp, out, line;
 	//[] wolna
 	out += ELINE;
 	printf("%s",out.String());
+	printf("%s\n", slownie("15234.34"));
 	printf("---------------------\n");
 }
 
