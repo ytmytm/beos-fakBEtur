@@ -3,29 +3,10 @@
 //	- rozdzielic text od klasybazowej w miare szybko
 //	- wlaczyc slownie do klasy?
 //
-// ogolne:
-//		wygenerowanie podsumowania z rozbiciem na stawki
-//		obliczenie sumy do zaplaty
-//			- dwie kwerendy sql
-//			- jak przekazac liste wynikow do klasy potomnej? wlasna struktura?
 // text:
-//		generowanie tabelki
-//			szerokosci na sztywno dla 80/136
-//		RAZEM osobno, zeby moglo zajsc na sume/slownie
+//		szerokosci,parametry dla 80/136 do osobnej tabeli, indeksowac
 //		konfiguracja - liczba kolumn, znak konca linii
 //
-
-// podsumowanie:
-// tabela pomocnicza:
-// CREATE TEMPORARY TABLE sumawydruk ( wnetto DECIMAL(12,2), vatid INTEGER, wvat DECIMAL(12,2), wbrutto DECIMAL(12,2) );
-// wstawiac kolejne rekordy
-// INSERT INTO sumawydruk (wnetto,vatid,wvat,wbrutto) VALUES ( %Q, %i, %Q, %Q );
-// suma z rozbiciem na stawki
-// SELECT SUM(wnetto), vat/stawka, SUM(wvat), SUM(wbrutto) FROM sumawydruk GROUP BY vatid ORDER BY vatid/stawka;
-// suma calkowita
-// SELECT SUM(wnetto), vat/stawka, SUM(wvat), SUM(wbrutto) FROM sumawydruk;
-// koniec sesji
-// DROP TABLE sumawydruk;
 
 #include "befakprint.h"
 
@@ -320,6 +301,15 @@ int ret;
 	//[] [tabela]
 	// [naglowek]
 	if (wide) {
+	   hline = "+----+-----------------------------------------+-------------+---------+------+-------+----------+----------+---+----------+----------+"; hline += ELINE;
+		out += hline;
+		line = "|    |                                         |             |         |      |       |          |          |   |          |          |"; line += ELINE;
+		out += line;
+		line = "| Lp | Nazwa towaru/uslugi                     |    PKWiU    |  Ilosc  |  Jm  | Rabat |  Cena z  |  Wartosc |VAT|  Wartosc |  Wartosc |"; line += ELINE;
+		out += line;
+		line = "|    |                                         |             |         |      |  (%)  |  rabatem |    netto |   |    VAT   |   brutto |"; line += ELINE;
+		out += line;
+		out += hline;
 	} else {
 	   hline = "+--+-------+--------+-------+----+-----+--------+--------+---+--------+--------+"; hline += ELINE;
 		out += hline;
@@ -336,6 +326,28 @@ int ret;
 	while (cur!=NULL) {
 		line = "|";
 		if (wide) {
+			// lp
+			tmp = ""; tmp << cur->lp; line += fitAlignR(tmp,4,true); line += "|";
+			// nazwa
+			line += fitAlignL(cur->data->data[1],41,true); line += "|";
+			// pkwiu
+			line += fitAlignR(cur->data->data[2],13,true); line += "|";
+			// ilosc
+			line += fitAlignR(cur->data->data[3],9,true); line += "|";
+			// jm
+			line += fitAlignR(cur->data->data[4],6,true); line += "|";
+			// rabat
+			line += fitAlignR(cur->data->data[5],7,true); line += "|";
+			// cenajednostkowa
+			line += fitAlignR(cur->data->data[6],10,true); line += "|";
+			// w.netto
+			line += fitAlignR(cur->data->data[7],10,true); line += "|";
+			// vat %
+			line += fitAlignR(cur->data->data[8],3); line += "|";
+			// w.vat
+			line += fitAlignR(cur->data->data[9],10,true); line += "|";
+			// w.brutto
+			line += fitAlignR(cur->data->data[10],10,true); line += "|";
 		} else {
 			// lp
 			tmp = ""; tmp << cur->lp; line += fitAlignR(tmp,2); line += "|";
@@ -376,6 +388,11 @@ int ret;
 	//[] wypisac podsumowanie
 	for (int i=0;i<fsummarows;i++) {
 		if (wide) {
+			line = leftFill("|", 97);
+			line += fitAlignR(fsumma[i].summa[0],10,true); line += "|";
+			line += fitAlignR(fsumma[i].summa[1],3); line += "|";
+			line += fitAlignR(fsumma[i].summa[2],10,true); line += "|";
+			line += fitAlignR(fsumma[i].summa[3],10,true); line += "|";
 		} else {
 			line = leftFill("|", 48);
 			line += fitAlignR(fsumma[i].summa[0],8); line += "|";
@@ -388,12 +405,18 @@ int ret;
 	}
 	//[] oddzielenie od podsumowania
 	if (wide) {
+		hline2 = leftFill("+----------+---+----------+----------+", 97); hline2 += ELINE;
 	} else {
 		hline2 = leftFill("+--------+---+--------+--------+", 48); hline2 += ELINE;
 	}
 	out += hline2;
 	//[] RAZEM
 	if (wide) {
+		line = leftFill("RAZEM: |", 97-7);
+		line += fitAlignR(razem.summa[0],10,true); line += "|";
+		line += fitAlignR(razem.summa[1],3); line += "|";
+		line += fitAlignR(razem.summa[2],10,true); line += "|";
+		line += fitAlignR(razem.summa[3],10,true); line += "|";
 	} else {
 		line = leftFill("RAZEM: |", 48-7);
 		line += fitAlignR(razem.summa[0],8); line += "|";
@@ -498,12 +521,14 @@ const char *beFakPrint::fitAlignR(const BString line, int len, bool space = fals
 
 const char *beFakPrint::fitAlignL(const BString line, int len, bool space = false) {
 	static BString tmp;
-	if (space)
-		len--;
+	int j;
+
 	tmp = line;
-	tmp.Truncate(len);
 	if (space)
 		tmp.Prepend(" ");
+	tmp.Truncate(len);
+	j = len-tmp.CountChars();
+	while (j>0) { tmp.Append(" "); j--; }
 	return tmp.String();
 }
 
