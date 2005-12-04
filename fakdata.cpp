@@ -612,7 +612,7 @@ printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 		sql += "*0"; sql += data->data[3];
 		data->data[7] = decround(execSQL(sql.String()));	// w.netto
 		// vat = stawka
-		sql = "SELECT stawka FROM stawka_vat WHERE id = "; sql << data->vatid;
+		sql = "SELECT nazwa FROM stawka_vat WHERE id = "; sql << data->vatid;
 		data->data[8] = execSQL(sql.String());
 		// w.brutto = w.netto*stawka
 		sql = "SELECT 0"; sql += data->data[7];
