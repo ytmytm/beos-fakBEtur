@@ -37,6 +37,7 @@ beFakPrint::beFakPrint(int id, sqlite *db) {
 	fdata->id = fakturaid;
 	fdata->fetch();
 	flist->fetch(fdata->id);
+	fsumma = NULL;
 
 	// XXX duplicated in dialfirma constructor!!! separate!!!
 	int i, j;
