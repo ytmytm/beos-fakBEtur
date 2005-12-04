@@ -164,12 +164,8 @@ printf("--------------------\n");
 			// w.brutto
 			line += fitAlignR(cur->data->data[10],8); line += "|";
 		}
-		// XXX do baseclass!!!
-		// wstawic podsumowanie do tymczasowej tabeli
-//		tmp = "INSERT INTO sumawydruk (wnetto,vatid,wvat,wbrutto) VALUES ( %Q, %i, %Q, %Q )";
-//		ret = sqlite_exec_printf(dbData, tmp.String(), 0, 0, &dbErrMsg,
 		updateSummary(cur->data->data[7].String(), cur->data->vatid, cur->data->data[9].String(), cur->data->data[10].String());
-//		printf("result: %i, %s\n", ret, dbErrMsg);
+ //		printf("result: %i, %s\n", ret, dbErrMsg);
 		cur = cur->nxt;
 		line += ELINE;
 		out += line;
