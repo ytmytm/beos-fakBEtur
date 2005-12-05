@@ -72,7 +72,7 @@ void printHTML::Go(void) {
 		out.ReplaceAll("@SREGON@", "");
 	}
 	if (own[7].Length()>0) {
-		tmp += "NIP: "; tmp += own[7].String();
+		tmp = "NIP: "; tmp += own[7].String();
 		out.ReplaceAll("@SNIP@", tmp.String());
 	} else {
 		out.ReplaceAll("@SNIP@", "");
