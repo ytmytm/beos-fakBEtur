@@ -306,6 +306,7 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			break;
 		case BUT_NEW:
 			if (CommitCurdata()) {
+				list->DeselectAll();
 				// clear curdata
 				curdata->clear();
 				// refresh tabs
