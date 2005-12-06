@@ -88,7 +88,7 @@ void beFakPrint::makeSummary(void) {
 	BString sql;
 
 	// suma z rozbiciem na stawki
-	sql = "SELECT SUM(s.wnetto), v.nazwa, SUM(s.wvat), SUM(s.wbrutto) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid GROUP BY s.vatid ORDER BY v.nazwa";
+	sql = "SELECT DECROUND(SUM(s.wnetto)), v.nazwa, DECROUND(SUM(s.wvat)), DECROUND(SUM(s.wbrutto)) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid GROUP BY s.vatid ORDER BY v.nazwa";
 //printf("sql:[%s]\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
@@ -100,16 +100,16 @@ void beFakPrint::makeSummary(void) {
 		fsummarows = nRows;
 		fsumma = new summary[nRows];
 		while (j <= nRows) {
-			fsumma[j-1].summa[0] = decround(result[i++]);
+			fsumma[j-1].summa[0] = result[i++];
 			fsumma[j-1].summa[1] = result[i++];
-			fsumma[j-1].summa[2] = decround(result[i++]);
-			fsumma[j-1].summa[3] = decround(result[i++]);
+			fsumma[j-1].summa[2] = result[i++];
+			fsumma[j-1].summa[3] = result[i++];
 			j++;
 		}
 	}
 	sqlite_free_table(result);
 	// obliczyc RAZEM
-	sql = "SELECT SUM(s.wnetto), v.nazwa, SUM(s.wvat), SUM(s.wbrutto) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid";
+	sql = "SELECT DECROUND(SUM(s.wnetto)), '', DECROUND(SUM(s.wvat)), DECROUND(SUM(s.wbrutto)) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid";
 //printf("sql:[%s]\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
@@ -117,10 +117,10 @@ void beFakPrint::makeSummary(void) {
 		// nothin'?
 	} else {
 		i = nCols;
-		razem.summa[0] = decround(result[i++]);
+		razem.summa[0] = result[i++];
 		razem.summa[1] = result[i++];
-		razem.summa[2] = decround(result[i++]);
-		razem.summa[3] = decround(result[i++]);
+		razem.summa[2] = result[i++];
+		razem.summa[3] = result[i++];
 	}
 	sqlite_free_table(result);
 }

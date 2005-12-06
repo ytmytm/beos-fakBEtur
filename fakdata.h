@@ -128,6 +128,5 @@
 
 	// helpers
 	int toint(const char *input);
-	const char *decround(const char *input);
 
 #endif

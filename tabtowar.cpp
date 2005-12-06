@@ -226,10 +226,10 @@ void tabTowar::updateTab(void) {
 	// XXX usluga, to cos wylaczyc/wyzerowac???
 	BString sql;
 // brać tu pod uwagę rabat/marżę - NIE: robi to but_sell
-	sql = "SELECT 0"; sql += ceny[0]->Text();
-	sql += "*(100+stawka)/100.0 FROM stawka_vat WHERE id = ";
+	sql = "SELECT DECROUND(0"; sql += ceny[0]->Text();
+	sql += "*(100+stawka)/100.0) FROM stawka_vat WHERE id = ";
 	sql << curdata->vatid;
-	brutto->SetText(decround(execSQL(sql.String())));
+	brutto->SetText(execSQL(sql.String()));
 }
 
 void tabTowar::MessageReceived(BMessage *Message) {
@@ -264,22 +264,22 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			break;
 		case BUT_SELL:
 //			printf("calc sell\n");
-			sql = "SELECT 0";
+			sql = "SELECT DECROUND(0";
 			sql += validateDecimal(ceny[1]->Text());
 			sql += "*(1.0+";
 			sql += validateDecimal(ceny[2]->Text());
 			sql += "/100.0)";
 			sql += "*(1.0-";
 			sql += validateDecimal(ceny[3]->Text());
-			sql += "/100.0)";
-			result = decround(execSQL(sql.String()));
+			sql += "/100.0))";
+			result = execSQL(sql.String());
 //			printf("sql:[%s]\nres[%s]\n",sql.String(),result.String());
 			ceny[0]->SetText(result.String());
 			updateTab();
 			break;
 		case BUT_MARZA:
 //			printf("calc marza\n");
-			sql = "SELECT (0";
+			sql = "SELECT DECROUND((0";
 			sql += validateDecimal(ceny[0]->Text());
 			sql += "/(0";
 			sql += validateDecimal(ceny[1]->Text());
@@ -289,15 +289,15 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			sql += validateDecimal(ceny[4]->Text());
 			sql += "*(1+";
 			sql += validateDecimal(ceny[5]->Text());
-			sql += "/100.0))-1)*100";
-			result = decround(execSQL(sql.String()));
+			sql += "/100.0))-1)*100)";
+			result = execSQL(sql.String());
 //			printf("sql:[%s]\nres[%s]\n",sql.String(),result.String());
 			ceny[2]->SetText(result.String());
 			updateTab();
 			break;
 		case BUT_IMPORT:
 //			printf("calc import\n");
-			sql = "SELECT 0";
+			sql = "SELECT DECROUND(0";
 			sql += validateDecimal(ceny[1]->Text());
 			sql += "*(1.0+";
 			sql += validateDecimal(ceny[2]->Text());
@@ -307,8 +307,8 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			sql += validateDecimal(ceny[5]->Text());
 			sql += "/100.0)*(1.0-";
 			sql += validateDecimal(ceny[3]->Text());
-			sql += "/100.0)";
-			result = decround(execSQL(sql.String()));
+			sql += "/100.0))";
+			result = execSQL(sql.String());
 //			printf("sql:[%s]\nres[%s]\n",sql.String(),result.String());
 			ceny[0]->SetText(result.String());
 			updateTab();

@@ -55,8 +55,8 @@ const char *beFakTab::validateDecimal(const char *input) {
 		tmp = "0";
 	tmp.ReplaceAll(",",".");	// XXX more safeguards?
 
-	sql = "SELECT ABS(0"; sql += tmp; sql += ")";
-	return decround(execSQL(sql.String()));
+	sql = "SELECT DECROUND(ABS(0"; sql += tmp; sql += "))";
+	return execSQL(sql.String());
 }
 
 const char *beFakTab::validateDate(const char *input) {

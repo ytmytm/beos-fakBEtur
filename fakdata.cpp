@@ -220,47 +220,6 @@ int toint(const char *input) {
 		return 0;
 }
 
-// not thread-safe!
-// zaokraglanie zgodnie z rozporzadzeniem Ministra Finansow z 25.05.2005
-// (Dz.U. 2005 nr 95 poz. 798), roz. 4, par 9, pkt. 6
-const char *decround(const char *input) {
-	static char out[512];
-	int i = 0;
-	int l = strlen(input);
-	char c;
-
-	int z = 0;		// zlote
-	int g = 0;		// grosze
-	int w = 0;		// wykladnik
-	bool grosze = false;
-
-	memset(out,0,sizeof(out));
-	while (i<l) {
-		c = input[i++];
-		if (c == '.') 
-			grosze = true;
-		else
-		if (!grosze)
-			z = z*10+c-'0';
-		else {
-			w++;
-			if (w<3)
-				g = g*10+c-'0';
-			else
-			if (w==3) {
-				if ((c-'0')>=5) {
-					g++;
-					if (g>=100) { z++, g-=100; }
-				}
-				break;	// nie interesuja nas cyfry poza .00x
-			}
-		}
-	}
-	if (w==1) g*=10;
-	sprintf(out, "%i.%02i", z, g);
-	return out;
-}
-
 //----------------------
 
 fakturadat::fakturadat(sqlite *db) {
@@ -601,28 +560,28 @@ printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 		// XXX duplicated calculations from updateTab2 on suma[]
 		// 6, 7, 8, 9, 10 - cjednost, w.netto, vat, wvat, wbrutto
 		// cjednostk = cnetto*(100-rabat)/100
-		sql = "SELECT 0"; sql += data->data[11];
-		sql += "*(100-0"; sql += data->data[5]; sql += ")/100.0";
-		data->data[6] = decround(execSQL(sql.String()));	// c.jednostkowa
+		sql = "SELECT DECROUND(0"; sql += data->data[11];
+		sql += "*(100-0"; sql += data->data[5]; sql += ")/100.0)";
+		data->data[6] = execSQL(sql.String());				// c.jednostkowa
 		// cbrutto = cjednostk*(100+stawka)/100
-		sql = "SELECT 0"; sql += data->data[6];
-		sql += "*(100+stawka)/100.0 FROM stawka_vat WHERE id = "; sql << data->vatid;
-		cbrutto = decround(execSQL(sql.String()));			// c.brutto
+		sql = "SELECT DECROUND(0"; sql += data->data[6];
+		sql += "*(100+stawka)/100.0) FROM stawka_vat WHERE id = "; sql << data->vatid;
+		cbrutto = execSQL(sql.String());					// c.brutto
 		// w.netto = cjednostkowanetto*ilosc
-		sql = "SELECT 0"; sql += data->data[6];
-		sql += "*0"; sql += data->data[3];
-		data->data[7] = decround(execSQL(sql.String()));	// w.netto
+		sql = "SELECT DECROUND(0"; sql += data->data[6];
+		sql += "*0"; sql += data->data[3]; sql += ")";
+		data->data[7] = execSQL(sql.String());				// w.netto
 		// vat = stawka
 		sql = "SELECT nazwa FROM stawka_vat WHERE id = "; sql << data->vatid;
 		data->data[8] = execSQL(sql.String());
 		// w.brutto = w.netto*stawka
-		sql = "SELECT 0"; sql += data->data[7];
-		sql += "*(100+stawka)/100.0 FROM stawka_vat WHERE id = "; sql << data->vatid;
-		data->data[10] = decround(execSQL(sql.String()));	// w.brutto
+		sql = "SELECT DECROUND(0"; sql += data->data[7];
+		sql += "*(100+stawka)/100.0) FROM stawka_vat WHERE id = "; sql << data->vatid;
+		data->data[10] = execSQL(sql.String());				// w.brutto
 		// w.vat = w.brutto-w.netto
-		sql = "SELECT 0"; sql += data->data[10];
-		sql += "-0"; sql += data->data[7];
-		data->data[9] = decround(execSQL(sql.String()));	// w.vat
+		sql = "SELECT DECROUND(0"; sql += data->data[10];
+		sql += "-0"; sql += data->data[7]; sql += ")";
+		data->data[9] = execSQL(sql.String());				// w.vat
 		j++;							// next row
 	}
 	sqlite_free_table(result);

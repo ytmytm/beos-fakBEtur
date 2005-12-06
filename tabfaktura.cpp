@@ -1,11 +1,13 @@
 //
 // TODO:
 // - nazwa nowej faktury: '##/miesiac/rok', ## brac z konf, ale kiedy uaktualniac?
+// - guzik kalendarza
+// - guzik importu
 // IDEAS:
 // - pewnego słonecznego dnia wrzucić do destruktora listę z delete...
 // - pole uwagi nie reaguje na zmiany! (sprawdzac UndoState?)
 // - obliczac wartosci i ceny w jednym miejscu
-//	 (np. suma[] i data->data w pozfakdata oraz (fut!) wydruk)
+//	 (np. suma[] i data->data w pozfakdata)
 // - usunac kopiowanie kodu (execsql, inne kawalki)
 // - zamiast usuwać/dodawać wszystkie pozitems - może pamiętać ich id?
 //	 generować, uaktualniać, czyścić
@@ -479,25 +481,25 @@ void tabFaktura::updateTab2(void) {
 	towar[4]->SetText(validateDecimal(towar[4]->Text()));
 	// calculate data for summary suma[]
 	BString sql, cnetto, cbrutto;
-	sql = "SELECT 0"; sql += towar[2]->Text();
-	sql += "*(100-0"; sql += towar[3]->Text(); sql += ")/100.0";
-	cnetto = decround(execSQL(sql.String()));	// cnettojednostkowa
+	sql = "SELECT DECROUND(0"; sql += towar[2]->Text();
+	sql += "*(100-0"; sql += towar[3]->Text(); sql += ")/100.0)";
+	cnetto = execSQL(sql.String());						// cnettojednostkowa
 	suma[0]->SetText(cnetto.String());
 	// cbrutto = cnettojedn*stawka
-	sql = "SELECT 0"; sql += cnetto; sql +="*(100+stawka)/100.0 FROM stawka_vat WHERE id = ";
+	sql = "SELECT DECROUND(0"; sql += cnetto; sql +="*(100+stawka)/100.0) FROM stawka_vat WHERE id = ";
 	sql << curtowarvatid;
-	suma[1]->SetText(decround(execSQL(sql.String())));	// cbrutto
+	suma[1]->SetText(execSQL(sql.String()));			// cbrutto
 	suma[2]->SetText(towar[4]->Text());					// ilosc
 	// wnetto = cnettojedn*ilosc
-	sql = "SELECT 0"; sql += cnetto; sql += "*0"; sql += towar[4]->Text();
-	suma[3]->SetText(decround(execSQL(sql.String())));	// wnetto
+	sql = "SELECT DECROUND(0"; sql += cnetto; sql += "*0"; sql += towar[4]->Text(); sql += ")";
+	suma[3]->SetText(execSQL(sql.String()));			// wnetto
 	// wbrutto = cnettojedn*ilosc*stawka = wnetto*stawka
-	sql = "SELECT 0"; sql += suma[3]->Text();
-	sql += "*(100+stawka)/100.0 FROM stawka_vat WHERE id = "; sql << curtowarvatid;
-	suma[5]->SetText(decround(execSQL(sql.String())));	// wbrutto
+	sql = "SELECT DECROUND(0"; sql += suma[3]->Text();
+	sql += "*(100+stawka)/100.0) FROM stawka_vat WHERE id = "; sql << curtowarvatid;
+	suma[5]->SetText(execSQL(sql.String()));			// wbrutto
 	// wvat = wbrutto - wnetto
-	sql = "SELECT 0"; sql += suma[5]->Text(); sql += "-0"; sql += suma[3]->Text();
-	suma[4]->SetText(decround(execSQL(sql.String())));	// wvat
+	sql = "SELECT DECROUND(0"; sql += suma[5]->Text(); sql += "-0"; sql += suma[3]->Text(); sql += ")";
+	suma[4]->SetText(execSQL(sql.String()));			// wvat
 }
 
 void tabFaktura::makeNewForm(void) {
@@ -628,6 +630,16 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				break;
 				// XXX if not canceled:
 				// this->dirty = true;
+			}
+		case BUT_PIMPORT:
+			{	// XXX present with another faktura list, select one or cancel
+				// XXX if selected - fetch pozfaklist
+				BAlert *import = new BAlert(APP_NAME, "Tutaj dialog do wyboru faktury, z której zaimportować listę towarów", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
+				import->Go();
+				break;
+				// XXX if not canceled
+				// this->dirty = true;
+				// towardirty = true;
 			}
 // from tab2
 		case DCT:
