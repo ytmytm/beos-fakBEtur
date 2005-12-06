@@ -48,7 +48,7 @@ int firmadat::generate_id(void) {
 void firmadat::commit(void) {
 	BString sql;
 	int ret;
-printf("commit\n");
+//printf("commit\n");
 	if (id>=0) {	// UPDATE
 		sql = "UPDATE firma SET ";
 		sql += "nazwa = %Q, symbol = %Q, adres = %Q, kod = %Q, miejscowosc = %Q, telefon = %Q, email = %Q";
@@ -74,11 +74,11 @@ printf("commit\n");
 		data[8].String(), data[9].String(), data[10].String(),
 		odbiorca, dostawca, aktywny, zablokowany,
 		id);
-	printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
+//printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
 
 void firmadat::fetch(void) {
-printf("in fetchcurdata with %i\n",id);
+//printf("in fetchcurdata with %i\n",id);
 	int i, j;
 	int nRows, nCols;
 	char **result;
@@ -91,7 +91,7 @@ printf("in fetchcurdata with %i\n",id);
 	sql << id;
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-printf ("got:%ix%i\n", nRows, nCols);
+//printf ("got:%ix%i\n", nRows, nCols);
 	// readout data
 	i = nCols;
 	for (j=0;j<=10;j++) {
@@ -148,7 +148,7 @@ int towardat::generate_id(void) {
 void towardat::commit(void) {
 	BString sql;
 	int ret;
-printf("commit\n");
+//printf("commit\n");
 	if (id>=0) {	// UPDATE
 		sql = "UPDATE towar SET ";
 		sql += "nazwa = %Q, symbol = %Q, pkwiu = %Q, jm = %Q";
@@ -169,14 +169,14 @@ printf("commit\n");
 		sql += ", %Q, %Q";
 		sql += ", %i)";
 	}
-printf("sql:[%s]\n",sql.String());
+//printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		data[0].String(), data[1].String(), data[2].String(), data[3].String(),
 		usluga, notatki.String(), vatid,
 		ceny[0].String(), ceny[1].String(), ceny[2].String(), ceny[3].String(),
 		ceny[4].String(), ceny[5].String(),
 		id);
-printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
+//printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
 
 void towardat::fetch(void) {
@@ -191,9 +191,9 @@ void towardat::fetch(void) {
 	sql += ", netto, zakupu, marza, rabat, kurs, clo";
 	sql += " FROM towar WHERE id = ";
 	sql << id;
-printf("sql:%s\n",sql.String());
+//printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
+//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	// readout data
 	i = nCols;
 	for (j=0;j<=3;j++) {
@@ -264,7 +264,7 @@ int fakturadat::generate_id(void) {
 }
 
 void fakturadat::commit(void) {
-printf("in commit with %i\n",id);
+//printf("in commit with %i\n",id);
 	BString sql;
 	int ret;
 	if (id>=0) {	// UPDATE
@@ -294,7 +294,7 @@ printf("in commit with %i\n",id);
 		sql += ", %Q, %Q, %Q, %Q";
 		sql += ", %i)";
 	}
-printf("sql:[%s]\n",sql.String());
+//printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		nazwa.String(), ogol[0].String(), ogol[1].String(), ogol[2].String(), ogol[3].String(),
 		ogol[4].String(), ogol[5].String(), ogol[6].String(),
@@ -302,11 +302,11 @@ printf("sql:[%s]\n",sql.String());
 		odata[0].String(), odata[2].String(), odata[3].String(), odata[4].String(), odata[5].String(), odata[6].String(),
 		odata[7].String(), odata[8].String(), odata[9].String(), odata[10].String(),
 		id);
-printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
+//printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
 
 void fakturadat::fetch(void) {
-printf("in fetchcurdata with %i\n",id);
+//printf("in fetchcurdata with %i\n",id);
 	int i, j;
 	int nRows, nCols;
 	char **result;
@@ -320,9 +320,9 @@ printf("in fetchcurdata with %i\n",id);
 	sql += ", onip, oregon, obank, okonto";
 	sql += " FROM faktura WHERE id = ";
 	sql << id;
-printf("sql:%s\n",sql.String());
+//printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
+//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	// readout data
 	i = nCols;
 	nazwa = result[i++];
@@ -491,10 +491,9 @@ int pozfaklist::generate_id(void) {
 
 void pozfaklist::commit(int fakturaid) {
 	int ret;
-	/// XXX ids for existing should be already known!!!
-	/// XXX remove all existing and insert new? convenient!
+	/// remove all existing and insert new? convenient!
 	ret = sqlite_exec_printf(dbData, "DELETE FROM pozycjafakt WHERE fakturaid = %i", 0, 0, &dbErrMsg, fakturaid);
-printf("result: %i, %s;\n", ret, dbErrMsg);
+//printf("result: %i, %s;\n", ret, dbErrMsg);
 
 	// iterate through list, commit items
 	pozfakitem *cur = start;
@@ -518,17 +517,17 @@ void pozfaklist::commititem(int fakturaid, pozfakitem *item) {
 	sql += ", %Q, %Q, %Q, %i, %Q, %Q";
 	sql += ", %i )";
 printf("commit for %i #%i\n", id, fakturaid);
-printf("sql:[%s]\n",sql.String());
+//printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		id, item->lp, data->data[3].String(),
 		data->data[1].String(), data->data[2].String(), data->data[4].String(), data->vatid, data->data[11].String(), data->data[5].String(),
 		fakturaid
 	);
-printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
+//printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
 
 void pozfaklist::fetch(int fakturaid) {
-printf("fetchpozfak id=%i\n", fakturaid);
+///printf("fetchpozfak id=%i\n", fakturaid);
 	pozfakdata *data;
 	int i, j;
 	int nRows, nCols;
@@ -544,9 +543,9 @@ printf("fetchpozfak id=%i\n", fakturaid);
 	sql += " FROM pozycjafakt WHERE fakturaid = ";
 	sql << fakturaid;
 	sql += " ORDER BY lp";
-printf("sql:%s\n",sql.String());
+//printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
+//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	if (nRows < 1)
 		return;
 	// readout data
