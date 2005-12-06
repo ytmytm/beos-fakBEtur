@@ -452,6 +452,15 @@ void tabFaktura::updateTab2(void) {
 	faklista->calcBruttoFin(result);
 }
 
+void tabFaktura::updateTermin(void) {
+	BString tmp;
+
+	tmp = "SELECT DATE('now', '0";
+	tmp += ogol[7]->Text();
+	tmp += " days')";
+	ogol[6]->SetText(execSQL(tmp.String()));
+}
+
 void tabFaktura::makeNewForm(void) {
 	curdata->clear();
 	// unselect symbolmenu
@@ -460,15 +469,13 @@ void tabFaktura::makeNewForm(void) {
 	}
 	menusymbol->Superitem()->SetLabel("[wybierz]");
 	// XXX prepare new 'nazwa' for faktura
+	// data sprzedaży, wystawienia
 	curdata->ogol[2] = execSQL("SELECT DATE('now')");
 	curdata->ogol[3] = execSQL("SELECT DATE('now')");
-	// XXX this is already in TERMCHANGE handler
+	// data płatności = dziś+30
 	curdata->ogol[7] = "30";
-	BString tmp;
-	tmp = "SELECT DATE('now', '0";
-	tmp << curdata->ogol[7].String();
-	tmp += " days')";
-	curdata->ogol[6] = execSQL(tmp.String());
+	updateTermin();
+	curdata->ogol[6] = ogol[6]->Text();
 	// 
 	uwagi->SetText("");
 	cbzaplacono->SetValue(B_CONTROL_OFF);
@@ -527,7 +534,6 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			curdataFromTab();
 			DoCommitCurdata();
 			curdataToTab();
-			// XXX prepare default params
 			printCurrent();
 			break;
 		case LIST_SEL:
@@ -566,10 +572,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			}
 			break;
 		case TERMCHANGE:
-			sql = "SELECT DATE('now', '0";
-			sql << ogol[7]->Text();
-			sql += " days')";
-			ogol[6]->SetText(execSQL(sql.String()));
+			updateTermin();
 			break;
 		case CBUT:
 			{	void *ptr;
@@ -734,14 +737,9 @@ void tabFaktura::ChangedTowarSelection(int newid) {
 		towar[3]->SetText(item->data[5].String());	// rabat
 		curtowarvatid = item->vatid;				// vatid
 		towar[2]->SetText(item->data[11].String());	// cnetto
-//		// cena netto z jednostkowej przed rabatem
-//		BString sql;
-//		sql = "SELECT 0"; sql += item->data[6];
-//		sql += "/(1-0"; sql += item->data[5]; sql += "/100.0)";
-//		towar[2]->SetText(execSQL(sql.String()));
 		updateTab2();
 	} else {
-//		printf("null item after selchg, happens after all-delete\n");
+//printf("null item after selchg, happens after all-delete\n");
 	}
 	towardirty = false;
 }
@@ -892,7 +890,7 @@ void tabFaktura::RefreshTowarList(void) {
 	}
 
 	while (cur!=NULL) {
-//		printf("[%i] - %s\n",cur->lp, cur->data->data[1].String());
+//printf("[%i] - %s\n",cur->lp, cur->data->data[1].String());
 		tmp = ""; tmp << cur->lp;
 		pozcolumn[0]->AddItem(new BStringItem(tmp.String()));
 		for (i=1;i<=10;i++) {
@@ -961,6 +959,7 @@ void tabFaktura::RefreshTowarSymbols(void) {
 void tabFaktura::printCurrent(void) {
 	beFakPrint *print;
 	printf("do printing stuff\n");
+	// XXX set some defaults? msg_printconf might have been never called!
 	switch(pmode) {
 		case 2:
 			print = new printHTML(curdata->id, this->dbData, ptyp, pwide);
