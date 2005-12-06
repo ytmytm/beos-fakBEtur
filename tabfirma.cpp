@@ -6,9 +6,11 @@
 //
 
 
+#include "globals.h"
 #include "tabfirma.h"
 #include "fakdata.h"
 
+#include <Alert.h>
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
@@ -150,6 +152,68 @@ void tabFirma::updateTab(void) {
 	aktywny->SetEnabled(state);
 }
 
+// perform checks against supplied data
+bool tabFirma::validateTab(void) {
+	BAlert *error;
+	BString sql, tmp;
+	int i;
+	// nazwa - niepusta
+	if (strlen(data[0]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano nazwy kontrahenta!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// nazwa - unikalna
+	tmp = data[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
+	sql = "SELECT id FROM firma WHERE nazwa = '"; sql += tmp; sql += "'";
+	i = toint(execSQL(sql.String()));
+	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id >0) && (i != curdata->id))) {
+		error = new BAlert(APP_NAME, "Nazwa firmy nie jest unikalna!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// symbol - niepusty
+	if (strlen(data[1]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano symbolu kontrahenta!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// symbol - unikalny
+	tmp = data[1]->Text(); tmp.ReplaceAll("'","''");	// sql quote
+	sql = "SELECT id FROM firma WHERE symbol = '"; sql += tmp; sql += "'";
+	i = toint(execSQL(sql.String()));
+	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id >0) && (i != curdata->id))) {
+		error = new BAlert(APP_NAME, "Symbol kontrahenta nie jest unikalny!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// adres - wszystkie dane
+	if ((strlen(data[2]->Text())==0) || (strlen(data[3]->Text())==0) || (strlen(data[4]->Text())==0)) {
+		error = new BAlert(APP_NAME, "Adres kontrahenta jest niepełny.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// NIP - niepusty,poprawny
+	if (strlen(data[7]->Text())==0) {
+		error = new BAlert(APP_NAME, "Nie wpisano numeru NIP kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// REGON - niepusty,poprawny
+	if (strlen(data[8]->Text())==0) {
+		error = new BAlert(APP_NAME, "Nie wpisano numeru REGON kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// nr konta - niepusty,poprawny
+	if (strlen(data[10]->Text())==0) {
+		error = new BAlert(APP_NAME, "Nie wpisanu numeru konta kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	return true;
+}
+
 void tabFirma::MessageReceived(BMessage *Message) {
 	switch (Message->what) {
 		case DC:
@@ -201,6 +265,8 @@ void tabFirma::ChangedSelection(int newid) {
 }
 
 void tabFirma::DoCommitCurdata(void) {
+	if (!(validateTab()))
+		return;
 	curdata->commit();
 	this->dirty = false;
 	BMessage *msg = new BMessage(MSG_REQFIRMAUP);

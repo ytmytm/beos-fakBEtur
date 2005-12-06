@@ -1,7 +1,7 @@
 //
 // TODO:
-// - testy danych - wymagane/opcjonalne (wł/wył)
-//		- wszędzie: wymagana nazwa+symbol, unikalne
+// - testy danych - te z kontynuacją wyłączalne w konf.
+//		- dorobić dla tabfaktura
 // - dialog do edycji stawek vat
 // - drukowanie przez printjob
 // - wpisanie nieistniejącego kontr/towaru na fakture -> uaktualnienie bazy

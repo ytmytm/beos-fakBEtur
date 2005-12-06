@@ -18,6 +18,7 @@ class beFakTab {
 		virtual void MessageReceived(BMessage *Message);
 		virtual bool CommitCurdata(bool haveCancelButton = true);
 		virtual void DoCommitCurdata(void) { };	// INSERT/UPDATE
+		virtual bool validateTab(void) { return true; };
 
 		virtual void curdataFromTab(void) { };
 		virtual void curdataToTab(void) { };

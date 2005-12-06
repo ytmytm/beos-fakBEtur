@@ -33,9 +33,11 @@ class tabTowar : public beFakTab {
 		// update - enable/disable widgets, parse msg (combo items)
 		// curdataTo - read data from curtab to widgets, call update
 		// curdataFrom - read from widgets to curtab
+		// validate - perform all checks, notify user and return true only if OK
 		void curdataFromTab(void);
 		void curdataToTab(void);
 		void updateTab(void);
+		bool validateTab(void);
 
 	private:
 		BButton *but_new, *but_del, *but_restore, *but_save;

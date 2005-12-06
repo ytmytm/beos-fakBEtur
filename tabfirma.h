@@ -33,6 +33,7 @@ class tabFirma : public beFakTab {
 		void curdataFromTab(void);
 		void curdataToTab(void);
 		void updateTab(void);
+		bool validateTab(void);
 
 	private:
 		BButton *but_new, *but_del, *but_restore, *but_save;

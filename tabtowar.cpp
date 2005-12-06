@@ -5,13 +5,9 @@
 // pola ceny[] ida przez sqlite - mozna wpisywac wyrazenia arytmetyczne
 //
 // pole 'usługa' - związane tylko z magazynem
-// kontrola wypełnienia wymaganych pól (cena, vat, itd.) - czy są i czym są
-//    (wszystko w DoCommitCurdata)
 // TODO:
 // blokada: DoCommitCurdata powinno zwracać wartość do Commit, aby móc anulować
 // zmianę pozycji (cur-dirty, zmiana na liście)
-// bug: uruchomienie i zamknięcie daje segv, wystarczy kliknąć na listę aby
-//		zamknięcie poszło czysto (chyba nieaktualny)
 
 #include "globals.h"
 #include "tabtowar.h"
@@ -224,13 +220,77 @@ void tabTowar::updateTab(void) {
 		brutto->SetText("???");
 		return;
 	}
-	// XXX usluga, to cos wylaczyc/wyzerowac???
+	// XXX usluga, to cos wylaczyc/wyzerowac??? - stan magazynu
 	BString sql;
 // brać tu pod uwagę rabat/marżę - NIE: robi to but_sell
 	sql = "SELECT DECROUND(0"; sql += ceny[0]->Text();
 	sql += "*(100+stawka)/100.0) FROM stawka_vat WHERE id = ";
 	sql << curdata->vatid;
 	brutto->SetText(execSQL(sql.String()));
+}
+
+// perform checks against supplied data
+bool tabTowar::validateTab(void) {
+	BAlert *error;
+	BString sql, tmp;
+	int i;
+	// nazwa - niepusta
+	if (strlen(data[0]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano nazwy towaru!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// nazwa - unikalna
+	tmp = data[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
+	sql = "SELECT id FROM towar WHERE nazwa = '"; sql += tmp; sql += "'";
+	i = toint(execSQL(sql.String()));
+	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id >0) && (i != curdata->id))) {
+		error = new BAlert(APP_NAME, "Nazwa towaru nie jest unikalna!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// symbol - niepusty
+	if (strlen(data[1]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano symbolu towaru!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// symbol - unikalny
+	tmp = data[1]->Text(); tmp.ReplaceAll("'","''");	// sql quote
+	sql = "SELECT id FROM towar WHERE symbol = '"; sql += tmp; sql += "'";
+	i = toint(execSQL(sql.String()));
+	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id >0) && (i != curdata->id))) {
+		error = new BAlert(APP_NAME, "Symbol towaru nie jest unikalny!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// pkwiu - ostrzeżenie że pusty
+	if (strlen(data[2]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano kodu PKWiU.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// jm - ostrzeżenie że pusty
+	if (strlen(data[3]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wybrano jednostki miary.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// stawka vat
+	if (curdata->vatid < 0) {
+		error = new BAlert(APP_NAME, "Nie wybrano stawki VAT!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// cena niezerowa
+	sql = "SELECT 100*0"; sql += ceny[0]->Text();
+	i = toint(execSQL(sql.String()));
+	if (i == 0) {
+		error = new BAlert(APP_NAME, "Cena jest równa zero.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	return true;
 }
 
 void tabTowar::MessageReceived(BMessage *Message) {
@@ -353,13 +413,8 @@ void tabTowar::ChangedSelection(int newid) {
 }
 
 void tabTowar::DoCommitCurdata(void) {
-	// XXX perform all checks against supplied data
-	if (curdata->vatid < 0) {
-		// alert!
-		BAlert *error = new BAlert(APP_NAME, "Nie wybrano stawki VAT!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		error->Go();
+	if (!(validateTab()))
 		return;
-	}
 	curdata->commit();
 	this->dirty = false;
 	BMessage *msg = new BMessage(MSG_REQTOWARUP);
