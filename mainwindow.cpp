@@ -6,13 +6,16 @@
 // - drukowanie przez printjob
 // - wpisanie nieistniejącego kontr/towaru na fakture -> uaktualnienie bazy
 //		(kontrola w tabfaktura)
+// - layout w tabach: setdivider na maksimum z kolumny zamiast sztywno
 // - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)
 // - wysłać msg do tabfaktura z początkową konfiguracją wydruku
 // - usunąć duplikat execSQL()
+// - prawdziwe validateDate
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - nazwa nowej faktury: '##/miesiac/rok', ## brac z konf, ale kiedy uaktualniac?
 // - guzik kalendarza
 // - guzik importu
+// - DECROUND zaimplementować jako hook i userfunction, nie jako patch na sqlite
 // - dummy menu ze statystykami
 // - trzymanie stanu magazynu, info magazynowe
 // - na koniec - usunac printfy z debugiem
