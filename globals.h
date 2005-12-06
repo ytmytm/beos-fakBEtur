@@ -3,7 +3,7 @@
 #define _globals_h
 	// application signature
 	#define APP_NAME "fakBEtur"
-	#define APP_VERSION "0.1"
+	#define APP_VERSION "0.2"
 	#define APP_SIGNATURE "application/x-vnd.generic-fakBEtur"
 	extern int AppReturnValue;
 	// gettext-style translation helper
