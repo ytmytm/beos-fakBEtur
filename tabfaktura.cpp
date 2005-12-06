@@ -4,7 +4,6 @@
 // - guzik kalendarza
 // - guzik importu
 // IDEAS:
-// - pewnego słonecznego dnia wrzucić do destruktora listę z delete...
 // - pole uwagi nie reaguje na zmiany! (sprawdzac UndoState?)
 // - obliczac wartosci i ceny w jednym miejscu (jeden string z kwerenda?)
 //	 (np. suma[] i data->data w pozfakdata)
@@ -148,7 +147,13 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db
 }
 
 tabFaktura::~tabFaktura() {
-
+	delete curtowar;
+	delete curdata;
+	delete faklista;
+	delete [] idlist;
+	delete [] symbolIds;
+	delete [] tsymbolIds;
+	delete [] vatIds;
 }
 
 void tabFaktura::initTab1(void) {
