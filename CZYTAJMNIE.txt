@@ -27,7 +27,6 @@ Aby był widoczny symbol kontrahenta musi on mieć zaznaczone pole 'Aktywny'.
 WYMAGANIA
 Program wymaga skonfigurowania BeOSa do obsługi polskiego układu klawiatury oraz
 instalacji czcionek z polskimi znakami.
-Program wymaga zainstalowanej biblioteki SpLocale. http://bebits.com/app/1869
 Do eksportu HTML niezbędny jest szablon, przykładowy szablon został dołączony do
 programu. Należy go umieścić w katalogu domowym
 
