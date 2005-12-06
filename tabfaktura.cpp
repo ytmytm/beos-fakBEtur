@@ -735,6 +735,10 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			if (Message->FindInt32("_pmode", &item) == B_OK) pmode = item;
 			if (Message->FindInt32("_pwide", &item) == B_OK) pwide = item;
 			break;
+		case MSG_REQTOWARUP:
+		case MSG_REQFIRMAUP:
+			printf("faktura updates menus\n");
+			break;
 	}
 }
 

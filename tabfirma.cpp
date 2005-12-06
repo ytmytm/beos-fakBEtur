@@ -203,6 +203,8 @@ void tabFirma::ChangedSelection(int newid) {
 void tabFirma::DoCommitCurdata(void) {
 	curdata->commit();
 	this->dirty = false;
+	BMessage *msg = new BMessage(MSG_REQFIRMAUP);
+	handler->Looper()->PostMessage(msg);
 	RefreshIndexList();
 }
 
@@ -210,6 +212,8 @@ void tabFirma::DoDeleteCurdata(void) {
 // XXX ask for confimation?
 	curdata->del();
 	curdataToTab();
+	BMessage *msg = new BMessage(MSG_REQFIRMAUP);
+	handler->Looper()->PostMessage(msg);
 	RefreshIndexList();
 }
 

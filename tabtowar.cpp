@@ -361,6 +361,8 @@ void tabTowar::DoCommitCurdata(void) {
 	}
 	curdata->commit();
 	this->dirty = false;
+	BMessage *msg = new BMessage(MSG_REQTOWARUP);
+	handler->Looper()->PostMessage(msg);
 	RefreshIndexList();
 }
 
@@ -368,6 +370,8 @@ void tabTowar::DoDeleteCurdata(void) {
 // XXX ask for confimation?
 	curdata->del();
 	curdataToTab();
+	BMessage *msg = new BMessage(MSG_REQTOWARUP);
+	handler->Looper()->PostMessage(msg);
 	RefreshIndexList();
 }
 

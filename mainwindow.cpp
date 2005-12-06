@@ -221,6 +221,11 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 				this->SetTitle(title.String());
 			}
 			break;
+		case MSG_REQFIRMAUP:
+		case MSG_REQTOWARUP:
+			// XXX tab 0 is faktura, make it defined constant
+			tabs[0]->MessageReceived(Message);
+			break;
 		default:
 			curTab = tabs[tabView->Selection()];
 			curTab->MessageReceived(Message);
