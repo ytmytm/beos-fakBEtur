@@ -1,3 +1,10 @@
+//
+// obliczanie:
+// 1. w.brutto = round(ilość*c.brutto) = round(ilość*round(c.netto*stawka)) = 3.23
+// 2. w.brutto = round(stawka*ilość*c.netto) = 3.24 (3.235)
+//
+// 2. jest poprawny (wtedy w.netto*stawka = w.brutto!)
+// kwota vat = wbrutto-wnetto
 
 #include "fakdata.h"
 
@@ -557,35 +564,72 @@ printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 		data->data[11] = result[i++];	// c.netto
 		data->data[5] = result[i++];	// rabat
 		addlast(data);
-		// XXX duplicated calculations from updateTab2 on suma[]
 		// 6, 7, 8, 9, 10 - cjednost, w.netto, vat, wvat, wbrutto
-		// cjednostk = cnetto*(100-rabat)/100
-		sql = "SELECT DECROUND(0"; sql += data->data[11];
-		sql += "*(100-0"; sql += data->data[5]; sql += ")/100.0)";
-		data->data[6] = execSQL(sql.String());				// c.jednostkowa
-		// cbrutto = cjednostk*(100+stawka)/100
-		sql = "SELECT DECROUND(0"; sql += data->data[6];
-		sql += "*(100+stawka)/100.0) FROM stawka_vat WHERE id = "; sql << data->vatid;
-		cbrutto = execSQL(sql.String());					// c.brutto
-		// w.netto = cjednostkowanetto*ilosc
-		sql = "SELECT DECROUND(0"; sql += data->data[6];
-		sql += "*0"; sql += data->data[3]; sql += ")";
-		data->data[7] = execSQL(sql.String());				// w.netto
+		int nCols;
+		char **result = calcBrutto(data->data[11].String(), data->data[5].String(), data->data[3].String(), data->vatid, &nCols);
+		if (nCols<1) {
+			data->data[6] = data->data[7] = data->data[9] = data->data[10] = "";
+		} else {
+			data->data[6] = result[nCols+0];
+			data->data[7] = result[nCols+3];
+			data->data[9] = result[nCols+4];
+			data->data[10] = result[nCols+5];
+		}
+		calcBruttoFin(result);
 		// vat = stawka
 		sql = "SELECT nazwa FROM stawka_vat WHERE id = "; sql << data->vatid;
 		data->data[8] = execSQL(sql.String());
-		// w.brutto = w.netto*stawka
-		sql = "SELECT DECROUND(0"; sql += data->data[7];
-		sql += "*(100+stawka)/100.0) FROM stawka_vat WHERE id = "; sql << data->vatid;
-		data->data[10] = execSQL(sql.String());				// w.brutto
-		// w.vat = w.brutto-w.netto
-		sql = "SELECT DECROUND(0"; sql += data->data[10];
-		sql += "-0"; sql += data->data[7]; sql += ")";
-		data->data[9] = execSQL(sql.String());				// w.vat
 		j++;							// next row
 	}
 	sqlite_free_table(result);
 	setlp();							// reset lp
+}
+
+// in->cnetto, rabat, ilosc, idstawka
+// out->cnettojednostkowa, cbrutto, ilosc, wnetto, wvat, wbrutto
+char **pozfaklist::calcBrutto(const char *cnetto, const char *rabat, const char *ilosc, const int vatid, int *retcols) {
+	BString sql, cjednost;
+	int ret;
+	int nRows, nCols;
+	char **result;
+	char *dbErrMsg;
+
+	sql = "SELECT DECROUND(0"; sql += cnetto; sql += "*(100-0";
+	sql += rabat; sql += ")/100.0)";
+	cjednost = execSQL(sql.String());				// cnettojednostkowa
+
+	sql = "CREATE TEMPORARY TABLE calcs ( cnetto, ilosc, vatid );";
+	sql += "INSERT INTO calcs (cnetto, ilosc, vatid) VALUES (%Q, %Q, %i);";
+	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
+		cjednost.String(), ilosc, vatid );
+//printf("got:%i,[%s]\n",ret,dbErrMsg);
+	sql = "SELECT ";
+	// [0] - cnettojednostkowa (po rabacie)
+	sql += "cnetto AS cnetto";
+	// [1] - cbrutto = cnetto*(1+stawka)
+	sql += ", DECROUND(cnetto*(100+stawka)/100.0) AS cbrutto";
+	// [2] - ilosc
+	sql += ", ilosc";
+	// [3] - wnetto = cnetto*ilosc
+	sql += ", DECROUND(cnetto*ilosc) AS wnetto";
+	// [4] - wvat = wbrutto-wnetto = cnetto*ilosc*(1+stawka) - cnetto*ilosc
+	sql += ", DECROUND(DECROUND(DECROUND(cnetto*ilosc)*(100+s.stawka)/100.0)-DECROUND(cnetto*ilosc)) AS wvat";
+	// [5] - wbrutto = cnetto*ilosc*(1+stawka)
+	sql += ",          DECROUND(DECROUND(cnetto*ilosc)*(100+s.stawka)/100.0) AS wbrutto";
+	sql += " FROM calcs, stawka_vat AS s WHERE s.id = vatid";
+//printf("sql:[%s]\n",sql.String());
+	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
+	if (nRows<1)
+		*retcols = 0;
+	else
+		*retcols = nCols;
+	return result;
+}
+
+void pozfaklist::calcBruttoFin(char **result) {
+	sqlite_free_table(result);
+	execSQL("DROP TABLE calcs");
 }
 
 // XXX this is duplicated in befaktab!
@@ -600,5 +644,6 @@ const char *pozfaklist::execSQL(const char *input) {
 		res = "";
 	else
 		res = result[1];
+	sqlite_free_table(result);
 	return res.String();
 }

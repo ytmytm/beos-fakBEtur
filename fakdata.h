@@ -117,8 +117,11 @@
 			void commit(int fakturaid);
 			void commititem(int fakturaid, pozfakitem *data);
 			void fetch(int fakturaid);
+			// db, calculations
 			const char *execSQL(const char *input);	// XXX dupe from befaktab!
-	
+			char **calcBrutto(const char *cnetto, const char *rabat, const char *ilosc, const int vatid, int *retcols);
+			void calcBruttoFin(char **result);
+
 			pozfakitem *start;
 			pozfakitem *end;
 		private:

@@ -1,26 +1,11 @@
 //
-// TODO:
-// - nazwa nowej faktury: '##/miesiac/rok', ## brac z konf, ale kiedy uaktualniac?
-// - guzik kalendarza
-// - guzik importu
 // IDEAS:
-// - pole uwagi nie reaguje na zmiany! (sprawdzac UndoState?)
-// - obliczac wartosci i ceny w jednym miejscu (jeden string z kwerenda?)
-//	 (np. suma[] i data->data w pozfakdata)
-// - usunac kopiowanie kodu (execsql, inne kawalki)
 // - zamiast usuwać/dodawać wszystkie pozitems - może pamiętać ich id?
 //	 generować, uaktualniać, czyścić
 //	 (problem: które UPDATE, które INSERT, a które DELETE)
 //
 // wyrzucić uwagi i zastąpić całym podsumowaniem? podsumowanie na 3 karcie?
 // opcja faktury korygującej (jak? trzeba pamiętać co się zmieniło)
-//
-// obliczanie:
-// 1. w.brutto = round(ilość*c.brutto) = round(ilość*round(c.netto*stawka)) = 3.23
-// 2. w.brutto = round(stawka*ilość*c.netto) = 3.24 (3.235)
-//
-// 2. jest poprawny (wtedy w.netto*stawka = w.brutto!)
-// kwota vat = wbrutto-wnetto
 //
 // testy w commitfaktura
 // - data/sposób płatności
@@ -453,27 +438,18 @@ void tabFaktura::updateTab2(void) {
 	towar[2]->SetText(validateDecimal(towar[2]->Text()));
 	towar[3]->SetText(validateDecimal(towar[3]->Text()));
 	towar[4]->SetText(validateDecimal(towar[4]->Text()));
+
 	// calculate data for summary suma[]
-	BString sql, cnetto, cbrutto;
-	sql = "SELECT DECROUND(0"; sql += towar[2]->Text();
-	sql += "*(100-0"; sql += towar[3]->Text(); sql += ")/100.0)";
-	cnetto = execSQL(sql.String());						// cnettojednostkowa
-	suma[0]->SetText(cnetto.String());
-	// cbrutto = cnettojedn*stawka
-	sql = "SELECT DECROUND(0"; sql += cnetto; sql +="*(100+stawka)/100.0) FROM stawka_vat WHERE id = ";
-	sql << curtowarvatid;
-	suma[1]->SetText(execSQL(sql.String()));			// cbrutto
-	suma[2]->SetText(towar[4]->Text());					// ilosc
-	// wnetto = cnettojedn*ilosc
-	sql = "SELECT DECROUND(0"; sql += cnetto; sql += "*0"; sql += towar[4]->Text(); sql += ")";
-	suma[3]->SetText(execSQL(sql.String()));			// wnetto
-	// wbrutto = cnettojedn*ilosc*stawka = wnetto*stawka
-	sql = "SELECT DECROUND(0"; sql += suma[3]->Text();
-	sql += "*(100+stawka)/100.0) FROM stawka_vat WHERE id = "; sql << curtowarvatid;
-	suma[5]->SetText(execSQL(sql.String()));			// wbrutto
-	// wvat = wbrutto - wnetto
-	sql = "SELECT DECROUND(0"; sql += suma[5]->Text(); sql += "-0"; sql += suma[3]->Text(); sql += ")";
-	suma[4]->SetText(execSQL(sql.String()));			// wvat
+	int nCols;
+	char **result = faklista->calcBrutto(towar[2]->Text(), towar[3]->Text(), towar[4]->Text(), curtowarvatid, &nCols);
+	if (nCols<1) {
+		for (int j=0;j<6;j++)
+			suma[j]->SetText("0.00");
+	} else {
+		for (int j=0;j<6;j++)
+			suma[j]->SetText(result[nCols+j]);
+	}
+	faklista->calcBruttoFin(result);
 }
 
 void tabFaktura::makeNewForm(void) {
