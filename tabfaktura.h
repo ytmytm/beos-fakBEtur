@@ -48,6 +48,7 @@ class tabFaktura : public beFakTab {
 		void updateTab(void);
 		void updateTab2(void);
 		void updateTermin(void);
+		bool validateTab(void);
 		//
 		void printCurrent(void);
 

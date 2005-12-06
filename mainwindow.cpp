@@ -6,6 +6,7 @@
 // - drukowanie przez printjob
 // - wpisanie nieistniejącego kontr/towaru na fakture -> uaktualnienie bazy
 //		(kontrola w tabfaktura)
+//		- nieistniejący: id=-1 z nazwa+symbol
 //		- pytac tylko o nowy symbol, test na obecnosc+unikalnosc nazwa+symbol
 // - layout w tabach: setdivider na maksimum z kolumny zamiast sztywno
 // - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)

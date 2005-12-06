@@ -539,6 +539,12 @@ void tabFaktura::makeNewTowar(void) {
 	updateTab2();
 }
 
+// call separate for validate towar
+// check fakura fields
+bool tabFaktura::validateTab(void) {
+	return true;
+}
+
 void tabFaktura::MessageReceived(BMessage *Message) {
 	int i;
 	int32 item;
@@ -782,7 +788,8 @@ void tabFaktura::ChangedTowarSelection(int newid) {
 }
 
 void tabFaktura::DoCommitCurdata(void) {
-	// XXX perform all checks against supplied data
+	if (!(validateTab()))
+		return;
 	curdata->commit();
 	faklista->commit(curdata->id);
 	this->dirty = false;
@@ -942,9 +949,9 @@ void tabFaktura::RefreshFirmaSymbols(void) {
 		delete menusymbol->RemoveItem(i--);
 	}
 
-	BMessage *msg;
 	int nRows, nCols;
 	char **result;
+	BMessage *msg;
 
 	sqlite_get_table(dbData, "SELECT id, symbol FROM firma WHERE aktywny = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
