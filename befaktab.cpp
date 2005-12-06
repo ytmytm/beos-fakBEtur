@@ -44,6 +44,7 @@ const char *beFakTab::execSQL(const char *input) {
 		res = "";
 	else
 		res = result[1];
+	sqlite_free_table(result);
 	return res.String();
 }
 
