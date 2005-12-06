@@ -172,10 +172,10 @@ void tabFaktura::initTab1(void) {
 	box1->AddChild(ogol[4]);
 	BMessage *msg;
 	msg = new BMessage(CBUT);
-	msg->AddInt32("_butnum", 0);
+	msg->AddPointer("_datefield", ogol[2]);
 	cbut[0] = new BButton(BRect(260,70,280,90), "tfcbut0", "+", msg);
 	msg = new BMessage(CBUT);
-	msg->AddInt32("_butnum", 1);
+	msg->AddPointer("_datefield", ogol[3]);
 	cbut[1] = new BButton(BRect(260,100,280,120), "tfcbut1", "+", msg);
 	box1->AddChild(cbut[0]);
 	box1->AddChild(cbut[1]);
@@ -215,7 +215,7 @@ void tabFaktura::initTab1(void) {
 	BMenuField *menufpField = new BMenuField(BRect(160,10,180,30), "tfmffp", NULL, menufp);
 	box2->AddChild(menufpField);
 	msg = new BMessage(CBUT);
-	msg->AddInt32("_butnum", 2);
+	msg->AddPointer("_datefield", ogol[6]);
 	cbut[2] = new BButton(BRect(160,40,180,60), "tfcbut2", "+", msg);
 	box2->AddChild(cbut[2]);
 	// box3
@@ -231,7 +231,7 @@ void tabFaktura::initTab1(void) {
 	box3->AddChild(ogol[9]);
 	ogol[8]->SetDivider(50); ogol[9]->SetDivider(50);
 	msg = new BMessage(CBUT);
-	msg->AddInt32("_butnum", 3);
+	msg->AddPointer("_datefield", ogol[9]);
 	cbut[3] = new BButton(BRect(180,50,200,70), "tfcbut3", "+", msg);
 	box3->AddChild(cbut[3]);
 	// box4
@@ -591,9 +591,16 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			ogol[6]->SetText(execSQL(sql.String()));
 			break;
 		case CBUT:
-			{	// XXX find source, get date from dialog, put into src
-				BAlert *calendar = new BAlert(APP_NAME, "Tutaj dialog z kalendarzem do wyboru daty", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
-				calendar->Go();
+			{	void *ptr;
+				BTextControl *dateField;
+				BString curDate;
+				if (Message->FindPointer("_datefield", &ptr) == B_OK) {
+					dateField = static_cast<BTextControl*>(ptr);
+					curDate = validateDate(dateField->Text());
+					curDate.Prepend("Tutaj dialog z kalendarzem do wyboru daty, startujemy od ");
+					BAlert *calendar = new BAlert(APP_NAME, curDate.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
+					calendar->Go();
+				}
 				break;
 				// XXX if not canceled:
 				// this->dirty = true;
