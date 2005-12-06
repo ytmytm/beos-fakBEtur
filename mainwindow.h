@@ -64,7 +64,7 @@
 			char *dbErrMsg;
 			// configuration
 			int liczbakopii;	// # kopii do wydruku
-			int ostatni_nr;		// nr ostatniej faktury // XXX a nie w faktab?
+			int ostatni_nr;		// nr ostatniej faktury // XXX zbędne?
 			bool num_prosta;	// numeracja uproszczona - bez miesiaca - nr/rok
 	};
 

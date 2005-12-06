@@ -10,8 +10,8 @@
 // - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)
 // - usunąć duplikat execSQL()
 // - prawdziwe validateDate
+// - nrfaktury (ostatniej) - wyrzucić z konfiguracji? działa bez tego
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
-// - nazwa nowej faktury: '##/miesiac/rok', ## brac z konf, ale kiedy uaktualniac?
 // - guzik kalendarza
 // - guzik importu
 // - DECROUND zaimplementować jako hook i userfunction, nie jako patch na sqlite

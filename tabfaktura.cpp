@@ -462,16 +462,22 @@ void tabFaktura::updateTermin(void) {
 }
 
 void tabFaktura::makeNewForm(void) {
+	BString tmp;
+	int i, curmax;
+	BString rok, mies;
+	int nRows, nCols;
+	char **result;
+	char *dbErrMsg;
+
 	curdata->clear();
 	// unselect symbolmenu
-	for (int i=0;i<symbolRows;i++) {
+	for (int i=0;i<symbolRows;i++)
 		symbolMenuItems[i]->SetMarked(false);
-	}
 	menusymbol->Superitem()->SetLabel("[wybierz]");
-	// XXX prepare new 'nazwa' for faktura
 	// data sprzedaży, wystawienia
-	curdata->ogol[2] = execSQL("SELECT DATE('now')");
-	curdata->ogol[3] = execSQL("SELECT DATE('now')");
+	tmp = execSQL("SELECT DATE('now')");
+	curdata->ogol[2] = tmp;
+	curdata->ogol[3] = tmp;
 	// data płatności = dziś+30
 	curdata->ogol[7] = "30";
 	updateTermin();
@@ -479,6 +485,36 @@ void tabFaktura::makeNewForm(void) {
 	// 
 	uwagi->SetText("");
 	cbzaplacono->SetValue(B_CONTROL_OFF);
+
+	// wygenerowanie nowej nazwy
+	// identyfikator z daty
+	rok = tmp; mies = tmp;
+	rok.Remove(4,rok.Length()-4);
+	mies.Remove(0,5);
+	mies.Remove(2,mies.Length()-2);
+	// max z konfiguracji? i tak działa nieźle
+	curmax = 0;
+	// nazwy wszystkich faktur z aktualnym rokiem i miesiacem
+	tmp = "SELECT nazwa FROM faktura WHERE data_wystawienia > '";
+	tmp += rok; tmp += "-"; tmp += mies; tmp += "-01' ORDER BY data_wystawienia";
+	sqlite_get_table(dbData, tmp.String(), &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows < 1) {
+//		printf("database is empty\n");
+	} else {
+		for (int j=1;j<=nRows;j++) {
+			tmp = result[j*nCols+0];
+			tmp.ReplaceAll("-","/");
+			i = tmp.FindFirst('/');
+			tmp.Remove(i,tmp.Length()-i);
+			i = toint(tmp.String());
+			curmax = (i>curmax) ? i : curmax;
+		}
+	}
+	sqlite_free_table(result);
+	// dodaj 1
+	tmp = ""; tmp << curmax+1; tmp << "/"; tmp << mies; tmp << "/"; tmp << rok;
+	// wygeneruj string, zapisz
+	curdata->nazwa = tmp;
 	curdataToTab();
 }
 
@@ -516,6 +552,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			break;
 		case BUT_NEW:
 			if (CommitCurdata()) {
+				list->DeselectAll();
 				makeNewForm();
 			}
 			break;
@@ -792,9 +829,7 @@ void tabFaktura::RefreshIndexList(void) {
 	int nRows, nCols;
 	char **result;
 	char *dbErrMsg;
-	BString sqlQuery;
-	sqlQuery = "SELECT id, nazwa FROM faktura ORDER BY id";
-	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, nazwa FROM faktura ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// XXX database is empty, do sth about it?
 		printf("database is empty\n");
@@ -807,6 +842,7 @@ void tabFaktura::RefreshIndexList(void) {
 	}
 	sqlite_free_table(result);
 }
+
 // ret. false -> cancel action and resume editing
 bool tabFaktura::CommitCurtowar(void) {
 	if (!towardirty)
