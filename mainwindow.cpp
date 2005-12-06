@@ -11,6 +11,7 @@
 // - usunąć duplikat execSQL()
 // - prawdziwe validateDate
 // - nrfaktury (ostatniej) - wyrzucić z konfiguracji? działa bez tego
+// - numeracja uproszczona - konfig/menu? uzywac? (wtedy bez miesiaca)
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - guzik kalendarza
 // - guzik importu
