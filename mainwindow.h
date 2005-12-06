@@ -2,7 +2,6 @@
 #ifndef _MAINWINDOW_H
 #define _MAINWINDOW_H
 
-	#include <SpLocaleApp.h>
 	#include <Window.h>
 	#include <sqlite.h>
 	#include "globals.h"

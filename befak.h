@@ -2,11 +2,10 @@
 #ifndef _BEFAKAPP_H
 #define _BEFAKAPP_H
 
-#include <SpLocaleApp.h>
-
+#include <Application.h>
 #include "mainwindow.h"
 
-class BeFAKApp : public SpLocaleApp {
+class BeFAKApp : public BApplication {
 	public:
 		BeFAKApp();
 		~BeFAKApp();

@@ -1,9 +1,10 @@
 
 #include "befak.h"
 #include "globals.h"
-#include <SpLocaleApp.h>
 
-BeFAKApp::BeFAKApp() : SpLocaleApp(APP_SIGNATURE) {
+#include <Application.h>
+
+BeFAKApp::BeFAKApp() : BApplication(APP_SIGNATURE) {
 	mainWindow = new BeFAKMainWindow(APP_NAME);
 	if (mainWindow != NULL) {
 		mainWindow->Show();

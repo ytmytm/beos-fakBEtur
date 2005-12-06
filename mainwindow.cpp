@@ -29,6 +29,8 @@
 #include "tabtowar.h"
 #include "tabfaktura.h"
 
+#include <Application.h>
+#include <File.h>
 #include <View.h>
 #include <Menu.h>
 #include <MenuBar.h>
@@ -67,8 +69,6 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	mainView->AddChild(menuBar);
 
 	menu = new BMenu("Plik", B_ITEMS_IN_COLUMN);
-	((SpLocaleApp*)be_app)->AddToFileMenu(menu,false,false,false);
-	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Zamknij", new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
 
