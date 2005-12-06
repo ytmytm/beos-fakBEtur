@@ -1,6 +1,7 @@
 //
 // TODO:
 // - testy danych - wymagane/opcjonalne (wł/wył)
+//		- wszędzie: wymagana nazwa+symbol, unikalne
 // - dialog do edycji stawek vat
 // - drukowanie przez printjob
 // - wpisanie nieistniejącego kontr/towaru na fakture -> uaktualnienie bazy
@@ -15,6 +16,7 @@
 // - dummy menu ze statystykami
 // - trzymanie stanu magazynu, info magazynowe
 // - na koniec - usunac printfy z debugiem
+// - przy włączonej optymalizacji dialAbout ma segfault
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
 
