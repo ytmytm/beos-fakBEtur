@@ -1,16 +1,10 @@
 //
 // TODO:
-// - odświeżać listy symboli w fakturze!
 // - czwarty tab ze stawkami vat? może lepiej dialog?
 // - wpisanie nieistniejącego kontr/towaru na fakture -> uaktualnienie bazy
-// - menu w/ ticks do wyboru eksportu: tekst(80/136) / html
-// - obsluga drukowania/eksportu 
-//		- commit current faktura
-//		- przekazanie parametrow:
-//			fakturaid, kopia/orig/dupl, # kopii, wydruk/eksport HTML/text
-//		- w zaleznosci od typu wydruku nowy obiekt (dziedziczy z tego samego?)
 // - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)
 // - dummy menu ze statystykami
+// - trzymanie stanu magazynu, info magazynowe
 // - na koniec - usunac printfy z debugiem
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?

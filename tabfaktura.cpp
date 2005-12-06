@@ -6,7 +6,7 @@
 // IDEAS:
 // - pewnego słonecznego dnia wrzucić do destruktora listę z delete...
 // - pole uwagi nie reaguje na zmiany! (sprawdzac UndoState?)
-// - obliczac wartosci i ceny w jednym miejscu
+// - obliczac wartosci i ceny w jednym miejscu (jeden string z kwerenda?)
 //	 (np. suma[] i data->data w pozfakdata)
 // - usunac kopiowanie kodu (execsql, inne kawalki)
 // - zamiast usuwać/dodawać wszystkie pozitems - może pamiętać ich id?
@@ -268,25 +268,8 @@ void tabFaktura::initTab1(void) {
 	data[9]->SetDivider(50); data[10]->SetDivider(50);
 	// firma-symbole
 	menusymbol = new BPopUpMenu("[wybierz]");
-	int nRows, nCols;
-	char **result;
-	BString sqlQuery;
-	sqlQuery = "SELECT id, symbol FROM firma WHERE aktywny = 1 ORDER BY id";
-	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
-	if (nRows < 1) {
-		// XXX Panic! empty table
-	} else {
-		symbolMenuItems = new BMenuItem*[nRows];
-		symbolIds = new int[nRows];
-		symbolRows = nRows;
-		for (int i=1;i<=nRows;i++) {
-			msg = new BMessage(MENUFSYM);
-			msg->AddInt32("_firmaid", toint(result[i*nCols+0]));
-			symbolIds[i-1] = toint(result[i*nCols+0]);
-			symbolMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
-			menusymbol->AddItem(symbolMenuItems[i-1]);
-		}
-	}
+	symbolRows = 0;
+	RefreshFirmaSymbols();
 	BMenuField *menusymbolField = new BMenuField(BRect(280,15,420,35), "tfmsymbol", "Symbol", menusymbol);
 	menusymbolField->SetDivider(be_plain_font->StringWidth(menusymbolField->Label())+15);
 	box4->AddChild(menusymbolField);
@@ -329,32 +312,17 @@ void tabFaktura::initTab2(void) {
 	box6->AddChild(towar[4]); box6->AddChild(towar[5]);
 	// towar-symbole
 	tmenusymbol = new BPopUpMenu("[wybierz]");
-	int nRows, nCols;
-	char **result;
-	BString sqlQuery;
-	sqlQuery = "SELECT id, symbol FROM towar ORDER BY id";
-	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
-	if (nRows < 1) {
-		// XXX Panic! empty table
-	} else {
-		tsymbolMenuItems = new BMenuItem*[nRows];
-		tsymbolIds = new int[nRows];
-		tsymbolRows = nRows;
-		for (int i=1;i<=nRows;i++) {
-			msg = new BMessage(MENUTSYM);
-			msg->AddInt32("_towarid", toint(result[i*nCols+0]));
-			tsymbolIds[i-1] = toint(result[i*nCols+0]);
-			tsymbolMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
-			tmenusymbol->AddItem(tsymbolMenuItems[i-1]);
-		}
-	}
+	tsymbolRows = 0;
+	RefreshTowarSymbols();
 	BMenuField *tmenusymbolField = new BMenuField(BRect(200,15,300,35), "tfmtsymbol", "Symb.", tmenusymbol);
 	tmenusymbolField->SetDivider(be_plain_font->StringWidth(tmenusymbolField->Label())+15);
 	box6->AddChild(tmenusymbolField);
 	// vat-menu
 	menuvat = new BPopUpMenu("[wybierz]");
-	sqlQuery = "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id";
-	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
+	int nRows, nCols;
+	char **result;
+
+	sqlite_get_table(dbData, "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// XXX Panic! empty vat table
 	} else {
@@ -369,6 +337,7 @@ void tabFaktura::initTab2(void) {
 			menuvat->AddItem(vatMenuItems[i-1]);
 		}
 	}
+	sqlite_free_table(result);
 	BMenuField *menuvatField = new BMenuField(BRect(470,15,555,35), "tfmv", "VAT", menuvat);
 	menuvatField->SetDivider(be_plain_font->StringWidth(menuvatField->Label())+15);
 	box6->AddChild(menuvatField);
@@ -509,9 +478,7 @@ void tabFaktura::makeNewForm(void) {
 		symbolMenuItems[i]->SetMarked(false);
 	}
 	menusymbol->Superitem()->SetLabel("[wybierz]");
-	// XXX refresh symbolmenu
 	// XXX prepare new 'nazwa' for faktura
-	// XXX notify mainwindow about change
 	curdata->ogol[2] = execSQL("SELECT DATE('now')");
 	curdata->ogol[3] = execSQL("SELECT DATE('now')");
 	// XXX this is already in TERMCHANGE handler
@@ -735,9 +702,11 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			if (Message->FindInt32("_pmode", &item) == B_OK) pmode = item;
 			if (Message->FindInt32("_pwide", &item) == B_OK) pwide = item;
 			break;
-		case MSG_REQTOWARUP:
 		case MSG_REQFIRMAUP:
-			printf("faktura updates menus\n");
+			RefreshFirmaSymbols();
+			break;
+		case MSG_REQTOWARUP:
+			RefreshTowarSymbols();
 			break;
 	}
 }
@@ -942,6 +911,62 @@ void tabFaktura::RefreshTowarList(void) {
 		}
 		cur = cur->nxt;
 	}
+}
+
+void tabFaktura::RefreshFirmaSymbols(void) {
+	int i = symbolRows;
+	while (i>=0) {
+		delete menusymbol->RemoveItem(i--);
+	}
+
+	BMessage *msg;
+	int nRows, nCols;
+	char **result;
+
+	sqlite_get_table(dbData, "SELECT id, symbol FROM firma WHERE aktywny = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows < 1) {
+		// XXX Panic! empty table
+	} else {
+		symbolMenuItems = new BMenuItem*[nRows];
+		symbolIds = new int[nRows];
+		symbolRows = nRows;
+		for (int i=1;i<=nRows;i++) {
+			msg = new BMessage(MENUFSYM);
+			msg->AddInt32("_firmaid", toint(result[i*nCols+0]));
+			symbolIds[i-1] = toint(result[i*nCols+0]);
+			symbolMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
+			menusymbol->AddItem(symbolMenuItems[i-1]);
+		}
+	}
+	sqlite_free_table(result);
+}
+
+void tabFaktura::RefreshTowarSymbols(void) {
+	int i = tsymbolRows;
+	while (i>=0) {
+		delete tmenusymbol->RemoveItem(i--);
+	}
+
+	int nRows, nCols;
+	char **result;
+	BMessage *msg;
+
+	sqlite_get_table(dbData, "SELECT id, symbol FROM towar ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows < 1) {
+		// XXX Panic! empty table
+	} else {
+		tsymbolMenuItems = new BMenuItem*[nRows];
+		tsymbolIds = new int[nRows];
+		tsymbolRows = nRows;
+		for (int i=1;i<=nRows;i++) {
+			msg = new BMessage(MENUTSYM);
+			msg->AddInt32("_towarid", toint(result[i*nCols+0]));
+			tsymbolIds[i-1] = toint(result[i*nCols+0]);
+			tsymbolMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
+			tmenusymbol->AddItem(tsymbolMenuItems[i-1]);
+		}
+	}
+	sqlite_free_table(result);
 }
 
 void tabFaktura::printCurrent(void) {

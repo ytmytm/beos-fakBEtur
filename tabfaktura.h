@@ -53,6 +53,8 @@ class tabFaktura : public beFakTab {
 	private:
 		void initTab1(void);
 		void initTab2(void);
+		void RefreshTowarSymbols(void);
+		void RefreshFirmaSymbols(void);
 
 		BView *viewogol, *viewpozy, *viewtable;
 		BTab *tabogol, *tabpozy;
