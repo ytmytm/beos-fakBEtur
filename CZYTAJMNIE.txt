@@ -19,8 +19,6 @@ Program nie potrafi samodzielnie drukować, jest możliwy jedynie eksport do pli
 Dane nie są sprawdzane pod względem poprawności, ścieżki do plików i niektóre parametry
 są ustalone na stałe.
 Nie działają żadne skróty klawiaturowe, nie ma kalendarza do wyboru daty, nie ma statystyk.
-Przy dodawaniu pozycji czasem trzeba dwa razy kliknąć 'Nowa'.
-Aby był widoczny symbol kontrahenta musi on mieć zaznaczone pole 'Aktywny'.
 
 
 

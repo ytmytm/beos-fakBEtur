@@ -679,7 +679,6 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				}
 				if (i != lasttowarsel) {
 					lasttowarsel = i;
-//					printf("newsel:%i\n",i);
 					// zmiana wybranego towaru, uaktualnienie towarmark
 					ChangedTowarSelection(lasttowarsel);
 					if (towarmark != 0) {
@@ -731,9 +730,11 @@ void tabFaktura::ChangedSelection(int newid) {
 
 void tabFaktura::ChangedTowarSelection(int newid) {
 
-	if (!(CommitCurtowar())) {
+	if ((newid<1) || (newid==towarmark))
 		return;
-	}
+	if (!(CommitCurtowar()))
+		return;
+
 	towarmark = newid;
 	pozfakdata *item = faklista->itemat(newid);
 	if (item != NULL) {
