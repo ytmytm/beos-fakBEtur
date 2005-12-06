@@ -1,10 +1,16 @@
 //
 // TODO:
+// - testy danych - wymagane/opcjonalne (wł/wył)
 // - dialog do edycji stawek vat
 // - drukowanie przez printjob
 // - wpisanie nieistniejącego kontr/towaru na fakture -> uaktualnienie bazy
 //		(kontrola w tabfaktura)
 // - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)
+// - usunąć duplikat execSQL()
+// - pole 'uwagi' w towar/faktura nie reaguje na zmiany
+// - nazwa nowej faktury: '##/miesiac/rok', ## brac z konf, ale kiedy uaktualniac?
+// - guzik kalendarza
+// - guzik importu
 // - dummy menu ze statystykami
 // - trzymanie stanu magazynu, info magazynowe
 // - na koniec - usunac printfy z debugiem
