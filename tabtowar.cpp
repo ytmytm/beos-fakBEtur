@@ -149,6 +149,7 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 			menuvat->AddItem(vatMenuItems[i-1]);
 		}
 	}
+	sqlite_free_table(result);
 	BMenuField *menuvatField = new BMenuField(BRect(200,15,330,35), "ttmv", "VAT", menuvat);
 	menuvatField->SetDivider(be_plain_font->StringWidth(menuvatField->Label())+15);
 	box2->AddChild(menuvatField);
