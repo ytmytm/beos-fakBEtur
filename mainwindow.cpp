@@ -117,7 +117,6 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
-	curTab->CommitCurdata(false);
 	CloseDatabase();
 }
 
@@ -251,8 +250,7 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 bool BeFAKMainWindow::QuitRequested() {
 //	config->position = this->Frame();
 //	config->save();
-	// XXX cannot commit upon exit! object doesn't exist here!!!
-//	curTab->CommitCurdata(false);
+	curTab->CommitCurdata(false);
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return BWindow::QuitRequested();
 }
