@@ -8,7 +8,6 @@
 //		(kontrola w tabfaktura)
 // - layout w tabach: setdivider na maksimum z kolumny zamiast sztywno
 // - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)
-// - wysłać msg do tabfaktura z początkową konfiguracją wydruku
 // - usunąć duplikat execSQL()
 // - prawdziwe validateDate
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
@@ -114,7 +113,7 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	initTabs(tabView);
 	tabView->Select(0);
 	curTab = tabs[0];
-	updateMenus();
+	updateMenus();	// sends PRINTCONF message - initial config is passed down
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
