@@ -117,6 +117,7 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
+	curTab->CommitCurdata(false);
 	CloseDatabase();
 }
 
