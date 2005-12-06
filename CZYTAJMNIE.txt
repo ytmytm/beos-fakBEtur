@@ -50,20 +50,20 @@ nazwy, dzięki której możliwe jest szybkie odnajdywanie rekordów i wypełnian
 Na wszystkich zakładkach pola 'Nazwa' i 'SYMBOL' muszą być wypełnione.
 
 W polach numerycznych można wpisywać proste działania, jednak aby uniknąć błędnego
-zaokrąglenia należy po liczbach zawsze dodawać w postaci ułamka dzisiętnego. Np. zamiast
-pisać "3/7" należy wpisać "3.0/7.0".
+zaokrąglenia należy po liczbach zawsze dodawać w postaci ułamka dziesiętnego. Np. zamiast
+"3/7" należy wpisać "3.0/7.0".
 
 a) MENU
 Menu 'Dokument' służy do wyboru rodzaju drukowanego dokumentu.
 W menu 'Opcje' można wybrać metodę drukowania i zmienić parametry firmy.
 
 b) TOWARY
-PW zakładce towary umieszczono prosty kalkulator umożliwiający obliczanie cen znaczenie
-przycisków:
+W zakładce 'Towary' umieszczono prosty kalkulator umożliwiający obliczanie cen.
+Przeznaczenie przycisków:
 - Cena sprzedaży - na podstawie ceny zakupu i rabatu oblicza nową cenę sprzedaży netto
 - Marża - na podstawie ceny zakupu, rabatu oraz ceny sprzedaży netto oblicza marżę
 - Import - na podstawie kursu waluty, ceny zakupu (jednostką jest wówczas obca waluta),
-  cła, marży oraz rabatu oblicza cenę sprzedaży
+  cła, marży oraz rabatu oblicza cenę sprzedaży netto
 
 c) KONTRAHENCI
 Pola odbiorca/dostawca nie mają obecnie żadnego znaczenia.
