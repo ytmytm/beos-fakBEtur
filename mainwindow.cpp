@@ -1,20 +1,15 @@
 //
 // TODO:
-// - czwarty tab ze stawkami vat? może lepiej dialog?
+// - dialog do edycji stawek vat
+// - drukowanie przez printjob
 // - wpisanie nieistniejącego kontr/towaru na fakture -> uaktualnienie bazy
+//		(kontrola w tabfaktura)
 // - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)
 // - dummy menu ze statystykami
 // - trzymanie stanu magazynu, info magazynowe
 // - na koniec - usunac printfy z debugiem
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
-// wydruk:
-//	- jedna bazowa klasa do drukowania, przyjmuje parametry (k/o/d, #kopii), oblicza brakujace
-//	  dane itp. pozfakdata+faktura+konfiguracja powinny wystarczyc
-//	  klasy pochodne - generowanie naglowka, tabelki i stopki
-//	  	html - wypelnienie szablonu, zapis do pliku
-//		print - wyrysowanie bview, pochodna z bview, printjob
-//		txt - wypisanie i sformatowanie tekstu na 80/130(?) kolumn, zapis do pliku lub na lp
 
 #include "mainwindow.h"
 #include "dialabout.h"
@@ -24,6 +19,7 @@
 #include "tabtowar.h"
 #include "tabfaktura.h"
 
+#include <Alert.h>
 #include <Application.h>
 #include <File.h>
 #include <View.h>
@@ -38,6 +34,7 @@ const uint32 MENU_PRINTO	= 'MPOR';
 const uint32 MENU_PRINTC	= 'MPKO';
 const uint32 MENU_PRINTD	= 'MPKD';
 const uint32 MENU_CONFFIRMA	= 'MKOF';
+const uint32 MENU_CONFVAT	= 'MKOV';
 const uint32 MENU_PRINTT80	= 'MPT8';
 const uint32 MENU_PRINTT136 = 'MPT1';
 const uint32 MENU_PRINTHTML = 'MPHT';
@@ -77,6 +74,7 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	menu->AddItem(new BMenuItem("Dane firmy", new BMessage(MENU_CONFFIRMA)));
 	BMenu *printmenu = new BMenu("Rodzaj wydruku", B_ITEMS_IN_COLUMN);
 	menu->AddItem(printmenu);
+	menu->AddItem(new BMenuItem("Stawki VAT", new BMessage(MENU_CONFVAT)));
 	menuBar->AddItem(menu);
 
 	printmenu->AddItem(pmenut80  = new BMenuItem("Tekst (80 kol.)", new BMessage(MENU_PRINTT80)));
@@ -123,6 +121,12 @@ void BeFAKMainWindow::DoAbout(void) {
 
 void BeFAKMainWindow::DoConfigFirma(bool cancancel) {
 	firmaDialog = new dialFirma(APP_NAME, dbData, cancancel);
+}
+
+void BeFAKMainWindow::DoConfigVAT(void) {
+	// XXX a new db dialog here
+	BAlert *vatalert = new BAlert(APP_NAME, "Tutaj dialog do edycji stawek VAT", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
+	vatalert->Go();
 }
 
 void BeFAKMainWindow::DoCheckConfig(void) {
@@ -208,6 +212,9 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 			break;
 		case MENU_CONFFIRMA:
 			DoConfigFirma();
+			break;
+		case MENU_CONFVAT:
+			DoConfigVAT();
 			break;
 		case MSG_NAMECHANGE:
 			if (Message->FindString("_newtitle", &tmp) == B_OK) {

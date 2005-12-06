@@ -29,6 +29,7 @@
 //			virtual void RefsReceived(BMessage *Message);
 			void DoAbout(void);
 			void DoConfigFirma(bool cancancel = true);
+			void DoConfigVAT(void);
 			void DoCheckConfig(void);
 		private:
 			// database handlers
