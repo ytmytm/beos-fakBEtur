@@ -6,6 +6,7 @@
 // - wpisanie nieistniejącego kontr/towaru na fakture -> uaktualnienie bazy
 //		(kontrola w tabfaktura)
 // - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)
+// - wysłać msg do tabfaktura z początkową konfiguracją wydruku
 // - usunąć duplikat execSQL()
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - nazwa nowej faktury: '##/miesiac/rok', ## brac z konf, ale kiedy uaktualniac?
