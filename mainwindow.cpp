@@ -243,9 +243,9 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 		default:
 			curTab = tabs[tabView->Selection()];
 			curTab->MessageReceived(Message);
-			BWindow::MessageReceived(Message);
 			break;
 	}
+	BWindow::MessageReceived(Message);
 	this->EnableUpdates();
 }
 
