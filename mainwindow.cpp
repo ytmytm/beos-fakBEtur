@@ -1,5 +1,11 @@
 //
 // TODO:
+// - befakprint/printtext/printhtml - nowe pola w konfiguracji:
+//		- tryb druku
+//		- ścieżka zapisywania plików
+//		- text: szeroki/waski
+//		- text: znak konca linii (string)
+//		- html: ścieżka do domyślnego szablonu html
 // - dialog do wyboru symbolu przy dodawaniu do bazy towar/kontrahent z fak
 //		- pytac tylko o nowy symbol, test na obecnosc+unikalnosc nazwa+symbol
 // - dialog do edycji stawek vat

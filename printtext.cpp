@@ -1,17 +1,15 @@
 //
+//		konfiguracja:
+//		- liczba kolumn
+//		- znak konca linii
 // TODO:
-//		zapis do pliku
 // IDEAS:
 //		szerokosci,parametry dla 80/136 do osobnej tabeli, indeksowac
-//		konfiguracja - liczba kolumn, znak konca linii
 //
 
 #include "printtext.h"
 #include "globals.h"
 #include <stdio.h>
-
-#include <Alert.h>
-#include <File.h>
 
 printText::printText(int id, sqlite *db, int t, int p) : beFakPrint(id,db,t,p) {
 	wide = (param == 1);
@@ -254,16 +252,8 @@ void printText::Go(void) {
 //printf("---------------------\n");
 //printf("%s",out.String());
 //printf("---------------------\n");
-	// XXX dupe from printhtml!
-	// XXX dialog z savename?
-	tmp = "/boot/home/faktura-"; tmp += makeName(); tmp += ".txt";
-	BFile *savefile = new BFile(tmp.String(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	savefile->Write(out.String(),out.Length());
-	savefile->Unset();
-	// podsumowanie dla usera
-	tmp.Prepend("Zapisano plik ");
-	BAlert *saveinfo = new BAlert(APP_NAME, tmp.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
-	saveinfo->Go();
+	tmp = "faktura-"; tmp += makeName(); tmp += ".txt";
+	saveToFile(tmp.String(), &out);
 }
 
 const char *printText::rightAlign(const BString line, const BString right) {

@@ -16,6 +16,7 @@ class beFakPrint {
 		void updateSummary(const BString wnetto, const int vatid, const BString wvat, const BString wbrutto);
 		const char *slownie(const char *input);
 		const char *makeName(void);
+		void saveToFile(const char *name, const BString *content);
 
 		int typ;	// 0 - oryginal, 1 - kopia, 2 - duplikat
 		int param;	// dla text - 80/136

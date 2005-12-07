@@ -1,20 +1,18 @@
 //
+//		konfiguracja
+//		- nazwa pliku szablonu
 // TODO:
-//		wybor szablonu
-//		zapis do pliku
-// - NetPositive file &
-// - sleep 1
-// - hey NetPositive do MenuItem [8] of Menu [0] of View [0] of Window [0]
-//
 // IDEAS:
-//		konfiguracja - nazwa pliku szablonu
 //
 
 #include "globals.h"
 #include "printhtml.h"
+#include "dialfile.h"
 
 #include <Alert.h>
+#include <Entry.h>
 #include <File.h>
+#include <Path.h>
 #include <stdio.h>
 
 // XXX parametr
@@ -34,12 +32,22 @@ void printHTML::Go(void) {
 
 	// otworz plik z szablonem
 	szablon = new BFile();
+	// XXX pobrać ścieżkę do szablonu
 	r = szablon->SetTo(SZABLON_PATH, B_READ_ONLY);
 	if (r != B_OK) {
 		tmp = "Nie znaleziono pliku szablonu: "; tmp += SZABLON_PATH;
+		tmp += "\nProszę wskazać plik z szablonem eksportu do HTML.";
 		BAlert *error = new BAlert(APP_NAME, tmp.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		error->Go();
-		return;
+		BEntry *ent = dialFile::OpenDialog("Wybierz plik z szablonem HTML", SZABLON_PATH);
+		BPath path;
+		ent->GetPath(&path);
+		delete ent;
+		tmp = path.Path();
+		if (tmp.Length() == 0)
+			return;
+		// XXX zapisać nową ścieżkę do szablonu
+		szablon->SetTo(tmp.String(), B_READ_ONLY);
 	}
 	// wczytaj szablon
 	szablon->GetSize(&size);
@@ -150,13 +158,6 @@ void printHTML::Go(void) {
 //printf("----------\n");
 //printf("%s\n",out.String());
 //printf("----------\n");
-	// XXX dialog z savename?
-	tmp = "/boot/home/faktura-"; tmp += makeName(); tmp += ".html";
-	BFile *savefile = new BFile(tmp.String(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	savefile->Write(out.String(),out.Length());
-	savefile->Unset();
-	// podsumowanie dla usera
-	tmp.Prepend("Zapisano plik ");
-	BAlert *saveinfo = new BAlert(APP_NAME, tmp.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
-	saveinfo->Go();
+	tmp = "faktura-"; tmp += makeName(); tmp += ".html";
+	saveToFile(tmp.String(), &out);
 }

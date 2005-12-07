@@ -1,9 +1,13 @@
 //
 // TODO:
-//
+//	- konfiguracja - domyślna ścieżka zapisu
 
 #include "befakprint.h"
+#include "dialfile.h"
 
+#include <Entry.h>
+#include <File.h>
+#include <Path.h>
 #include <stdio.h>
 
 // baseclass with stuff, inherit to print/export/whatever
@@ -227,6 +231,24 @@ const char *beFakPrint::makeName(void) {
 	tmp.ReplaceAll("\\","-");
 	tmp.ReplaceAll(" ","");
 	return tmp.String();
+}
+
+void beFakPrint::saveToFile(const char *name, const BString *content) {
+	// XXX get path part from configuration
+	BEntry *ent = dialFile::SaveDialog("Zapisz wydruk do pliku", NULL, name);
+	BPath path;
+	BString tmp;
+
+	ent->GetPath(&path);
+	delete ent;
+
+	tmp = path.Path();
+	if (tmp.Length() > 0) {
+		// XXX extract path part and put as default
+		BFile *savefile = new BFile(tmp.String(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+		savefile->Write(content->String(),content->Length());
+		savefile->Unset();
+	}
 }
 
 void beFakPrint::Go(void) {
