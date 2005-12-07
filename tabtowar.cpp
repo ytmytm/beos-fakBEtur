@@ -266,7 +266,7 @@ bool tabTowar::validateTab(void) {
 	}
 	// pkwiu - ostrzeżenie że pusty
 	if (strlen(data[2]->Text()) == 0) {
-		error = new BAlert(APP_NAME, "Nie wpisano kodu PKWiU.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "Nie wpisano kodu PKWiU towaru.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1)
 			return false;
 	}
@@ -286,7 +286,7 @@ bool tabTowar::validateTab(void) {
 	sql = "SELECT 100*0"; sql += ceny[0]->Text();
 	i = toint(execSQL(sql.String()));
 	if (i == 0) {
-		error = new BAlert(APP_NAME, "Cena jest równa zero.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error = new BAlert(APP_NAME, "Cena towaru jest równa zero.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (error->Go() == 1)
 			return false;
 	}
