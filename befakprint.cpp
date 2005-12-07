@@ -88,7 +88,7 @@ void beFakPrint::makeSummary(void) {
 	BString sql;
 
 	// suma z rozbiciem na stawki
-	sql = "SELECT DECROUND(SUM(s.wnetto)), v.nazwa, DECROUND(SUM(s.wvat)), DECROUND(SUM(s.wbrutto)) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid GROUP BY s.vatid ORDER BY v.nazwa";
+	sql = "SELECT DECROUND(SUM(s.wnetto)), v.nazwa, DECROUND(SUM(s.wvat)), DECROUND(SUM(s.wbrutto)) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid GROUP BY s.vatid ORDER BY v.stawka";
 //printf("sql:[%s]\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
