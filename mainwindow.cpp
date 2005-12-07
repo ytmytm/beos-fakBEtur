@@ -1,6 +1,6 @@
 //
 // TODO:
-//	- milestone na 0.2: - testy danych (ale jeszcze bez dodawania)
+//	- milestone na 0.2: - testy danych w faktura/validtowar (ale jeszcze bez dodawania)
 //						- layout z dividerem ustawionym na max w kolumnie
 //
 // - testy danych - te z kontynuacją wyłączalne w konf.

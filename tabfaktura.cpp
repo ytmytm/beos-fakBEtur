@@ -7,13 +7,12 @@
 // wyrzucić uwagi i zastąpić całym podsumowaniem? podsumowanie na 3 karcie?
 // opcja faktury korygującej (jak? trzeba pamiętać co się zmieniło)
 //
-// validateTab - pola odbiorcy+opcja dopisania
+// validateTab:
+//	- opcja dopisania
 // validateTowar:
-// - towar o tej nazwie już jest
-// - czy dodać to do bazy towarów?
-// - ilość/cena wynosi 0
-// - nazwa, pkwiu, jm, stawka - nie wpisane
-//
+//	- towar o tej nazwie już jest
+//	- opcja uaktualnienia
+//	- opcja dopisania
 
 #include "globals.h"
 #include "tabfaktura.h"
@@ -466,6 +465,8 @@ void tabFaktura::makeNewForm(void) {
 	char *dbErrMsg;
 
 	curdata->clear();
+	faklista->clear();
+	this->dirty = false;
 	// unselect symbolmenu
 	for (int i=0;i<symbolRows;i++)
 		symbolMenuItems[i]->SetMarked(false);
@@ -513,6 +514,7 @@ void tabFaktura::makeNewForm(void) {
 	// wygeneruj string, zapisz
 	curdata->nazwa = tmp;
 	curdataToTab();
+	RefreshTowarList();
 }
 
 void tabFaktura::makeNewTowar(void) {
@@ -695,8 +697,59 @@ bool tabFaktura::validateTab(void) {
 	return true;
 }
 
-// check towar fields, add if needed
+// XXX uzupełnić
 bool tabFaktura::validateTowar(void) {
+	BAlert *error;
+	BString sql, tmp;
+	int i;
+	// nazwa niepusta?
+	if (strlen(towar[0]->Text()) == 0) {
+		// pusta, ale jesli nie brudne dane, to znaczy ze nowy towar!
+		if (!towardirty)
+			return true;
+		error = new BAlert(APP_NAME, "Nie wpisano nazwy towaru!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// XXX nazwa unikalna na fakturze! "Towar o tej nazwie już jest na fakturze!"
+	//		XXX przejść całą listę i porównać
+	// XXX nowa nazwa w bazie - czy dopisać do bazy?
+	// XXX nazwa z bazy, ale inne dane - co zmienić?
+	// pkwiu - ostrzeżenie że pusty
+	if (strlen(towar[1]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano kodu PKWiU towaru.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// cena niezerowa
+	sql = "SELECT 100*0"; sql += towar[2]->Text();
+	i = toint(execSQL(sql.String()));
+	if (i == 0) {
+		error = new BAlert(APP_NAME, "Cena towaru jest równa zero.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// ilosc niezerowa
+	sql = "SELECT 100*0"; sql += towar[4]->Text();
+	i = toint(execSQL(sql.String()));
+	if (i == 0) {
+		error = new BAlert(APP_NAME, "Sprzedawana ilość towaru jest równa zero!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// jm - ostrzeżenie że pusty
+	if (strlen(towar[5]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wybrano jednostki miary.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// stawka vat
+	if (curtowarvatid < 0) {
+		error = new BAlert(APP_NAME, "Nie wybrano stawki VAT!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+
 	return true;
 }
 
@@ -834,10 +887,10 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			updateTab2();
 			break;
 		case BUT_PSAVE:
-			this->dirty = true;
-			towardirty = true;
 //			printf("saving!\n");
 			DoCommitTowardata();
+			this->dirty = true;
+			towardirty = false;
 			break;
 		case BUT_PNEW:
 			if (CommitCurtowar()) {
