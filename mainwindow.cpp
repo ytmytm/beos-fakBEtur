@@ -125,7 +125,12 @@ void BeFAKMainWindow::initTabs(BTabView *tv) {
 }
 
 void BeFAKMainWindow::DoAbout(void) {
-	aboutDialog = new dialAbout(APP_NAME "  " APP_VERSION);
+	aboutDialog = new dialAbout("O programie");
+	aboutDialog->SetApplicationName(APP_NAME);
+	aboutDialog->SetVersionNumber(APP_VERSION);
+	aboutDialog->SetCopyrightString(B_UTF8_COPYRIGHT"2005 by Maciej Witkowiak");
+	aboutDialog->SetText("Kontakt: <ytm@elysium.pl>\nhttp://members.elysium.pl/ytm/html\nhttp://ytm.bossstation.dnsalias.org/html/\n\nProgram powstał na konkurs zorganizowany\nprzez portal http://www.haiku-os.pl.\n\n\t\t\t\t\t\t\t:* E.");
+	aboutDialog->Show();
 }
 
 void BeFAKMainWindow::DoConfigFirma(bool cancancel) {
