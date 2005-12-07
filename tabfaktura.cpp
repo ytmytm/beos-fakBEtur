@@ -481,7 +481,8 @@ void tabFaktura::makeNewForm(void) {
 	// 
 	uwagi->SetText("");
 	cbzaplacono->SetValue(B_CONTROL_OFF);
-
+	// miejsce wystawienia - weź z danych firmy
+	curdata->ogol[0] = execSQL("SELECT miejscowosc FROM konfiguracja WHERE zrobiona = 1");
 	// wygenerowanie nowej nazwy
 	// identyfikator z daty
 	rok = tmp; mies = tmp;
@@ -614,12 +615,87 @@ bool tabFaktura::validateTab(void) {
 		error->Go();
 		return false;	
 	}
-	//
-	// XXX odbiorca - powtórzyć testy z tabfirma + opcja zapisu nowego
+	// test odbiorcy
+	// adres - wszystkie dane
+	if ((strlen(data[2]->Text())==0) || (strlen(data[3]->Text())==0) || (strlen(data[4]->Text())==0)) {
+		error = new BAlert(APP_NAME, "Adres kontrahenta jest niepełny.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// NIP - niepusty,poprawny
+	if (strlen(data[7]->Text())==0) {
+		error = new BAlert(APP_NAME, "Nie wpisano numeru NIP kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// REGON - niepusty,poprawny
+	if (strlen(data[8]->Text())==0) {
+		error = new BAlert(APP_NAME, "Nie wpisano numeru REGON kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// nr konta - niepusty,poprawny
+	if (strlen(data[10]->Text())==0) {
+		error = new BAlert(APP_NAME, "Nie wpisanu numeru konta kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// odbiorca - nazwa niepusta
+	// nazwa - niepusta
+	if (strlen(data[0]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano nazwy kontrahenta!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	tmp = data[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
+	sql = "SELECT id FROM firma WHERE nazwa = '"; sql += tmp; sql += "'";
+	i = toint(execSQL(sql.String()));
+	if (i == 0) {
+		// XXX dopisać? tak-> jaki jest nowy symbol (niepusty, uniq)
+		// (docelowo jeden dialog z symbolem i OK + cancel)
+		error = new BAlert(APP_NAME, "Nowy kontrahent? Należałoby spytać teraz, czy dopisać go do bazy.", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+	} else {
+		// taka nazwa jest w bazie...
+		// porównać dane z tym z id
+		firmadat *oldfirma = new firmadat(dbData);
+		int j = 0;
+		oldfirma->id = i;
+		oldfirma->fetch();
+		for (i=0;i<=10;i++) {
+			if (i!=1) {
+				if (strcmp(data[i]->Text(),oldfirma->data[i].String()))
+					j++;
+			}
+		}
+		// jeśli dane są różne - męczyć usera
+		if (j!=0) {
+			error = new BAlert(APP_NAME, "Dane kontrahenta z bazy różnią się z tymi wpisanymi na fakturze\nCo robić?.", "Uaktualnij bazę", "Uaktualnij fakturę", "Nic nie rób", B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			int ret = error->Go();
+			switch(ret) {
+				case 0:	// fak->baza
+					for (i=0;i<=10;i++) {
+						if (i!=1)
+							oldfirma->data[i] = data[i]->Text();
+					}
+					oldfirma->commit();
+					break;
+				case 1: // baza->fak
+					for (i=0;i<=10;i++) {
+						if (i!=1)
+							curdata->odata[i] = oldfirma->data[i];
+					}
+				case 2:	// nothing
+				default:
+					break;
+			}
+		}
+		delete oldfirma;
+	}
 	return true;
 }
 
-// check towar fields
+// check towar fields, add if needed
 bool tabFaktura::validateTowar(void) {
 	return true;
 }
@@ -954,7 +1030,8 @@ bool tabFaktura::DoCommitTowardata(void) {
 	pozfakdata *newdata;
 	BString sql;
 
-	// XXX tutaj wszystkie niezbędne testy, w razie bledu - return false
+	if (!(validateTowar()))
+		return false;
 
 	if (towarmark < 0) {
 		// nowa pozycja
