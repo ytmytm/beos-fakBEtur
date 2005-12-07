@@ -7,12 +7,8 @@
 // wyrzucić uwagi i zastąpić całym podsumowaniem? podsumowanie na 3 karcie?
 // opcja faktury korygującej (jak? trzeba pamiętać co się zmieniło)
 //
-// testy w commitfaktura
-// - data/sposób płatności
-// - brak adresu odbiorcy
-// - kto wystawił?
-// - lista towarów pusta
-// testy w docommitcurtowardata
+// validateTab - pola odbiorcy+opcja dopisania
+// validateTowar:
 // - towar o tej nazwie już jest
 // - czy dodać to do bazy towarów?
 // - ilość/cena wynosi 0
@@ -539,9 +535,92 @@ void tabFaktura::makeNewTowar(void) {
 	updateTab2();
 }
 
-// call separate for validate towar
-// check fakura fields
 bool tabFaktura::validateTab(void) {
+	BAlert *error;
+	BString sql, tmp;
+	int i;
+
+	if (!(validateTowar()))
+		return false;
+	// numer/nazwa - niepuste
+	if (strlen(nazwa->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano numeru faktury!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// numer/nazwa - unikalne
+	tmp = nazwa->Text(); tmp.ReplaceAll("'","''");	// sql quote
+	sql = "SELECT id FROM faktura WHERE nazwa = '"; sql += tmp; sql += "'";
+	i = toint(execSQL(sql.String()));
+	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id >0) && (i != curdata->id))) {
+		error = new BAlert(APP_NAME, "Numer faktury nie jest unikalny!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// miejsce - niepuste
+	if (strlen(ogol[0]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano miejsca wystawienia faktury!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// wystawil - niepuste
+	if (strlen(ogol[1]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano wystawiającego fakturę.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// data wystawienia - niepuste
+	if (strlen(ogol[2]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano daty wystawienia faktury!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// data sprzedazy - niepuste
+	if (strlen(ogol[3]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano daty sprzedaży!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// forma platnosci - niepusta
+	if (strlen(ogol[5]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano formy płatności!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// termin zaplaty - niepusty
+	if (strlen(ogol[6]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano terminu zapłaty!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// jesli (zaplacono), to data i kwota
+	if (cbzaplacono->Value() == B_CONTROL_ON) {
+		// kwota płatności - niepusta
+		if (strlen(ogol[8]->Text()) == 0) {
+			error = new BAlert(APP_NAME, "Nie wpisano kwoty wykonanej płatności!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			error->Go();
+			return false;
+		}
+		// data płatności - niepusta
+		if (strlen(ogol[9]->Text()) == 0) {
+			error = new BAlert(APP_NAME, "Nie wpisano daty wykonanej płatności!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			error->Go();
+			return false;
+		}
+	}
+	// lista towarów niepusta
+	if ((faklista->start == faklista->end) && (faklista->start == NULL)) {
+		error = new BAlert(APP_NAME, "Na fakturze nie ma żadnej pozycji!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;	
+	}
+	//
+	// XXX odbiorca - powtórzyć testy z tabfirma + opcja zapisu nowego
+	return true;
+}
+
+// check towar fields
+bool tabFaktura::validateTowar(void) {
 	return true;
 }
 
