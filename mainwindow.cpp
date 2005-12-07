@@ -1,5 +1,8 @@
 //
 // TODO:
+//	- milestone na 0.2: - testy danych (ale jeszcze bez dodawania)
+//						- layout z dividerem ustawionym na max w kolumnie
+//
 // - testy danych - te z kontynuacją wyłączalne w konf.
 //		- dorobić dla tabfaktura
 // - dialog do edycji stawek vat
@@ -16,7 +19,7 @@
 // - numeracja uproszczona - konfig/menu? uzywac? (wtedy bez miesiaca)
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - guzik kalendarza
-// - guzik importu
+// - guzik importu z innej faktury (wybór numeru/ok/anuluj)
 // - DECROUND zaimplementować jako hook i userfunction, nie jako patch na sqlite
 // - dummy menu ze statystykami
 // - trzymanie stanu magazynu, info magazynowe
