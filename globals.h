@@ -6,6 +6,8 @@
 	#define APP_VERSION "0.2"
 	#define APP_SIGNATURE "application/x-vnd.generic-fakBEtur"
 	extern int AppReturnValue;
+	// general max() function
+	#define max(x,y) ( ((x)>(y)) ? (x) : (y) )
 	// gettext-style translation helper
 	#define _(x) SpTranslate(x)
 	// Qt-style translation helper

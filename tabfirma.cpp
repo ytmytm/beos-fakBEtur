@@ -98,13 +98,22 @@ tabFirma::tabFirma(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	box4->AddChild(aktywny); box4->AddChild(zablokowany);	
 	// fix widths
 	int i;
-	for (i=0;i<=6;i++) {
+	// first set them to be enough
+	for (i=0;i<=10;i++) {
 		data[i]->SetDivider(be_plain_font->StringWidth(data[i]->Label())+5);
 	}
-	data[0]->SetDivider(50); data[2]->SetDivider(50);
-	data[3]->SetDivider(50); data[5]->SetDivider(50);
-	data[7]->SetDivider(50); data[8]->SetDivider(50);
-	data[9]->SetDivider(50); data[10]->SetDivider(50);
+	// align in columns
+	float d;
+	d = max(data[0]->Divider(), data[2]->Divider());
+	d = max(data[3]->Divider(), d);
+	d = max(data[5]->Divider(), d);
+	data[0]->SetDivider(d); data[2]->SetDivider(d);
+	data[3]->SetDivider(d); data[5]->SetDivider(d);
+	d = max(data[7]->Divider(), data[8]->Divider());
+	d = max(data[9]->Divider(), d);
+	d = max(data[10]->Divider(), d);
+	data[7]->SetDivider(d); data[8]->SetDivider(d);
+	data[9]->SetDivider(d); data[10]->SetDivider(d);
 	curdataToTab();
 
 	RefreshIndexList();

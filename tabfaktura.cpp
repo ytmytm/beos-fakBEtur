@@ -164,9 +164,6 @@ void tabFaktura::initTab1(void) {
 	cbut[1] = new BButton(BRect(260,100,280,120), "tfcbut1", "+", msg);
 	box1->AddChild(cbut[0]);
 	box1->AddChild(cbut[1]);
-	int i;
-	for (i=0;i<=4;i++)
-		ogol[i]->SetDivider(70);
 	// box1-menu
 	BMenu *menust = new BMenu("");
 	int j=0;
@@ -188,7 +185,6 @@ void tabFaktura::initTab1(void) {
 	box2->AddChild(ogol[5]);
 	box2->AddChild(ogol[6]);
 	box2->AddChild(ogol[7]);
-	ogol[5]->SetDivider(50); ogol[6]->SetDivider(50); ogol[7]->SetDivider(20);
 	// box2-menu
 	BMenu *menufp = new BMenu("");
 	j=0;
@@ -242,15 +238,6 @@ void tabFaktura::initTab1(void) {
 	data[10] = new BTextControl(r, "tfd10", "Nr konta", NULL, new BMessage(DC));
 	box4->AddChild(data[7]); box4->AddChild(data[8]);
 	box4->AddChild(data[9]); box4->AddChild(data[10]);
-	// fix widths
-	for (i=0;i<=6;i++) {
-		if (i!=1)
-		data[i]->SetDivider(be_plain_font->StringWidth(data[i]->Label())+5);
-	}
-	data[0]->SetDivider(50); data[2]->SetDivider(50);
-	data[3]->SetDivider(50); data[5]->SetDivider(50);
-	data[7]->SetDivider(50); data[8]->SetDivider(50);
-	data[9]->SetDivider(50); data[10]->SetDivider(50);
 	// firma-symbole
 	menusymbol = new BPopUpMenu("[wybierz]");
 	symbolRows = 0;
@@ -258,6 +245,34 @@ void tabFaktura::initTab1(void) {
 	BMenuField *menusymbolField = new BMenuField(BRect(280,15,420,35), "tfmsymbol", "Symbol", menusymbol);
 	menusymbolField->SetDivider(be_plain_font->StringWidth(menusymbolField->Label())+15);
 	box4->AddChild(menusymbolField);
+	// fix widths
+	nazwa->SetDivider(be_plain_font->StringWidth(nazwa->Label())+5);
+	int i;
+	for (i=0;i<=9;i++)
+		ogol[i]->SetDivider(be_plain_font->StringWidth(ogol[i]->Label())+5);
+	// kolumna ogol: 0-4
+	float d;
+	d = 0;
+	for (i=0;i<=4;i++)
+		d = max(ogol[i]->Divider(), d);
+	for (i=0;i<=4;i++)
+		ogol[i]->SetDivider(d);
+	// platnosc
+	d = max(ogol[5]->Divider(), ogol[6]->Divider());
+	ogol[5]->SetDivider(d); ogol[6]->SetDivider(d);
+	for (i=0;i<=10;i++) {
+		if (i!=1)
+		data[i]->SetDivider(be_plain_font->StringWidth(data[i]->Label())+5);
+	}
+	d = 0;
+	for (i=0;i<=10;i++) {
+		if ((i!=1)&&(i!=4)&&(i!=6))
+			d = max(data[i]->Divider(), d);
+	}
+	for (i=0;i<=10;i++) {
+		if ((i!=1)&&(i!=4)&&(i!=6))
+			data[i]->SetDivider(d);
+	}	
 }
 
 void tabFaktura::initTab2(void) {
@@ -373,10 +388,8 @@ void tabFaktura::initTab2(void) {
 	uwagi = new BTextView(r, "tfuwagi", s, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
 	box7->AddChild(uwagi);
 	// fix widths
-	towar[0]->SetDivider(50);
-	towar[1]->SetDivider(50);
-	towar[2]->SetDivider(90);
-	towar[4]->SetDivider(30);
+	for (i=0;i<=5;i++)
+		towar[i]->SetDivider(be_plain_font->StringWidth(towar[i]->Label())+5);
 	RefreshTowarList();
 }
 

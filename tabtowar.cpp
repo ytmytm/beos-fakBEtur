@@ -161,15 +161,22 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	box3->AddChild(notatki);
 	// fix widths
 	int i;
+	// first set them to be enough
 	for (i=0;i<=3;i++) {
 		data[i]->SetDivider(be_plain_font->StringWidth(data[i]->Label())+5);
 	}
 	for (i=0;i<=5;i++) {
 		ceny[i]->SetDivider(be_plain_font->StringWidth(ceny[i]->Label())+5);
 	}
-	data[0]->SetDivider(50); data[2]->SetDivider(50);
-	ceny[0]->SetDivider(70); ceny[1]->SetDivider(70);
-	ceny[2]->SetDivider(70); ceny[4]->SetDivider(70);
+	// align in columns
+	float d;
+	d = max(data[0]->Divider(), data[2]->Divider());
+	data[0]->SetDivider(d); data[2]->SetDivider(d);
+	d = max(ceny[0]->Divider(), ceny[1]->Divider());
+	d = max(ceny[2]->Divider(), d);
+	d = max(ceny[4]->Divider(), d);
+	ceny[0]->SetDivider(d); ceny[1]->SetDivider(d);
+	ceny[2]->SetDivider(d); ceny[4]->SetDivider(d);
 	updateTab();
 	RefreshIndexList();
 }

@@ -1,8 +1,5 @@
 //
 // TODO:
-//	- milestone na 0.2:
-//						- layout z dividerem ustawionym na max w kolumnie
-//
 // - dialog do wyboru symbolu przy dodawaniu do bazy towar/kontrahent z fak
 //		- pytac tylko o nowy symbol, test na obecnosc+unikalnosc nazwa+symbol
 // - dialog do edycji stawek vat
