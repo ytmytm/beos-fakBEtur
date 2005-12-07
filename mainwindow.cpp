@@ -4,7 +4,6 @@
 //		- pytac tylko o nowy symbol, test na obecnosc+unikalnosc nazwa+symbol
 // - dialog do edycji stawek vat
 // - drukowanie przez printjob
-// - layout w tabach: setdivider na maksimum z kolumny zamiast sztywno
 // - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)
 // - usunąć duplikat execSQL()
 // - prawdziwe validateDate

@@ -711,7 +711,6 @@ bool tabFaktura::validateTab(void) {
 	return true;
 }
 
-// XXX uzupełnić
 bool tabFaktura::validateTowar(void) {
 	BAlert *error;
 	BString sql, tmp;

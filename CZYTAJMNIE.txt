@@ -1,5 +1,5 @@
 
-fakBEtur 0.1 (20051204)
+fakBEtur 0.2 (20051207)
 (c) Maciej Witkowiak <ytm@elysium.pl>
 http://members.elysium.pl/html/beos.html
 
@@ -13,12 +13,24 @@ LICENCJA
 Programu wolno używać w dowolny sposób w celu testowania na potrzeby konkursu
 zorganizowanego przez portal http://www.haiku-os.pl/
 
-NOTATKI DO WERSJI 0.1
+ZMIANY
+0.2
+ - rezygnacja z SpLocale
+ - sprawdzanie poprawności danych
+ - lepszy szablon eksportu do HTML (tabela z ramkami)
+ - odświeżanie symboli w zakładce faktura po zmianach w bazie danych
+ - nazwy wszystkich pól ustawiane w zależności od aktualnej czcionki, zawsze widoczne
+ - automatyczne ustawianie numeru nowej faktury, miejsce wystawienia ustawione na
+   siedzibę firmy
+0.1
+ - pierwsza publiczna wersja
+
+NOTATKI DO WERSJI 0.2
 Program nie potrafi samodzielnie drukować, jest możliwy jedynie eksport do pliku tekstowego
 (80/136 kolumn) lub HTML. Nazwa pliku generowana jest z nazwy faktury.
-Dane nie są sprawdzane pod względem poprawności, ścieżki do plików i niektóre parametry
-są ustalone na stałe.
-Nie działają żadne skróty klawiaturowe, nie ma kalendarza do wyboru daty, nie ma statystyk.
+Ścieżki do plików i niektóre parametry są ustalone na stałe.
+Nie działają żadne skróty klawiaturowe, nie ma kalendarza do wyboru daty, nie ma statystyk,
+nie ma kilku istotnych okien dialogowych.
 
 
 
