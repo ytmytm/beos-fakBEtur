@@ -15,9 +15,6 @@ AboutView::AboutView(BRect frame, const char *name, BBitmap *icon)
 	bIcon=new BBitmap(BRect(0,0,31,31), B_CMAP8);
 }
 
-//AboutView::~AboutView() {
-//}
-
 void AboutView::SetIcon(BBitmap *icon) {
 	bIcon->SetBits(icon->Bits(), icon->BitsLength(), 0, icon->ColorSpace());
 	Invalidate();
@@ -33,56 +30,57 @@ void AboutView::Draw(BRect updateRect) {
 	}
 }
 
-dialAbout::dialAbout(const char *title)
-		: BWindow(BRect(100,100,400,280), title, B_FLOATING_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_RESIZABLE) {
-	vAbout=new AboutView(Bounds(), "AboutView", NULL);	
+dialAbout::dialAbout(const char *title) : BWindow(
+		BRect(100,100,400,280),
+		title,
+		B_FLOATING_WINDOW_LOOK,
+		B_MODAL_APP_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_RESIZABLE) {
+
+	vAbout = new AboutView(Bounds(), "AboutView", NULL);	
 	AddChild(vAbout);
-	BRect frame=Bounds();
-	
-	applicationNameSV=new BStringView(BRect(60,1, frame.Width()-60, 27), "applicationNameSV", "");
+	BRect frame = Bounds();
+
+	applicationNameSV = new BStringView(BRect(60,1, frame.Width()-60, 27), "applicationNameSV", "");
 	applicationNameSV->SetFont(be_bold_font);
 	vAbout->AddChild(applicationNameSV);
 
-	versionNumberSV=new BStringView(BRect(applicationNameSV->StringWidth(applicationNameSV->Text())+65, 1, frame.Width()-5, 27), "versionNumberSV", "");
+	versionNumberSV = new BStringView(BRect(applicationNameSV->StringWidth(applicationNameSV->Text())+65, 1, frame.Width()-5, 27), "versionNumberSV", "");
 	versionNumberSV->SetFontSize(10);
 	vAbout->AddChild(versionNumberSV);
 
-	copyrightStringSV=new BStringView(BRect(60,27, frame.Width()-60, 41), "copyrightStringSV", "");
+	copyrightStringSV = new BStringView(BRect(60,27, frame.Width()-60, 41), "copyrightStringSV", "");
 	copyrightStringSV->SetFontSize(10);
 	vAbout->AddChild(copyrightStringSV);
 
-	textTV=new BTextView(BRect(60,55, frame.right-10, frame.bottom-8), "textTV", BRect(1,1,frame.Width()-72,400), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	textTV = new BTextView(BRect(60,55, frame.right-10, frame.bottom-8), "textTV", BRect(1,1,frame.Width()-72,400), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	textTV->SetViewColor(216,216,216,255);
 	textTV->MakeEditable(false);
 	textTV->MakeSelectable(false);
 	textTV->SetWordWrap(true);
-	BFont	*font=new BFont(be_plain_font);
+	BFont *font = new BFont(be_plain_font);
 	font->SetSize(10);
 	textTV->SetFontAndColor(font);
 	vAbout->AddChild(textTV);
 	delete font;
 
-	BScreen	*screen=new BScreen();
+	BScreen	*screen = new BScreen();
 	MoveTo((int)((screen->Frame().Width()-Bounds().Width())/2), (int)((screen->Frame().Height()-Bounds().Height())/2));
 	delete screen;
-	
-	app_info	info;
-	if (be_app->GetAppInfo(&info)==B_OK) {
+
+	app_info info;
+	if (be_app->GetAppInfo(&info) == B_OK) {
 		BBitmap bmp(BRect(0,0,31,31), B_CMAP8);
 		if (BNodeInfo::GetTrackerIcon(&info.ref, &bmp, B_LARGE_ICON)==B_OK)
 			SetIcon(&bmp);
 	}
 }
 
-//XXXdialAbout::~dialAbout() {
-//}
-
 void dialAbout::SetApplicationName(const char *name) {
 	font_height	boldheight, plainheight;
-	
+
 	applicationNameSV->GetFontHeight(&boldheight);
 	versionNumberSV->GetFontHeight(&plainheight);
-	
+
 	applicationNameSV->SetText(name);
 	versionNumberSV->ResizeTo((Bounds().Width()-5)-(applicationNameSV->StringWidth(applicationNameSV->Text())+65), 26);
 	versionNumberSV->MoveTo(applicationNameSV->StringWidth(applicationNameSV->Text())+65, applicationNameSV->Frame().top-(boldheight.descent-plainheight.descent));

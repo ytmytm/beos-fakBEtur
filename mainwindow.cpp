@@ -16,7 +16,6 @@
 // - dummy menu ze statystykami
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 // - na koniec - usunac printfy z debugiem
-// - przy włączonej optymalizacji dialAbout ma segfault
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
 
