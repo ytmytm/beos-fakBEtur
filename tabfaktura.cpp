@@ -687,6 +687,7 @@ bool tabFaktura::validateTab(void) {
 						if (i!=1)
 							curdata->odata[i] = oldfirma->data[i];
 					}
+					break;
 				case 2:	// nothing
 				default:
 					break;
@@ -711,10 +712,64 @@ bool tabFaktura::validateTowar(void) {
 		error->Go();
 		return false;
 	}
-	// XXX nazwa unikalna na fakturze! "Towar o tej nazwie już jest na fakturze!"
-	//		XXX przejść całą listę i porównać
-	// XXX nowa nazwa w bazie - czy dopisać do bazy?
-	// XXX nazwa z bazy, ale inne dane - co zmienić?
+	// nazwa - unikalna na fakturze
+	pozfakitem *cur = faklista->start;
+	i = 0;
+	while (cur!=NULL) {
+		if (!strcmp(cur->data->data[1].String(), towar[0]->Text()))
+			i++;
+		cur = cur->nxt;
+	}
+	// jest na fakturze, ale czy to edycja, czy dodanie nowego?
+	if ((i > 0) && (towarmark<1)) {
+		error = new BAlert(APP_NAME, "Towar o tej nazwie już jest na fakturze!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// nazwa - nowa w bazie?
+	tmp = towar[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
+	sql = "SELECT id FROM towar WHERE nazwa = '"; sql += tmp; sql += "'";
+	i = toint(execSQL(sql.String()));
+	if (i == 0) {
+		// XXX dopisać? tak-> jaki jest nowy symbol (niepusty, uniq)
+		error = new BAlert(APP_NAME, "Nowy towar? Należałoby spytać teraz, czy dopisać go do bazy.", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+	} else {
+		// taka nazwa jest w bazie...
+		// porównać dane z tym z id
+		towardat *oldtowar = new towardat(dbData);
+		int j = 0;
+		oldtowar->id = i;
+		oldtowar->fetch();
+		if (strcmp(towar[1]->Text(),oldtowar->data[2].String())) j++; // pkwiu
+		if (strcmp(towar[5]->Text(),oldtowar->data[3].String())) j++; // jm
+		if (strcmp(towar[2]->Text(),oldtowar->ceny[0].String())) j++; // netto
+		if (curtowarvatid != oldtowar->vatid) j++;					  // vatid
+		// jeśli dane są różne - męczyć usera
+		if (j!=0) {
+			error = new BAlert(APP_NAME, "Dane towaru z bazy różnią się z tymi wpisanymi na fakturze\nCo robić?.", "Uaktualnij bazę", "Uaktualnij fakturę", "Nic nie rób", B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			int ret = error->Go();
+			switch(ret) {
+				case 0:	// fak->baza
+					oldtowar->data[2] = towar[1]->Text();
+					oldtowar->data[3] = towar[5]->Text();
+					oldtowar->ceny[0] = towar[2]->Text();
+					oldtowar->vatid = curtowarvatid;
+					oldtowar->commit();
+					break;
+				case 1: // baza->fak
+					towar[1]->SetText(oldtowar->data[2].String());
+					towar[2]->SetText(oldtowar->ceny[0].String());
+					towar[5]->SetText(oldtowar->data[3].String());
+					curtowarvatid = oldtowar->vatid;
+					break;
+				case 2:	// nothing
+				default:
+					break;
+			}
+		}
+		delete oldtowar;
+	}
 	// pkwiu - ostrzeżenie że pusty
 	if (strlen(towar[1]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano kodu PKWiU towaru.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -749,7 +804,7 @@ bool tabFaktura::validateTowar(void) {
 		error->Go();
 		return false;
 	}
-
+	updateTab2();		// in case that data was fetched from db
 	return true;
 }
 
@@ -891,6 +946,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			DoCommitTowardata();
 			this->dirty = true;
 			towardirty = false;
+			towarmark = -1;
 			break;
 		case BUT_PNEW:
 			if (CommitCurtowar()) {

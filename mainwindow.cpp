@@ -1,16 +1,13 @@
 //
 // TODO:
-//	- milestone na 0.2: - testy danych w faktura/validtowar (ale jeszcze bez dodawania)
+//	- milestone na 0.2:
 //						- layout z dividerem ustawionym na max w kolumnie
 //
-// - testy danych - te z kontynuacją wyłączalne w konf.
-//		- dorobić dla tabfaktura
+// - ramki w HTML - colspan/rowspan?
+// - dialog do wyboru symbolu przy dodawaniu do bazy towar/kontrahent z fak
+//		- pytac tylko o nowy symbol, test na obecnosc+unikalnosc nazwa+symbol
 // - dialog do edycji stawek vat
 // - drukowanie przez printjob
-// - wpisanie nieistniejącego kontr/towaru na fakture -> uaktualnienie bazy
-//		(kontrola w tabfaktura)
-//		- nieistniejący: id=-1 z nazwa+symbol
-//		- pytac tylko o nowy symbol, test na obecnosc+unikalnosc nazwa+symbol
 // - layout w tabach: setdivider na maksimum z kolumny zamiast sztywno
 // - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)
 // - usunąć duplikat execSQL()
@@ -18,11 +15,11 @@
 // - nrfaktury (ostatniej) - wyrzucić z konfiguracji? działa bez tego
 // - numeracja uproszczona - konfig/menu? uzywac? (wtedy bez miesiaca)
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
-// - guzik kalendarza
-// - guzik importu z innej faktury (wybór numeru/ok/anuluj)
+// - dialog kalendarza
+// - guzik importu z innej faktury (wybór numeru z listy/ok/anuluj)
 // - DECROUND zaimplementować jako hook i userfunction, nie jako patch na sqlite
 // - dummy menu ze statystykami
-// - trzymanie stanu magazynu, info magazynowe
+// - trzymanie stanu magazynu, info i podsumowania magazynowe
 // - na koniec - usunac printfy z debugiem
 // - przy włączonej optymalizacji dialAbout ma segfault
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
