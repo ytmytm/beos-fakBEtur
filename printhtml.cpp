@@ -26,7 +26,7 @@ printHTML::printHTML(int id, sqlite *db, int t, int p) : beFakPrint(id,db,t,p) {
 
 void printHTML::Go(void) {
 	BFile *szablon;
-	BString out, tmp, leftab;
+	BString out, tmp;
 	off_t size;
 	ssize_t l;
 	int i, r;
@@ -113,7 +113,11 @@ void printHTML::Go(void) {
 		updateSummary(cur->data->data[7].String(), cur->data->vatid, cur->data->data[9].String(), cur->data->data[10].String());
 		tmp += "<tr><td>"; tmp << cur->lp; tmp += "</td>";
 		for (i=1;i<=10;i++) {
-			tmp += "<td>"; tmp += cur->data->data[i]; tmp += "</td>";
+			if (i>2)
+				tmp += "<td align=\"right\">";
+			else
+				tmp += "<td>";
+			tmp += cur->data->data[i]; tmp += "</td>";
 		}
 		tmp += "</tr>\n";
 		cur = cur->nxt;
@@ -123,22 +127,20 @@ void printHTML::Go(void) {
 	// oblicz podsumowanie
 	makeSummary();
 	// wypisz summary
-	leftab = "<tr><td></td><td></td><td></td><td></td><td></td><td></td>";
-	tmp = "";
+	tmp = "<tr><td rowspan=\""; tmp << fsummarows; tmp+="\" colspan=\"7\"></td>";
 	for (i=0;i<fsummarows;i++) {
-		tmp += leftab; tmp += "<td></td>";
-		tmp += "<td>"; tmp += fsumma[i].summa[0]; tmp += "</td>";
-		tmp += "<td>"; tmp += fsumma[i].summa[1]; tmp += "</td>";
-		tmp += "<td>"; tmp += fsumma[i].summa[2]; tmp += "</td>";
-		tmp += "<td>"; tmp += fsumma[i].summa[3]; tmp += "</td>";
+		tmp += "<td align=\"right\">"; tmp += fsumma[i].summa[0]; tmp += "</td>";
+		tmp += "<td align=\"right\">"; tmp += fsumma[i].summa[1]; tmp += "</td>";
+		tmp += "<td align=\"right\">"; tmp += fsumma[i].summa[2]; tmp += "</td>";
+		tmp += "<td align=\"right\">"; tmp += fsumma[i].summa[3]; tmp += "</td>";
 		tmp += "</tr>\n";
 	}
 	// suma
-	tmp += leftab; tmp += "<strong><td>RAZEM:</td></strong>";
-	tmp += "<td>"; tmp += razem.summa[0]; tmp += "</td>";
-	tmp += "<td>"; tmp += razem.summa[1]; tmp += "</td>";
-	tmp += "<td>"; tmp += razem.summa[2]; tmp += "</td>";
-	tmp += "<td>"; tmp += razem.summa[3]; tmp += "</td>";
+	tmp += "<tr><th colspan=\"7\" align=\"right\">RAZEM:</th>";
+	tmp += "<th align=\"right\">"; tmp += razem.summa[0]; tmp += "</th>";
+	tmp += "<th align=\"right\">"; tmp += razem.summa[1]; tmp += "</th>";
+	tmp += "<th align=\"right\">"; tmp += razem.summa[2]; tmp += "&nbsp;</th>";
+	tmp += "<th align=\"right\">"; tmp += razem.summa[3]; tmp += "</th>";
 	tmp += "</tr>\n";
 	out.ReplaceAll("@TABSUMA@",tmp.String());
 	// podsumowanie	
