@@ -84,7 +84,7 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	box1->AddChild(usluga);
 	dodany = new BStringView(BRect(280,80,340,95), "tts0", "Dodano");
 	box1->AddChild(dodany);
-	dodany = new BStringView(BRect(350,80,420,95), "ttsd", "XX-YY-ZZZZ");
+	dodany = new BStringView(BRect(350,80,420,95), "ttsd", "");
 	box1->AddChild(dodany);
 	// box1-menu
 	BMenu *menujm = new BMenu("");
