@@ -1278,8 +1278,6 @@ void tabFaktura::RefreshTowarSymbols(void) {
 
 void tabFaktura::printCurrent(void) {
 	beFakPrint *print;
-	printf("do printing stuff\n");
-	// XXX set some defaults? msg_printconf might have been never called!
 	switch(pmode) {
 		case 2:
 			print = new printHTML(curdata->id, this->dbData, ptyp, pwide);
@@ -1290,6 +1288,5 @@ void tabFaktura::printCurrent(void) {
 			break;
 	}
 	print->Go();
-	printf("launched printing job\n");
 	delete print;
 }
