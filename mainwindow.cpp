@@ -3,7 +3,6 @@
 //	- milestone na 0.2:
 //						- layout z dividerem ustawionym na max w kolumnie
 //
-// - ramki w HTML - colspan/rowspan?
 // - dialog do wyboru symbolu przy dodawaniu do bazy towar/kontrahent z fak
 //		- pytac tylko o nowy symbol, test na obecnosc+unikalnosc nazwa+symbol
 // - dialog do edycji stawek vat
