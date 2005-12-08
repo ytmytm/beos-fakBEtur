@@ -1109,8 +1109,7 @@ void tabFaktura::RefreshIndexList(void) {
 	char *dbErrMsg;
 	sqlite_get_table(dbData, "SELECT id, nazwa FROM faktura ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
-		// XXX database is empty, do sth about it?
-		printf("database is empty\n");
+		// no entries
 	} else {
 		idlist = new int[nRows];
 		for (int i=1;i<=nRows;i++) {
