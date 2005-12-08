@@ -5,6 +5,7 @@
 #include <TextControl.h>
 #include <View.h>
 
+#include "globals.h"
 #include "dialfirma.h"
 #include <stdio.h>
 
@@ -57,14 +58,23 @@ dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
 	box2->AddChild(data[7]); box2->AddChild(data[8]);
 	box2->AddChild(data[9]); box2->AddChild(data[10]);
 	// fix widths
-	for (int i=0;i<=6;i++) {
+	// first set them to be enough
+	for (int i=0;i<=10;i++) {
 		if (i!=1)
 			data[i]->SetDivider(be_plain_font->StringWidth(data[i]->Label())+5);
 	}
-	data[0]->SetDivider(50); data[2]->SetDivider(50);
-	data[3]->SetDivider(50); data[5]->SetDivider(50);
-	data[7]->SetDivider(50); data[8]->SetDivider(50);
-	data[9]->SetDivider(50); data[10]->SetDivider(50);
+	// align in columns
+	float d;
+	d = max(data[0]->Divider(), data[2]->Divider());
+	d = max(data[3]->Divider(), d);
+	d = max(data[5]->Divider(), d);
+	data[0]->SetDivider(d); data[2]->SetDivider(d);
+	data[3]->SetDivider(d); data[5]->SetDivider(d);
+	d = max(data[7]->Divider(), data[8]->Divider());
+	d = max(data[9]->Divider(), d);
+	d = max(data[10]->Divider(), d);
+	data[7]->SetDivider(d); data[8]->SetDivider(d);
+	data[9]->SetDivider(d); data[10]->SetDivider(d);
 	// XXX end of ripped stuff
 	// buttons - OK, CANCEL
 	but_ok = new BButton(BRect(400,340,450,360), "firma_butok", "OK", new BMessage(BUT_OK));
@@ -86,11 +96,10 @@ dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i\n", nRows, nCols);
 	if (nRows < 1) {
+		// WILL NEVER HAPPEN!
 //		printf("initial\n");
-		initial = true;
 	} else {
 //		printf("not initial\n");
-		initial = false;
 		// readout data
 		i = nCols;
 		data[0]->SetText(result[i++]);
@@ -105,27 +114,17 @@ void dialFirma::commit(void) {
 	BString sql;
 	int ret;
 //printf("commit");
-	if (initial) {
-		sql = "INSERT INTO konfiguracja ( ";
-		sql += "nazwa, adres, kod, miejscowosc, telefon, email";
-		sql += ", nip, regon, bank, konto";
-		sql += ", zrobiona ) VALUES ( ";
-		sql += "%Q, %Q, %Q, %Q, %Q, %Q";
-		sql += ", %Q, %Q, %Q, %Q";
-		sql += ", 1)";
-	} else {
-		sql = "UPDATE konfiguracja SET ";
-		sql += "nazwa = %Q, adres = %Q, kod = %Q, miejscowosc = %Q, telefon = %Q, email = %Q";
-		sql += ", nip = %Q, regon = %Q, bank = %Q, konto = %Q";
-		sql += " WHERE zrobiona = 1";
-	}
-//printf("sql:[%s]\n",sql.String());
+	sql = "UPDATE konfiguracja SET ";
+	sql += "nazwa = %Q, adres = %Q, kod = %Q, miejscowosc = %Q, telefon = %Q, email = %Q";
+	sql += ", nip = %Q, regon = %Q, bank = %Q, konto = %Q";
+	sql += " WHERE zrobiona = 1";
+printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		data[0]->Text(), data[2]->Text(), data[3]->Text(),
 		data[4]->Text(), data[5]->Text(), data[6]->Text(), data[7]->Text(),
 		data[8]->Text(), data[9]->Text(), data[10]->Text()
 		);
-//printf("result: %i, %s;\n", ret, dbErrMsg);
+printf("result: %i, %s;\n", ret, dbErrMsg);
 }
 
 void dialFirma::MessageReceived(BMessage *Message) {

@@ -1,6 +1,7 @@
 
-#ifndef _SQLSCHEMA_H
-#define _SQLSCHEMA_H
+// commented-out because this can be included only once
+//#ifndef _SQLSCHEMA_H
+//#define _SQLSCHEMA_H
 
 const char *sql_schema =
 "\n"
@@ -128,16 +129,22 @@ const char *sql_schema =
 "	bank		TEXT,\n"
 "	konto		TEXT,\n"
 "--- konfiguracja wydruku\n"
-"	liczbakopii	INTEGER NOT NULL DEFAULT 1,\n"
+"	p_mode		INTEGER NOT NULL DEFAULT 2,\n"	// XXX def. HTML - change later
+"	p_typ		INTEGER NOT NULL DEFAULT 0,\n"
+"	p_writepath	TEXT DEFAULT '/boot/home/',\n"
+"	p_textcols	INTEGER NOT NULL DEFAULT 80,\n"
+"	p_texteol	INTEGER NOT NULL DEFAULT 0,\n"
+"	p_htmltemplate	TEXT DEFAULT '/boot/home/vatszablon.html',\n"
+"	p_lkopii	INTEGER NOT NULL DEFAULT 1,\n"
 "--- konfiguracja faktur\n"
-"	ostatni_nr	INTEGER,\n"
-"	num_prosta	INTEGER,\n"
+"	f_numprosta	INTEGER NOT NULL DEFAULT 0,\n"
 "--- marker\n"
+"	wersja		TEXT DEFAULT '" APP_VERSION "',\n"
 "	zrobiona	INTEGER DEFAULT 1\n"
 ");\n"
 "\n"
-"INSERT INTO konfiguracja (liczbakopii, ostatni_nr, num_prosta, zrobiona) VALUES (1,0,1,1);\n"
+"INSERT INTO konfiguracja (zrobiona) VALUES (1);\n"
 "\n"
 ;
 
-#endif
+//#endif

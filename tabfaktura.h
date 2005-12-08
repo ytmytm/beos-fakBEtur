@@ -99,11 +99,6 @@ class tabFaktura : public beFakTab {
 
 		// to control many lists
 		int lasttowarsel;
-
-		// printout settings (set with MSG_PRINTCONF)
-		int ptyp;			// 0 - orig, 1 - copy, 2 - dupl
-		int pmode;			// 0 - print_server, 1 - text, 2 - html
-		int pwide;			// for text: 0 - 80, 1 - 136
 };
 
 #endif

@@ -25,8 +25,6 @@ class dialFirma : public BWindow {
 
 		BTextControl *data[11];
 
-		bool initial;
-
 		sqlite *dbData;
 		char *dbErrMsg;
 

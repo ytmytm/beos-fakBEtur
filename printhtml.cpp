@@ -1,7 +1,4 @@
 //
-//		konfiguracja
-//		- nazwa pliku szablonu
-// TODO:
 // IDEAS:
 //
 
@@ -15,16 +12,13 @@
 #include <Path.h>
 #include <stdio.h>
 
-// XXX parametr
-#define SZABLON_PATH "/boot/home/vatszablon.html"
+printHTML::printHTML(int id, sqlite *db) : beFakPrint(id,db) {
 
-printHTML::printHTML(int id, sqlite *db, int t, int p) : beFakPrint(id,db,t,p) {
-	// parametry ignorowane
 }
 
 void printHTML::Go(void) {
 	BFile *szablon;
-	BString out, tmp;
+	BString out, tmp, tpl;
 	off_t size;
 	ssize_t l;
 	int i, r;
@@ -32,28 +26,30 @@ void printHTML::Go(void) {
 
 	// otworz plik z szablonem
 	szablon = new BFile();
-	// XXX pobrać ścieżkę do szablonu
-	r = szablon->SetTo(SZABLON_PATH, B_READ_ONLY);
+	tpl = flist->execSQL("SELECT p_htmltemplate FROM konfiguracja WHERE zrobiona = 1");
+	r = szablon->SetTo(tpl.String(), B_READ_ONLY);
 	if (r != B_OK) {
-		tmp = "Nie znaleziono pliku szablonu: "; tmp += SZABLON_PATH;
+		tmp = "Nie znaleziono pliku szablonu:\n"; tmp += tpl;
 		tmp += "\nProszę wskazać plik z szablonem eksportu do HTML.";
 		BAlert *error = new BAlert(APP_NAME, tmp.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		error->Go();
-		BEntry *ent = dialFile::OpenDialog("Wybierz plik z szablonem HTML", SZABLON_PATH);
+		BEntry *ent = dialFile::OpenDialog("Wybierz plik z szablonem HTML", tpl.String());
 		BPath path;
 		ent->GetPath(&path);
 		delete ent;
-		tmp = path.Path();
-		if (tmp.Length() == 0)
+		tpl = path.Path();
+		if (tpl.Length() == 0)
 			return;
-		// XXX zapisać nową ścieżkę do szablonu
-		szablon->SetTo(tmp.String(), B_READ_ONLY);
+		// zapisać nową ścieżkę do szablonu
+		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET p_htmltemplate = %Q WHERE zrobiona = 1", 0, 0, &dbErrMsg,
+			tpl.String());
+		szablon->SetTo(tpl.String(), B_READ_ONLY);
 	}
 	// wczytaj szablon
 	szablon->GetSize(&size);
 	buf = new char[size+1];
 	if ((l = szablon->Read((void*)buf,size)) < 0) {
-		tmp = "Błąd przy czytaniu pliku szablonu: "; tmp += SZABLON_PATH;
+		tmp = "Błąd przy czytaniu pliku szablonu: "; tmp += tpl;
 		BAlert *error = new BAlert(APP_NAME, tmp.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		error->Go();
 		return;

@@ -8,7 +8,7 @@
 
 class beFakPrint {
 	public:
-		beFakPrint(int id, sqlite *db, int t, int p);
+		beFakPrint(int id, sqlite *db);
 		// if destructor override -> call it at the end of own
 		virtual ~beFakPrint();
 		virtual void Go(void);
@@ -18,13 +18,17 @@ class beFakPrint {
 		const char *makeName(void);
 		void saveToFile(const char *name, const BString *content);
 
-		int typ;	// 0 - oryginal, 1 - kopia, 2 - duplikat
-		int param;	// dla text - 80/136
-
 	private:
 		const char *rozbij_tysiac(int val);
 
 	protected:
+		// configuration
+		int p_typ;
+		BString p_writepath;
+		int p_textcols;
+		int p_texteol;
+		BString p_htmltemplate;
+		int p_lkopii;
 		// data holders
 		fakturadat *fdata;
 		pozfaklist *flist;

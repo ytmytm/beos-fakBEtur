@@ -1006,11 +1006,6 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				}
 				break;
 			}
-		case MSG_PRINTCONF:
-			if (Message->FindInt32("_ptyp", &item) == B_OK) ptyp = item;
-			if (Message->FindInt32("_pmode", &item) == B_OK) pmode = item;
-			if (Message->FindInt32("_pwide", &item) == B_OK) pwide = item;
-			break;
 		case MSG_REQFIRMAUP:
 			RefreshFirmaSymbols();
 			break;
@@ -1278,13 +1273,15 @@ void tabFaktura::RefreshTowarSymbols(void) {
 
 void tabFaktura::printCurrent(void) {
 	beFakPrint *print;
-	switch(pmode) {
+	int p_mode = toint(execSQL("SELECT p_mode FROM konfiguracja WHERE zrobiona = 1"));
+	switch(p_mode) {
 		case 2:
-			print = new printHTML(curdata->id, this->dbData, ptyp, pwide);
+			print = new printHTML(curdata->id, this->dbData);
 			break;
 		case 1:
+		case 0:
 		default:
-			print = new printText(curdata->id, this->dbData, ptyp, pwide);
+			print = new printText(curdata->id, this->dbData);
 			break;
 	}
 	print->Go();

@@ -12,7 +12,7 @@
 
 // baseclass with stuff, inherit to print/export/whatever
 
-beFakPrint::beFakPrint(int id, sqlite *db, int t, int p) {
+beFakPrint::beFakPrint(int id, sqlite *db) {
 
 	if (id<1) {
 		printf("illegal id!\n");
@@ -21,10 +21,38 @@ beFakPrint::beFakPrint(int id, sqlite *db, int t, int p) {
 
 	dbData = db;
 	fakturaid = id;
-	typ = t;
-	param = p;
 
-	switch (typ) {
+// XXX read config from db
+	int i, j;
+	int nRows, nCols;
+	char **result;
+	BString sql;
+	sql = "SELECT p_typ, p_writepath, p_textcols";
+	sql += ", p_texteol, p_htmltemplate, p_lkopii";
+	sql += ", nazwa, adres, kod, miejscowosc, telefon, email";
+	sql += ", nip, regon, bank, konto";
+	sql += " FROM konfiguracja WHERE zrobiona = 1";
+//printf("sql:%s\n",sql.String());
+	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+//printf ("got:%ix%i\n", nRows, nCols);
+	if (nRows < 1) {
+		// XXX brak informacji o własnej firmie, co robić?
+	} else {
+		i = nCols;
+		p_typ = toint(result[i++]);
+		p_writepath = result[i++];
+		p_textcols = toint(result[i++]);
+		p_texteol = toint(result[i++]);
+		p_htmltemplate = result[i++];
+		p_lkopii = toint(result[i++]);
+		own[0] = result[i++];
+		for (j=2;j<=10;j++) {
+			own[j] = result[i++];
+		}
+	}
+	sqlite_free_table(result);
+
+	switch (p_typ) {
 		case 2:
 			typfaktury = "Duplikat";
 			break;
@@ -47,29 +75,6 @@ beFakPrint::beFakPrint(int id, sqlite *db, int t, int p) {
 	flist->fetch(fdata->id);
 	fsumma = NULL;
 
-	// XXX duplicated in dialfirma constructor!!! separate!!!
-	int i, j;
-	int nRows, nCols;
-	char **result;
-	BString sql;
-	sql = "SELECT ";
-	sql += "nazwa, adres, kod, miejscowosc, telefon, email";
-	sql += ", nip, regon, bank, konto";
-	sql += " FROM konfiguracja WHERE zrobiona = 1";
-//printf("sql:%s\n",sql.String());
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-//printf ("got:%ix%i\n", nRows, nCols);
-	if (nRows < 1) {
-		// XXX brak informacji o własnej firmie, co robić?
-	} else {
-//		printf("not initial\n");
-		// readout data
-		i = nCols;
-		own[0] = result[i++];
-		for (j=2;j<=10;j++) {
-			own[j] = result[i++];
-		}
-	}
 	// tabela pomocnicza do podsumowania
 	flist->execSQL("CREATE TEMPORARY TABLE sumawydruk ( wnetto DECIMAL(12,2), vatid INTEGER, wvat DECIMAL(12,2), wbrutto DECIMAL(12,2) )");
 
@@ -234,20 +239,23 @@ const char *beFakPrint::makeName(void) {
 }
 
 void beFakPrint::saveToFile(const char *name, const BString *content) {
-	// XXX get path part from configuration
-	BEntry *ent = dialFile::SaveDialog("Zapisz wydruk do pliku", NULL, name);
 	BPath path;
 	BString tmp;
+	tmp = flist->execSQL("SELECT p_writepath FROM konfiguracja WHERE zrobiona = 1");
+	BEntry *ent = dialFile::SaveDialog("Zapisz wydruk do pliku", tmp.String(), name);
 
 	ent->GetPath(&path);
 	delete ent;
 
 	tmp = path.Path();
 	if (tmp.Length() > 0) {
-		// XXX extract path part and put as default
 		BFile *savefile = new BFile(tmp.String(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 		savefile->Write(content->String(),content->Length());
 		savefile->Unset();
+		// put path as default writing path
+		tmp.RemoveLast(path.Leaf());
+		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET p_writepath = %Q WHERE zrobiona = 1", 0, 0, &dbErrMsg,
+			tmp.String());
 	}
 }
 

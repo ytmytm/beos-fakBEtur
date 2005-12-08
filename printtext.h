@@ -7,14 +7,14 @@
 class printText : public beFakPrint {
 
 	public:
-		printText(int id, sqlite *db, int t, int p);
+		printText(int id, sqlite *db);
 //		virtual ~beFakPrint();
 		void Go(void);
-	private:
-		bool wide;	// tryb szerokiego druku (136) vs (80) kolumn
-		int ncols;	// liczba kolumn
 
-#define ELINE	"\n"	// znak końca linii
+	private:
+		bool wide;
+		BString eol;
+#define ELINE	eol.String();
 
 	private:
 		// text formatting helpers

@@ -51,10 +51,14 @@
 			// print menus, options
 			BMenuItem *pmenuo, *pmenuc, *pmenud;
 			BMenuItem *pmenut80, *pmenut136, *pmenuhtml;
-			// print settings (send them with MSG_PRINTCONF)
-			int ptyp;			// 0 - orig, 1 - copy, 2 - dupl
-			int pmode;			// 0 - print_server, 1 - text, 2 - html
-			int pwide;			// for text: 0 - 80, 1 - 136
+			// print settings
+			int p_mode;			// 0 - print_server, 1 - text, 2 - html
+			int p_typ;			// 0 - orig, 1 - kopia, 2 - dupl
+			int p_textcols;		// 80/136
+			int p_texteol;		// 0 - CR+LF, 1 - LF, 2 - CR
+			int p_lkopii;		// liczba kopii do druku
+			// faktura settings
+			bool f_numprosta;	// true - numeracja bez miesiąca
 
 			// tabs
 			beFakTab *curTab, *tabs[3];
@@ -62,10 +66,6 @@
 			// database
 			sqlite *dbData;
 			char *dbErrMsg;
-			// configuration
-			int liczbakopii;	// # kopii do wydruku
-			int ostatni_nr;		// nr ostatniej faktury // XXX zbędne?
-			bool num_prosta;	// numeracja uproszczona - bez miesiaca - nr/rok
 	};
 
 #endif

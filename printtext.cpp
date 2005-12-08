@@ -1,8 +1,4 @@
 //
-//		konfiguracja:
-//		- liczba kolumn
-//		- znak konca linii
-// TODO:
 // IDEAS:
 //		szerokosci,parametry dla 80/136 do osobnej tabeli, indeksowac
 //
@@ -11,9 +7,20 @@
 #include "globals.h"
 #include <stdio.h>
 
-printText::printText(int id, sqlite *db, int t, int p) : beFakPrint(id,db,t,p) {
-	wide = (param == 1);
-	ncols = wide ? 136 : 80;
+printText::printText(int id, sqlite *db) : beFakPrint(id,db) {
+	wide = ( p_textcols > 80 );
+	switch ( p_texteol ) {
+		case 2:
+			eol = "\r";
+			break;
+		case 1:
+			eol = "\r\n";
+			break;
+		case 0:
+		default:
+			eol = "\n";
+			break;
+	}
 }
 
 void printText::Go(void) {
@@ -262,8 +269,8 @@ const char *printText::rightAlign(const BString line, const BString right) {
 
 	tmp = line;
 	j = line.CountChars() + right.CountChars();
-	if (j < ncols) {
-		j = ncols-j;
+	if (j < p_textcols) {
+		j = p_textcols-j;
 		while (j>0) { tmp += " "; j--; };
 	}
 	tmp += right;
@@ -275,7 +282,7 @@ const char *printText::centerAlign(const BString line) {
 	int j;
 
 	tmp = "";
-	j = ncols/2 - line.CountChars()/2;
+	j = p_textcols/2 - line.CountChars()/2;
 	while (j>0) { tmp += " "; j--; }
 	tmp += line;
 	return tmp.String();
@@ -286,7 +293,7 @@ const char *printText::halfAlign(const BString line, const BString right) {
 	int j;
 
 	tmp = line;
-	j = ncols/2 - line.CountChars();
+	j = p_textcols/2 - line.CountChars();
 	while (j>0) { tmp += " "; j--; }
 	tmp += right;
 

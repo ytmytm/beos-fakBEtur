@@ -7,7 +7,7 @@
 class printHTML : public beFakPrint {
 
 	public:
-		printHTML(int id, sqlite *db, int t, int p);
+		printHTML(int id, sqlite *db);
 //		virtual ~beFakPrint();
 		void Go(void);
 };

@@ -1,20 +1,14 @@
 //
 // TODO:
-// - befakprint/printtext/printhtml - nowe pola w konfiguracji:
-//		- tryb druku
-//		- ścieżka zapisywania plików
-//		- text: szeroki/waski
-//		- text: znak konca linii (string)
-//		- html: ścieżka do domyślnego szablonu html
 // - dialog do wyboru symbolu przy dodawaniu do bazy towar/kontrahent z fak
 //		- pytac tylko o nowy symbol, test na obecnosc+unikalnosc nazwa+symbol
 // - dialog do edycji stawek vat
 // - drukowanie przez printjob
-// - dialog konfiguracji wydruku (liczba kopii, tekst/grafika/?)
-// - usunąć duplikat execSQL()
+// - usunąć duplikat execSQL() - zrobic jakos globalnie?
 // - prawdziwe validateDate
-// - nrfaktury (ostatniej) - wyrzucić z konfiguracji? działa bez tego
-// - numeracja uproszczona - konfig/menu? uzywac? (wtedy bez miesiaca)
+// - menu do sterowania num.uproszczona, # kopii, EOL, wybór pliku szablonu
+// - numeracja uproszczona - uzywac? (wtedy bez miesiaca)
+// - liczba kopii - uzywac? (ale to u mnie, czy w print/page setup?)
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - dialog kalendarza
 // - guzik importu z innej faktury (wybór numeru z listy/ok/anuluj)
@@ -116,7 +110,7 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	initTabs(tabView);
 	tabView->Select(0);
 	curTab = tabs[0];
-	updateMenus();	// sends PRINTCONF message - initial config is passed down
+	updateMenus();
 }
 
 BeFAKMainWindow::~BeFAKMainWindow() {
@@ -153,7 +147,7 @@ void BeFAKMainWindow::DoCheckConfig(void) {
 	char **result;
 	BString sql;
 	// select NAZWA and all config data
-	sql = "SELECT nazwa, liczbakopii, ostatni_nr, num_prosta FROM konfiguracja WHERE zrobiona = 1";
+	sql = "SELECT nazwa, wersja, p_mode, p_typ, p_textcols, p_texteol, p_lkopii, f_numprosta FROM konfiguracja WHERE zrobiona = 1";
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i\n", nRows, nCols);
@@ -165,33 +159,33 @@ void BeFAKMainWindow::DoCheckConfig(void) {
 		if (sql.Length() == 0)
 			DoConfigFirma(false);
 		// read other config data from result
-		liczbakopii = toint(result[i++]);
-		ostatni_nr = toint(result[i++]);
-//		printf("ostatninr = %i\n",ostatni_nr);
-		num_prosta = toint(result[i++]);
+		if (strcmp(result[i++], APP_VERSION)) {
+			// XXX Alert ze zla wersja bazy/programu
+			printf("za stara baza\n");
+			exit(2);
+		}
+		p_mode = toint(result[i++]);
+		p_typ = toint(result[i++]);
+		p_textcols = toint(result[i++]);
+		p_texteol = toint(result[i++]);
+		p_lkopii = toint(result[i++]);
+		f_numprosta = toint(result[i++]);
 	}
-	/// XXX store these in config?
-	ptyp = 0;
-	pmode = 1;
-	pwide = 0;
 }
 
 void BeFAKMainWindow::updateMenus(void) {
-	pmenuo->SetMarked(ptyp == 0);
-	pmenuc->SetMarked(ptyp == 1);
-	pmenud->SetMarked(ptyp == 2);
-	pmenut80->SetMarked( (pmode==1) && (pwide==0) );
-	pmenut136->SetMarked( (pmode==1) && (pwide==1) );
-	pmenuhtml->SetMarked(pmode == 2);
-	BMessage *msg;
-	msg = new BMessage(MSG_PRINTCONF);
-	msg->AddInt32("_ptyp", ptyp);
-	msg->AddInt32("_pmode", pmode);
-	msg->AddInt32("_pwide", pwide);
-	if (curTab!=NULL)
-		curTab->MessageReceived(msg);
-// needed?
-	delete msg;
+	pmenuo->SetMarked(p_typ == 0);
+	pmenuc->SetMarked(p_typ == 1);
+	pmenud->SetMarked(p_typ == 2);
+	pmenut80->SetMarked( (p_mode==1) && (p_textcols==80) );
+	pmenut136->SetMarked( (p_mode==1) && (p_textcols==136) );
+	pmenuhtml->SetMarked(p_mode == 2);
+	BString sql = "UPDATE konfiguracja SET p_mode = %i, p_typ = %i, p_textcols = %i, "
+		"p_texteol = %i, p_lkopii = %i, f_numprosta = %i "
+		"WHERE zrobiona = 1";
+	sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
+		p_mode, p_typ, p_textcols, p_texteol, p_lkopii, f_numprosta);
+//printf("result:%s\n",dbErrMsg);
 }
 
 void BeFAKMainWindow::MessageReceived(BMessage *Message) {
@@ -201,29 +195,29 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 	this->DisableUpdates();
 	switch (Message->what) {
 		case MENU_PRINTO:
-			ptyp = 0;
+			p_typ = 0;
 			updateMenus();
 			break;
 		case MENU_PRINTC:
-			ptyp = 1;
+			p_typ = 1;
 			updateMenus();
 			break;
 		case MENU_PRINTD:
-			ptyp = 2;
+			p_typ = 2;
 			updateMenus();
 			break;
 		case MENU_PRINTT80:
-			pmode = 1;
-			pwide = 0;
+			p_mode = 1;
+			p_textcols = 80;
 			updateMenus();
 			break;
 		case MENU_PRINTT136:
-			pmode = 1;
-			pwide = 1;
+			p_mode = 1;
+			p_textcols = 136;
 			updateMenus();
 			break;
 		case MENU_PRINTHTML:
-			pmode = 2;
+			p_mode = 2;
 			updateMenus();
 			break;
 		case MENU_ABOUT:
@@ -295,4 +289,5 @@ void BeFAKMainWindow::CloseDatabase(void) {
 void BeFAKMainWindow::InitDatabase(void) {
 //	printf("new database, fill with schema\n");
 	sqlite_exec(dbData, sql_schema, 0, 0, &dbErrMsg);
+//printf("init result:[%s]\n", dbErrMsg);
 }
