@@ -3,7 +3,10 @@
 #define _globals_h
 	// application signature
 	#define APP_NAME "fakBEtur"
-	#define APP_VERSION "0.2"
+	// bump it on every release
+	#define APP_VERSION "0.3"
+	// sync it to sqlschema CVS revision
+	#define APP_DBVERSION "1.3"
 	#define APP_SIGNATURE "application/x-vnd.generic-fakBEtur"
 	extern int AppReturnValue;
 	// general max() function
