@@ -1,8 +1,7 @@
 
 #include "befak.h"
 #include "globals.h"
-
-#include <Application.h>
+#include "mainwindow.h"
 
 BeFAKApp::BeFAKApp() : BApplication(APP_SIGNATURE) {
 	mainWindow = new BeFAKMainWindow(APP_NAME);

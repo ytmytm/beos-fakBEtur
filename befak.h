@@ -3,7 +3,8 @@
 #define _BEFAKAPP_H
 
 #include <Application.h>
-#include "mainwindow.h"
+
+class BeFAKMainWindow;
 
 class BeFAKApp : public BApplication {
 	public:
