@@ -1,7 +1,5 @@
 //
 // TODO:
-// - dialog do wyboru symbolu przy dodawaniu do bazy towar/kontrahent z fak
-//		- pytac tylko o nowy symbol, test na obecnosc+unikalnosc nazwa+symbol
 // - dialog do edycji stawek vat
 // - drukowanie przez printjob
 // - usunąć duplikat execSQL() - zrobic jakos globalnie?
@@ -233,6 +231,14 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 		case MSG_REQTOWARUP:
 			// XXX tab 0 is faktura, make it defined constant
 			tabs[0]->MessageReceived(Message);
+			break;
+		case MSG_REQTOWARLIST:
+			// XXX tab 1 is towar, make it defined constant
+			tabs[1]->MessageReceived(Message);
+			break;
+		case MSG_REQFIRMALIST:
+			// XXX tab 2 is firma, make it defined constant
+			tabs[2]->MessageReceived(Message);
 			break;
 		default:
 			curTab = tabs[tabView->Selection()];

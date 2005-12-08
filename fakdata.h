@@ -5,7 +5,23 @@
 #include <String.h>
 #include <sqlite.h>
 
-	class firmadat {
+	class dbdat {
+		public:
+			dbdat(sqlite *db) { dbData = db; clear(); };
+			virtual ~dbdat() { };
+			virtual void dump(void) { };
+			virtual void clear(void) { id = -1; };
+			// data management
+			virtual void commit(void) { };
+			virtual void fetch(void) { };
+			// data itself
+			int id;
+		protected:
+			sqlite *dbData;
+			char *dbErrMsg;
+	};
+
+	class firmadat : public dbdat {
 		public:
 			firmadat(sqlite *db);
 			~firmadat() { };
@@ -16,17 +32,12 @@
 			void commit(void);
 			void fetch(void);
 			void del(void);
-			// data holders
-			int id;
 			// data itself
 			BString data[11];
 			bool odbiorca, dostawca, aktywny, zablokowany;
-		private:
-			sqlite *dbData;
-			char *dbErrMsg;
 	};
 
-	class towardat {
+	class towardat : public dbdat {
 		public:
 			towardat(sqlite *db);
 			~towardat() { };
@@ -37,18 +48,13 @@
 			void commit(void);
 			void fetch(void);
 			void del(void);
-			// data holders
-			int id;
 			// data itself
 			BString data[4], ceny[6], notatki, dodany;
 			bool usluga;
 			int vatid;
-		private:
-			sqlite *dbData;
-			char *dbErrMsg;
 	};
 
-	class fakturadat {
+	class fakturadat : public dbdat {
 		public:
 			fakturadat(sqlite *db);
 			~fakturadat() { };
@@ -59,16 +65,10 @@
 			void commit(void);
 			void fetch(void);
 			void del(void);
-			// data holders
-			int id;
 			// data itself
 			BString nazwa, uwagi;
 			BString ogol[10], odata[11];
 			bool zaplacono;
-		private:
-			// data itself
-			sqlite *dbData;
-			char *dbErrMsg;
 	};
 
 	class pozfakdata {

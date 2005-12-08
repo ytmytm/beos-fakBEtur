@@ -251,7 +251,7 @@ bool tabTowar::validateTab(void) {
 	tmp = data[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
 	sql = "SELECT id FROM towar WHERE nazwa = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
-	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id >0) && (i != curdata->id))) {
+	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Nazwa towaru nie jest unikalna!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		return false;
@@ -266,7 +266,7 @@ bool tabTowar::validateTab(void) {
 	tmp = data[1]->Text(); tmp.ReplaceAll("'","''");	// sql quote
 	sql = "SELECT id FROM towar WHERE symbol = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
-	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id >0) && (i != curdata->id))) {
+	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Symbol towaru nie jest unikalny!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		return false;
@@ -407,6 +407,13 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			}
 			updateTab();
 			break;
+		case MSG_REQTOWARLIST:
+			{
+				RefreshIndexList();
+				BMessage *msg = new BMessage(MSG_REQTOWARUP);
+				handler->Looper()->PostMessage(msg);
+				break;
+			}
 	}
 }
 

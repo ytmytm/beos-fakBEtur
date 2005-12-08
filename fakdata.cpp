@@ -10,9 +10,8 @@
 
 #include <stdio.h>
 
-firmadat::firmadat(sqlite *db) {
+firmadat::firmadat(sqlite *db) : dbdat(db) {
 	clear();
-	dbData = db;
 }
 
 void firmadat::dump(void) {
@@ -114,9 +113,8 @@ void firmadat::del(void) {
 
 //----------------------
 
-towardat::towardat(sqlite *db) {
+towardat::towardat(sqlite *db) : dbdat(db) {
 	clear();
-	dbData = db;
 }
 
 void towardat::dump(void) {
@@ -229,9 +227,8 @@ int toint(const char *input) {
 
 //----------------------
 
-fakturadat::fakturadat(sqlite *db) {
+fakturadat::fakturadat(sqlite *db) : dbdat(db) {
 	clear();
-	dbData = db;
 }
 
 void fakturadat::dump(void) {

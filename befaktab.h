@@ -40,7 +40,5 @@ class beFakTab {
 };
 
 #define MSG_NAMECHANGE	'BFNC'
-#define MSG_REQTOWARUP	'BFRT'
-#define MSG_REQFIRMAUP	'BFRF'
 
 #endif

@@ -176,7 +176,7 @@ bool tabFirma::validateTab(void) {
 	tmp = data[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
 	sql = "SELECT id FROM firma WHERE nazwa = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
-	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id >0) && (i != curdata->id))) {
+	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Nazwa firmy nie jest unikalna!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		return false;
@@ -191,7 +191,7 @@ bool tabFirma::validateTab(void) {
 	tmp = data[1]->Text(); tmp.ReplaceAll("'","''");	// sql quote
 	sql = "SELECT id FROM firma WHERE symbol = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
-	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id >0) && (i != curdata->id))) {
+	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Symbol kontrahenta nie jest unikalny!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		return false;
@@ -249,6 +249,13 @@ void tabFirma::MessageReceived(BMessage *Message) {
 			DoCommitCurdata();
 			curdataToTab();
 			break;
+		case MSG_REQFIRMALIST:
+			{
+				RefreshIndexList();
+				BMessage *msg = new BMessage(MSG_REQFIRMAUP);
+				handler->Looper()->PostMessage(msg);
+				break;
+			}
 		case LIST_SEL:
 		case LIST_INV:
 //			printf("list selection/invoc\n");

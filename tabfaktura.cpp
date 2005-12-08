@@ -7,17 +7,12 @@
 // wyrzucić uwagi i zastąpić całym podsumowaniem? podsumowanie na 3 karcie?
 // opcja faktury korygującej (jak? trzeba pamiętać co się zmieniło)
 //
-// validateTab:
-//	- opcja dopisania
-// validateTowar:
-//	- towar o tej nazwie już jest
-//	- opcja uaktualnienia
-//	- opcja dopisania
 
 #include "globals.h"
 #include "tabfaktura.h"
 #include "printtext.h"
 #include "printhtml.h"
+#include "dialsymbol.h"
 
 #include <Alert.h>
 #include <Box.h>
@@ -568,7 +563,7 @@ bool tabFaktura::validateTab(void) {
 	tmp = nazwa->Text(); tmp.ReplaceAll("'","''");	// sql quote
 	sql = "SELECT id FROM faktura WHERE nazwa = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
-	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id >0) && (i != curdata->id))) {
+	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Numer faktury nie jest unikalny!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		return false;
@@ -655,21 +650,24 @@ bool tabFaktura::validateTab(void) {
 		if (error->Go() == 1)
 			return false;
 	}
-	// odbiorca - nazwa niepusta
 	// nazwa - niepusta
 	if (strlen(data[0]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano nazwy kontrahenta!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		return false;
 	}
+	// nazwa - unikalna
 	tmp = data[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
 	sql = "SELECT id FROM firma WHERE nazwa = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
 	if (i == 0) {
-		// XXX dopisać? tak-> jaki jest nowy symbol (niepusty, uniq)
-		// (docelowo jeden dialog z symbolem i OK + cancel)
-		error = new BAlert(APP_NAME, "Nowy kontrahent? Należałoby spytać teraz, czy dopisać go do bazy.", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		error->Go();
+		firmadat *newfirma = new firmadat(dbData);
+		newfirma->id = -1;
+		for (i=0;i<=10;i++)
+			if (i!=1)
+				newfirma->data[i] = data[i]->Text();
+		dialSymbol *tow = new dialSymbol(dbData, false, (dbdat*)newfirma, handler);
+		tow->Show();
 	} else {
 		// taka nazwa jest w bazie...
 		// porównać dane z tym z id
@@ -738,14 +736,54 @@ bool tabFaktura::validateTowar(void) {
 		error->Go();
 		return false;
 	}
+	// pkwiu - ostrzeżenie że pusty
+	if (strlen(towar[1]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wpisano kodu PKWiU towaru.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// cena niezerowa
+	sql = "SELECT 100*0"; sql += towar[2]->Text();
+	i = toint(execSQL(sql.String()));
+	if (i == 0) {
+		error = new BAlert(APP_NAME, "Cena towaru jest równa zero.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// ilosc niezerowa
+	sql = "SELECT 100*0"; sql += towar[4]->Text();
+	i = toint(execSQL(sql.String()));
+	if (i == 0) {
+		error = new BAlert(APP_NAME, "Sprzedawana ilość towaru jest równa zero!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
+	// jm - ostrzeżenie że pusty
+	if (strlen(towar[5]->Text()) == 0) {
+		error = new BAlert(APP_NAME, "Nie wybrano jednostki miary.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (error->Go() == 1)
+			return false;
+	}
+	// stawka vat
+	if (curtowarvatid < 0) {
+		error = new BAlert(APP_NAME, "Nie wybrano stawki VAT!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		error->Go();
+		return false;
+	}
 	// nazwa - nowa w bazie?
 	tmp = towar[0]->Text(); tmp.ReplaceAll("'","''");	// sql quote
 	sql = "SELECT id FROM towar WHERE nazwa = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
 	if (i == 0) {
-		// XXX dopisać? tak-> jaki jest nowy symbol (niepusty, uniq)
-		error = new BAlert(APP_NAME, "Nowy towar? Należałoby spytać teraz, czy dopisać go do bazy.", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		error->Go();
+		towardat *newtowar = new towardat(dbData);
+		newtowar->id = -1;
+		newtowar->data[0] = towar[0]->Text();	// nazwa
+		newtowar->data[2] = towar[1]->Text();	// pkwiu
+		newtowar->data[3] = towar[5]->Text();	// jm
+		newtowar->ceny[0] = towar[2]->Text();	// cena netto
+		newtowar->vatid = curtowarvatid;		// vatid
+		dialSymbol *sym = new dialSymbol(dbData, true, (dbdat*)newtowar, handler);
+		sym->Show();
 	} else {
 		// taka nazwa jest w bazie...
 		// porównać dane z tym z id
@@ -781,40 +819,6 @@ bool tabFaktura::validateTowar(void) {
 			}
 		}
 		delete oldtowar;
-	}
-	// pkwiu - ostrzeżenie że pusty
-	if (strlen(towar[1]->Text()) == 0) {
-		error = new BAlert(APP_NAME, "Nie wpisano kodu PKWiU towaru.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
-			return false;
-	}
-	// cena niezerowa
-	sql = "SELECT 100*0"; sql += towar[2]->Text();
-	i = toint(execSQL(sql.String()));
-	if (i == 0) {
-		error = new BAlert(APP_NAME, "Cena towaru jest równa zero.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
-			return false;
-	}
-	// ilosc niezerowa
-	sql = "SELECT 100*0"; sql += towar[4]->Text();
-	i = toint(execSQL(sql.String()));
-	if (i == 0) {
-		error = new BAlert(APP_NAME, "Sprzedawana ilość towaru jest równa zero!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		error->Go();
-		return false;
-	}
-	// jm - ostrzeżenie że pusty
-	if (strlen(towar[5]->Text()) == 0) {
-		error = new BAlert(APP_NAME, "Nie wybrano jednostki miary.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
-			return false;
-	}
-	// stawka vat
-	if (curtowarvatid < 0) {
-		error = new BAlert(APP_NAME, "Nie wybrano stawki VAT!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		error->Go();
-		return false;
 	}
 	updateTab2();		// in case that data was fetched from db
 	return true;
