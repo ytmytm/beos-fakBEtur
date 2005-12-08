@@ -4,6 +4,7 @@
 
 #include <Application.h>
 
+class dialAbout;
 class BeFAKMainWindow;
 
 class BeFAKApp : public BApplication {
@@ -11,8 +12,13 @@ class BeFAKApp : public BApplication {
 		BeFAKApp();
 		~BeFAKApp();
 		virtual void ReadyToRun();
+		virtual void MessageReceived(BMessage *message);
+		virtual void AboutRequested(void);
+
 	private:
 		BeFAKMainWindow *mainWindow;
+		dialAbout *aboutDialog;
+
 };
 
 #endif

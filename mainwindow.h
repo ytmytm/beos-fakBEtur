@@ -7,7 +7,6 @@
 	#include "globals.h"
 
 	class beFakTab;
-	class dialAbout;
 	class dialFirma;
 	class BButton;
 	class BCheckBox;
@@ -46,7 +45,6 @@
 			BMenu *menu;
 			BTabView *tabView;
 			// dialogs
-			dialAbout *aboutDialog;
 			dialFirma *firmaDialog;
 			// print menus, options
 			BMenuItem *pmenuo, *pmenuc, *pmenud;

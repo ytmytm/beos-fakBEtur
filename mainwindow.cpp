@@ -20,7 +20,6 @@
 // dziedziczyć z btab?
 
 #include "mainwindow.h"
-#include "dialabout.h"
 #include "dialfirma.h"
 #include "sqlschema.h"
 #include "tabfirma.h"
@@ -69,6 +68,8 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	mainView->AddChild(menuBar);
 
 	menu = new BMenu("Plik", B_ITEMS_IN_COLUMN);
+	menu->AddItem(new BMenuItem("O programie", new BMessage(MENU_ABOUT)));
+	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Zamknij", new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
 
@@ -88,10 +89,6 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	printmenu->AddItem(pmenut80  = new BMenuItem("Tekst (80 kol.)", new BMessage(MENU_PRINTT80)));
 	printmenu->AddItem(pmenut136 = new BMenuItem("Tekst (136 kol.)", new BMessage(MENU_PRINTT136)));
 	printmenu->AddItem(pmenuhtml = new BMenuItem("HTML", new BMessage(MENU_PRINTHTML)));
-
-	menu = new BMenu("Pomoc", B_ITEMS_IN_COLUMN);
-	menu->AddItem(new BMenuItem("O programie", new BMessage(MENU_ABOUT)));
-	menuBar->AddItem(menu);
 
 	// tabview
 	r = mainView->Bounds();
@@ -121,15 +118,6 @@ void BeFAKMainWindow::initTabs(BTabView *tv) {
 	tabs[0] = new tabFaktura(tv, dbData, this);
 	tabs[1] = new tabTowar(tv, dbData, this);
 	tabs[2] = new tabFirma(tv, dbData, this);
-}
-
-void BeFAKMainWindow::DoAbout(void) {
-	aboutDialog = new dialAbout("O programie");
-	aboutDialog->SetApplicationName(APP_NAME);
-	aboutDialog->SetVersionNumber(APP_VERSION);
-	aboutDialog->SetCopyrightString(B_UTF8_COPYRIGHT"2005 by Maciej Witkowiak");
-	aboutDialog->SetText("Kontakt: <ytm@elysium.pl>\nhttp://members.elysium.pl/ytm/html\nhttp://ytm.bossstation.dnsalias.org/html/\n\nProgram powstał na konkurs zorganizowany\nprzez portal http://www.haiku-os.pl.\n\n\t\t\t\t\t\t\t:* E.");
-	aboutDialog->Show();
 }
 
 void BeFAKMainWindow::DoConfigFirma(bool cancancel) {
@@ -226,7 +214,8 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 			updateMenus();
 			break;
 		case MENU_ABOUT:
-			DoAbout();
+			// really should go with B_ABOUT_REQUESTED, but it doesn't work...
+			be_app->AboutRequested();
 			break;
 		case MENU_CONFFIRMA:
 			DoConfigFirma();
