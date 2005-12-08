@@ -139,7 +139,7 @@ const char *sql_schema =
 "--- konfiguracja faktur\n"
 "	f_numprosta	INTEGER NOT NULL DEFAULT 0,\n"
 "--- marker\n"
-"	wersja		TEXT DEFAULT '" APP_VERSION "',\n"
+"	wersja		TEXT DEFAULT '" APP_DBVERSION "',\n"
 "	zrobiona	INTEGER DEFAULT 1\n"
 ");\n"
 "\n"
