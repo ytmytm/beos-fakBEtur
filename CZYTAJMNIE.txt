@@ -1,5 +1,5 @@
 
-fakBEtur 0.2 (20051207)
+fakBEtur 0.3 (200512xx)
 (c) Maciej Witkowiak <ytm@elysium.pl>
 http://members.elysium.pl/html/beos.html
 
@@ -14,6 +14,11 @@ Programu wolno używać w dowolny sposób w celu testowania na potrzeby konkursu
 zorganizowanego przez portal http://www.haiku-os.pl/
 
 ZMIANY
+0.3
+ - zmiana formatu bazy, dodane wersjonowanie bazy - obecnie brak możliwości upgrade,
+   będzie taka możliwość w przypadku kolejnych zmian
+ - zapamiętuje ścieżki (katalog zapisu, szablon HTML)
+ - [że w menu dostępne wszystkie parametry wydruku]
 0.2
  - rezygnacja z SpLocale
  - sprawdzanie poprawności danych

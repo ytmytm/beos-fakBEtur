@@ -159,9 +159,14 @@ void BeFAKMainWindow::DoCheckConfig(void) {
 		if (sql.Length() == 0)
 			DoConfigFirma(false);
 		// read other config data from result
-		if (strcmp(result[i++], APP_VERSION)) {
-			// XXX Alert ze zla wersja bazy/programu
-			printf("za stara baza\n");
+		if (strcmp(result[i++], APP_DBVERSION)) {
+			sql = "Plik:\n"; sql += DATABASE_PATHNAME;
+			sql += "\nzawiera nieprawidłową (starszą) wersję bazy danych,\n";
+			sql += "proszę go usunąć i wprowadzić dane ponownie.\n";
+			sql += "Do czasu rozstrzygnięcia konkursu format bazy\n";
+			sql += "może jeszcze ulec zmianie!\n";
+			BAlert *error = new BAlert(APP_NAME, sql.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			error->Go();
 			exit(2);
 		}
 		p_mode = toint(result[i++]);
