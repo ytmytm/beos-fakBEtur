@@ -322,8 +322,7 @@ void tabFirma::RefreshIndexList(void) {
 	sqlQuery = "SELECT id, symbol, nazwa FROM firma ORDER BY id";
 	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
-		// XXX database is empty, do sth about it?
-		printf("database is empty\n");
+		// no entries
 	} else {
 		BString tmp;
 		idlist = new int[nRows];

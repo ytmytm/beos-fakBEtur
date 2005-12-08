@@ -1129,10 +1129,8 @@ bool tabFaktura::CommitCurtowar(void) {
 	int ret = ask->Go();
 	switch (ret) {
 		case 2:
-			// XXX po wybraniu tego pyta dwa razy!
 			return false;
 		case 1:
-//			makeNewTowar();
 			break;
 		case 0:
 		default:
@@ -1227,7 +1225,7 @@ void tabFaktura::RefreshFirmaSymbols(void) {
 
 	sqlite_get_table(dbData, "SELECT id, symbol FROM firma WHERE aktywny = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
-		// XXX Panic! empty table
+		// empty table
 	} else {
 		symbolMenuItems = new BMenuItem*[nRows];
 		symbolIds = new int[nRows];
@@ -1255,7 +1253,7 @@ void tabFaktura::RefreshTowarSymbols(void) {
 
 	sqlite_get_table(dbData, "SELECT id, symbol FROM towar ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
-		// XXX Panic! empty table
+		// empty table
 	} else {
 		tsymbolMenuItems = new BMenuItem*[nRows];
 		tsymbolIds = new int[nRows];
