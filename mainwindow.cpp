@@ -9,7 +9,6 @@
 // - liczba kopii - uzywac? (ale to u mnie, czy w print/page setup?)
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - dialog kalendarza
-// - guzik importu z innej faktury (wybór numeru z listy/ok/anuluj)
 // - DECROUND zaimplementować jako hook i userfunction, nie jako patch na sqlite
 // - dummy menu ze statystykami
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
