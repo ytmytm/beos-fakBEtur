@@ -99,7 +99,7 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db
 	this->view->AddChild(but_save);
 	this->view->AddChild(but_print);
 
-	BTabView *tbv2 = new BTabView(BRect(180,0,790,500), "tftbv2");
+	tbv2 = new BTabView(BRect(180,0,790,500), "tftbv2");
 	this->view->AddChild(tbv2);
 	r = tbv2->Bounds();
 	r.InsetBy(5,5);
@@ -557,6 +557,7 @@ bool tabFaktura::validateTab(void) {
 	if (strlen(nazwa->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano numeru faktury!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		nazwa->MakeFocus();
 		return false;
 	}
 	// numer/nazwa - unikalne
@@ -566,42 +567,50 @@ bool tabFaktura::validateTab(void) {
 	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Numer faktury nie jest unikalny!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		nazwa->MakeFocus();
 		return false;
 	}
 	// miejsce - niepuste
 	if (strlen(ogol[0]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano miejsca wystawienia faktury!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		ogol[0]->MakeFocus();
 		return false;
 	}
 	// wystawil - niepuste
 	if (strlen(ogol[1]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano wystawiającego fakturę.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			ogol[1]->MakeFocus();
 			return false;
+		}
 	}
 	// data wystawienia - niepuste
 	if (strlen(ogol[2]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano daty wystawienia faktury!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		ogol[2]->MakeFocus();
 		return false;
 	}
 	// data sprzedazy - niepuste
 	if (strlen(ogol[3]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano daty sprzedaży!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		ogol[3]->MakeFocus();
 		return false;
 	}
 	// forma platnosci - niepusta
 	if (strlen(ogol[5]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano formy płatności!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		ogol[5]->MakeFocus();
 		return false;
 	}
 	// termin zaplaty - niepusty
 	if (strlen(ogol[6]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano terminu zapłaty!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		ogol[6]->MakeFocus();
 		return false;
 	}
 	// jesli (zaplacono), to data i kwota
@@ -610,12 +619,14 @@ bool tabFaktura::validateTab(void) {
 		if (strlen(ogol[8]->Text()) == 0) {
 			error = new BAlert(APP_NAME, "Nie wpisano kwoty wykonanej płatności!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			error->Go();
+			ogol[8]->MakeFocus();
 			return false;
 		}
 		// data płatności - niepusta
 		if (strlen(ogol[9]->Text()) == 0) {
 			error = new BAlert(APP_NAME, "Nie wpisano daty wykonanej płatności!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			error->Go();
+			ogol[9]->MakeFocus();
 			return false;
 		}
 	}
@@ -623,37 +634,47 @@ bool tabFaktura::validateTab(void) {
 	if ((faklista->start == faklista->end) && (faklista->start == NULL)) {
 		error = new BAlert(APP_NAME, "Na fakturze nie ma żadnej pozycji!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		tbv2->Select(1);
 		return false;	
 	}
 	// test odbiorcy
 	// adres - wszystkie dane
 	if ((strlen(data[2]->Text())==0) || (strlen(data[3]->Text())==0) || (strlen(data[4]->Text())==0)) {
 		error = new BAlert(APP_NAME, "Adres kontrahenta jest niepełny.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			data[2]->MakeFocus();
 			return false;
+		}
 	}
 	// NIP - niepusty,poprawny
 	if (strlen(data[7]->Text())==0) {
 		error = new BAlert(APP_NAME, "Nie wpisano numeru NIP kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			data[7]->MakeFocus();
 			return false;
+		}
 	}
 	// REGON - niepusty,poprawny
 	if (strlen(data[8]->Text())==0) {
 		error = new BAlert(APP_NAME, "Nie wpisano numeru REGON kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			data[8]->MakeFocus();
 			return false;
+		}
 	}
 	// nr konta - niepusty,poprawny
 	if (strlen(data[10]->Text())==0) {
 		error = new BAlert(APP_NAME, "Nie wpisanu numeru konta kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			data[10]->MakeFocus();
 			return false;
+		}
 	}
 	// nazwa - niepusta
 	if (strlen(data[0]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano nazwy kontrahenta!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		data[0]->MakeFocus();
 		return false;
 	}
 	// nazwa - unikalna
@@ -720,6 +741,7 @@ bool tabFaktura::validateTowar(void) {
 			return true;
 		error = new BAlert(APP_NAME, "Nie wpisano nazwy towaru!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		towar[0]->MakeFocus();
 		return false;
 	}
 	// nazwa - unikalna na fakturze
@@ -739,16 +761,20 @@ bool tabFaktura::validateTowar(void) {
 	// pkwiu - ostrzeżenie że pusty
 	if (strlen(towar[1]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano kodu PKWiU towaru.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			towar[1]->MakeFocus();
 			return false;
+		}
 	}
 	// cena niezerowa
 	sql = "SELECT 100*0"; sql += towar[2]->Text();
 	i = toint(execSQL(sql.String()));
 	if (i == 0) {
 		error = new BAlert(APP_NAME, "Cena towaru jest równa zero.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			towar[2]->MakeFocus();
 			return false;
+		}
 	}
 	// ilosc niezerowa
 	sql = "SELECT 100*0"; sql += towar[4]->Text();
@@ -756,13 +782,16 @@ bool tabFaktura::validateTowar(void) {
 	if (i == 0) {
 		error = new BAlert(APP_NAME, "Sprzedawana ilość towaru jest równa zero!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		towar[4]->MakeFocus();
 		return false;
 	}
 	// jm - ostrzeżenie że pusty
 	if (strlen(towar[5]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wybrano jednostki miary.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			towar[5]->MakeFocus();
 			return false;
+		}
 	}
 	// stawka vat
 	if (curtowarvatid < 0) {
@@ -978,7 +1007,6 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				faklista->setlp();
 				RefreshTowarList();
 			}
-			towardirty = true;
 			break;
 		case PLIST_SEL:
 		case PLIST_INV:
@@ -1149,7 +1177,8 @@ bool tabFaktura::DoCommitTowardata(void) {
 
 	if (!(validateTowar()))
 		return false;
-
+	if (strlen(towar[0]->Text()) == 0)		// against adding empty after 'new'
+		return false;
 	if (towarmark < 0) {
 		// nowa pozycja
 		newdata = new pozfakdata();

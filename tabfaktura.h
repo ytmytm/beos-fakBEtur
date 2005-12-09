@@ -61,7 +61,7 @@ class tabFaktura : public beFakTab {
 
 		BView *viewogol, *viewpozy, *viewtable;
 		BTab *tabogol, *tabpozy;
-		BTabView *tv2;
+		BTabView *tbv2;
 		BBox *box1, *box2, *box3, *box4, *box5, *box6, *box7;
 
 		BButton *but_new, *but_del, *but_restore, *but_save, *but_print;

@@ -1,5 +1,7 @@
 //
 // TODO:
+// - faktura nie dopisuje do listy towaru aktualnie edytowanego (przechodzi
+//	 walidacje)
 // - dialog do edycji stawek vat
 // - drukowanie przez printjob
 // - usunąć duplikat execSQL() - zrobic jakos globalnie?

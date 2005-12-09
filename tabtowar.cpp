@@ -245,6 +245,7 @@ bool tabTowar::validateTab(void) {
 	if (strlen(data[0]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano nazwy towaru!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		data[0]->MakeFocus();
 		return false;
 	}
 	// nazwa - unikalna
@@ -254,12 +255,14 @@ bool tabTowar::validateTab(void) {
 	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Nazwa towaru nie jest unikalna!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		data[0]->MakeFocus();
 		return false;
 	}
 	// symbol - niepusty
 	if (strlen(data[1]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano symbolu towaru!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		data[1]->MakeFocus();
 		return false;
 	}
 	// symbol - unikalny
@@ -269,19 +272,24 @@ bool tabTowar::validateTab(void) {
 	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Symbol towaru nie jest unikalny!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		data[1]->MakeFocus();
 		return false;
 	}
 	// pkwiu - ostrzeżenie że pusty
 	if (strlen(data[2]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano kodu PKWiU towaru.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			data[2]->MakeFocus();
 			return false;
+		}
 	}
 	// jm - ostrzeżenie że pusty
 	if (strlen(data[3]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wybrano jednostki miary.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			data[3]->MakeFocus();
 			return false;
+		}
 	}
 	// stawka vat
 	if (curdata->vatid < 0) {
@@ -294,8 +302,10 @@ bool tabTowar::validateTab(void) {
 	i = toint(execSQL(sql.String()));
 	if (i == 0) {
 		error = new BAlert(APP_NAME, "Cena towaru jest równa zero.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			ceny[0]->MakeFocus();
 			return false;
+		}
 	}
 	return true;
 }

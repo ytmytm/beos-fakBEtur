@@ -18,6 +18,8 @@ ZMIANY
  - zmiana formatu bazy, dodane wersjonowanie bazy - obecnie brak możliwości upgrade,
    będzie taka możliwość w przypadku kolejnych zmian
  - zapamiętuje ścieżki (katalog zapisu, szablon HTML)
+ - w wypadku błędnych danych przenosi focus w miejsce błędu
+ - towary/firmy pierwszy raz występujące na fakturze dopisuje do bazy danych
  - [że w menu dostępne wszystkie parametry wydruku]
 0.2
  - rezygnacja z SpLocale

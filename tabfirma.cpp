@@ -170,6 +170,7 @@ bool tabFirma::validateTab(void) {
 	if (strlen(data[0]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano nazwy kontrahenta!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		data[0]->MakeFocus();
 		return false;
 	}
 	// nazwa - unikalna
@@ -179,12 +180,14 @@ bool tabFirma::validateTab(void) {
 	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Nazwa firmy nie jest unikalna!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		data[0]->MakeFocus();
 		return false;
 	}
 	// symbol - niepusty
 	if (strlen(data[1]->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano symbolu kontrahenta!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		data[1]->MakeFocus();
 		return false;
 	}
 	// symbol - unikalny
@@ -194,31 +197,40 @@ bool tabFirma::validateTab(void) {
 	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Symbol kontrahenta nie jest unikalny!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
+		data[1]->MakeFocus();
 		return false;
 	}
 	// adres - wszystkie dane
 	if ((strlen(data[2]->Text())==0) || (strlen(data[3]->Text())==0) || (strlen(data[4]->Text())==0)) {
 		error = new BAlert(APP_NAME, "Adres kontrahenta jest niepełny.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			data[2]->MakeFocus();
 			return false;
+		}
 	}
 	// NIP - niepusty,poprawny
 	if (strlen(data[7]->Text())==0) {
 		error = new BAlert(APP_NAME, "Nie wpisano numeru NIP kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			data[7]->MakeFocus();
 			return false;
+		}
 	}
 	// REGON - niepusty,poprawny
 	if (strlen(data[8]->Text())==0) {
 		error = new BAlert(APP_NAME, "Nie wpisano numeru REGON kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			data[8]->MakeFocus();
 			return false;
+		}
 	}
 	// nr konta - niepusty,poprawny
 	if (strlen(data[10]->Text())==0) {
 		error = new BAlert(APP_NAME, "Nie wpisanu numeru konta kontrahenta.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (error->Go() == 1)
+		if (error->Go() == 1) {
+			data[10]->MakeFocus();
 			return false;
+		}
 	}
 	return true;
 }
