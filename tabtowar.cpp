@@ -482,9 +482,7 @@ void tabTowar::RefreshIndexList(void) {
 	int nRows, nCols;
 	char **result;
 	char *dbErrMsg;
-	BString sqlQuery;
-	sqlQuery = "SELECT id, symbol, nazwa FROM towar ORDER BY id";
-	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, symbol, nazwa FROM towar ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
