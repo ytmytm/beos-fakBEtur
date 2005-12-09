@@ -1,9 +1,8 @@
 
 #include <Button.h>
 #include <String.h>
-#include <TextControl.h>
-#include <String.h>
 #include <StringView.h>
+#include <TextControl.h>
 #include <View.h>
 
 #include "globals.h"
