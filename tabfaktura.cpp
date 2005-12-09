@@ -551,8 +551,6 @@ bool tabFaktura::validateTab(void) {
 	BString sql, tmp;
 	int i;
 
-	if (!(validateTowar()))
-		return false;
 	// numer/nazwa - niepuste
 	if (strlen(nazwa->Text()) == 0) {
 		error = new BAlert(APP_NAME, "Nie wpisano numeru faktury!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -1005,6 +1003,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				faklista->remove(i);
 				makeNewTowar();
 				faklista->setlp();
+				this->dirty = true;
 				RefreshTowarList();
 			}
 			break;
@@ -1093,6 +1092,8 @@ void tabFaktura::ChangedTowarSelection(int newid) {
 void tabFaktura::DoCommitCurdata(void) {
 	if (!(validateTab()))
 		return;
+	if (!(DoCommitTowardata()))
+		return;
 	curdata->commit();
 	faklista->commit(curdata->id);
 	this->dirty = false;
@@ -1178,7 +1179,7 @@ bool tabFaktura::DoCommitTowardata(void) {
 	if (!(validateTowar()))
 		return false;
 	if (strlen(towar[0]->Text()) == 0)		// against adding empty after 'new'
-		return false;
+		return true;
 	if (towarmark < 0) {
 		// nowa pozycja
 		newdata = new pozfakdata();
