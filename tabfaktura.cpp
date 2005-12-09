@@ -12,6 +12,7 @@
 #include "tabfaktura.h"
 #include "printtext.h"
 #include "printhtml.h"
+#include "dialimport.h"
 #include "dialsymbol.h"
 
 #include <Alert.h>
@@ -939,14 +940,10 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				// this->dirty = true;
 			}
 		case BUT_PIMPORT:
-			{	// XXX present with another faktura list, select one or cancel
-				// XXX if selected - fetch pozfaklist
-				BAlert *import = new BAlert(APP_NAME, "Tutaj dialog do wyboru faktury, z której zaimportować listę towarów", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
-				import->Go();
+			{
+				dialImport *di = new dialImport(dbData, curdata->id, faklista, handler);
+				di->Show();	// go? block here? XXX lock faktura change/new/refresh?
 				break;
-				// XXX if not canceled
-				// this->dirty = true;
-				// towardirty = true;
 			}
 // from tab2
 		case DCT:
@@ -1042,6 +1039,10 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			break;
 		case MSG_REQTOWARUP:
 			RefreshTowarSymbols();
+			break;
+		case MSG_REQFAKPOZLIST:
+			RefreshTowarList();
+			this->dirty = true;
 			break;
 	}
 }

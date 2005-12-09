@@ -23,4 +23,5 @@
 	#define MSG_REQFIRMAUP		'RQFU'	// symbols in faktura
 	#define MSG_REQTOWARLIST	'RQTL'	// refresh towar list
 	#define MSG_REQFIRMALIST	'RQFL'	// refresh firma list
+	#define MSG_REQFAKPOZLIST	'RQFT'	// refresh towar list on faktura, make dirty
 #endif
