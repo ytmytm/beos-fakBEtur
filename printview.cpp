@@ -1,5 +1,7 @@
 //
 // TODO:
+//	- ustalić z podglądem ogólny wygląd strony, potem używać 'this' zamiast
+//	  drugiego, pochodnego view do wypełnienia danymi
 //	- info w dokumentacji jak zrobić embedding fontów w pdfwriterze
 //	- ustalić listę kilku fontów, które mają polskie literki - próbować po
 //		kolei, jak sprawdzać w BFont co zostało ustalone?
@@ -18,12 +20,14 @@
 #include <Window.h>
 #include <stdio.h>
 
-printView::printView(int id, sqlite *db, BMessage *pSettings) : beFakPrint(id,db) {
+printView::printView(int id, sqlite *db, BMessage *pSettings) : beFakPrint(id,db),
+	 BView(BRect(0,0,100,100), "printView", B_FOLLOW_ALL, B_WILL_DRAW) {
 	status_t result;
 printf("printjob for [%s]\n", fdata->nazwa.String());
 	printJob = new BPrintJob(fdata->nazwa.String());
 	printJob->SetSettings(new BMessage(*pSettings));
-	result = printJob->ConfigJob();
+// dla przyspieszenia preview, potem wlaczyc!!!
+//XXX	result = printJob->ConfigJob();
 	// XXX return, ale jak błąd zgłosić? geterror lub sth?
 	if (result != B_OK)
 		return;
@@ -46,18 +50,28 @@ void printView::Go(void) {
 	// - przygotowac okno
 	// - w oknie view do rysowania, tam w Draw() wszystko wyrysowac
 	// - wyswietlic
-	BWindow *pWindow = new BWindow(pageRect, "Podgląd wydruku", B_TITLED_WINDOW, 0);
+	BRect r = pageRect;
+	r.OffsetBy(20,20);
+	pWindow = new BWindow(r, "Podgląd wydruku", B_TITLED_WINDOW, 0);
 	printViewView *pView = new printViewView(pageRect, "pView");
 	pWindow->AddChild(pView);
+//	pWindow->AddChild(this);
+//	MoveTo(pageRect.LeftTop());
+//	ResizeTo(pageRect.Width(),pageRect.Height());
 	pWindow->Show();
-//	return;
+	return;	// XXX removeme!
 	printJob->BeginJob();
 	// for all pages...
 	printJob->DrawView(pView,BRect(pageRect),BPoint(0.0,0.0));	// cala strona, od (0,0)
 	printJob->SpoolPage();
 	printJob->CommitJob();
-//	if (pWindow->Lock())
+}
+
+printView::~printView() {
+//	if (pWindow->Lock()) {
+////		RemoveSelf();
 //		pWindow->Quit();
+//	}
 }
 
 printViewView::printViewView(BRect frame, const char *name)
