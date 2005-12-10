@@ -12,7 +12,10 @@
 beFakTab::beFakTab(BTabView *tv, sqlite *db, BHandler *hr) {
 
 	dbData = db;
-	handler = hr;	
+	handler = hr;
+
+	if (tv == NULL)
+		return;
 
 	BRect r;
 
