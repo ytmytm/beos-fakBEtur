@@ -20,6 +20,8 @@ ZMIANY
  - zapamiętuje ścieżki (katalog zapisu, szablon HTML)
  - w wypadku błędnych danych przenosi focus w miejsce błędu
  - towary/firmy pierwszy raz występujące na fakturze dopisuje do bazy danych
+ - możliwość edycji stawek podatku
+ - możliwość importu listy towarów z innego dokumentu
  - [że w menu dostępne wszystkie parametry wydruku]
 0.2
  - rezygnacja z SpLocale
@@ -32,12 +34,11 @@ ZMIANY
 0.1
  - pierwsza publiczna wersja
 
-NOTATKI DO WERSJI 0.2
+NOTATKI DO WERSJI 0.3
 Program nie potrafi samodzielnie drukować, jest możliwy jedynie eksport do pliku tekstowego
-(80/136 kolumn) lub HTML. Nazwa pliku generowana jest z nazwy faktury.
-Ścieżki do plików i niektóre parametry są ustalone na stałe.
-Nie działają żadne skróty klawiaturowe, nie ma kalendarza do wyboru daty, nie ma statystyk,
-nie ma kilku istotnych okien dialogowych.
+(80/136 kolumn) lub HTML.
+Ścieżka do pliku bazy i niektóre parametry wydruku są ustalone na stałe.
+Nie działają żadne skróty klawiaturowe, nie ma kalendarza do wyboru daty, nie ma statystyk.
 
 
 
@@ -45,13 +46,14 @@ WYMAGANIA
 Program wymaga skonfigurowania BeOSa do obsługi polskiego układu klawiatury oraz
 instalacji czcionek z polskimi znakami.
 Do eksportu HTML niezbędny jest szablon, przykładowy szablon został dołączony do
-programu. Należy go umieścić w katalogu domowym
+programu. Można go umieścić w dowolnej lokalizacji.
 
 
 
 INSTALACJA
 Program można rozpakować gdziekolwiek, do eksportu w HTML niezbędny jest szablon.
-Szablon należy umieścić w pliku: /boot/home/vatszablon.html
+Szablon należy umieścić domyślnie w pliku: /boot/home/vatszablon.html, jeśli go nie będzie,
+program poprosi o wskazanie szablonu. Jego lokalizacja zostanie zapamiętana.
 
 
 
@@ -89,7 +91,6 @@ faktur.
 Pole 'Zablokowany' blokuje możliwość edycji danych kontrahenta.
 
 c) FAKTURY
-NALEŻY wypełnić pole "Nr faktury"!
 W polach 'Płatność' można wpisać datę płatności lub liczbę dni od daty sprzedaży, w drugim
 przypadku data zostanie uaktualniona automatycznie.
 Przy dodawaniu/edycji pozycji należy zawsze kliknąć 'Zapisz' (w ramce pozycji faktury)
