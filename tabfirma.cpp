@@ -120,7 +120,8 @@ tabFirma::tabFirma(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 }
 
 tabFirma::~tabFirma() {
-
+	delete curdata;
+	delete [] idlist;
 }
 
 void tabFirma::curdataFromTab(void) {
