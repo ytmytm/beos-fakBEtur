@@ -236,7 +236,7 @@ void tabFaktura::initTab1(void) {
 	box4->AddChild(data[9]); box4->AddChild(data[10]);
 	// firma-symbole
 	menusymbol = new BPopUpMenu("[wybierz]");
-	symbolRows = 0;
+	symbolRows = 0; symbolIds = NULL;
 	RefreshFirmaSymbols();
 	BMenuField *menusymbolField = new BMenuField(BRect(280,15,420,35), "tfmsymbol", "Symbol", menusymbol);
 	menusymbolField->SetDivider(be_plain_font->StringWidth(menusymbolField->Label())+15);
@@ -308,14 +308,14 @@ void tabFaktura::initTab2(void) {
 	box6->AddChild(towar[4]); box6->AddChild(towar[5]);
 	// towar-symbole
 	tmenusymbol = new BPopUpMenu("[wybierz]");
-	tsymbolRows = 0;
+	tsymbolRows = 0; tsymbolIds = NULL;
 	RefreshTowarSymbols();
 	BMenuField *tmenusymbolField = new BMenuField(BRect(200,15,300,35), "tfmtsymbol", "Symb.", tmenusymbol);
 	tmenusymbolField->SetDivider(be_plain_font->StringWidth(tmenusymbolField->Label())+15);
 	box6->AddChild(tmenusymbolField);
 	// vat-symbole
 	menuvat = new BPopUpMenu("[wybierz]");
-	vatRows = 0;
+	vatRows = 0; vatIds = NULL;
 	RefreshVatSymbols();
 	BMenuField *menuvatField = new BMenuField(BRect(470,15,555,35), "tfmv", "VAT", menuvat);
 	menuvatField->SetDivider(be_plain_font->StringWidth(menuvatField->Label())+15);
@@ -1239,6 +1239,8 @@ void tabFaktura::RefreshFirmaSymbols(void) {
 		delete menusymbol->RemoveItem(i--);
 	}
 
+	delete [] symbolIds;
+
 	int nRows, nCols;
 	char **result;
 	BMessage *msg;
@@ -1267,6 +1269,8 @@ void tabFaktura::RefreshTowarSymbols(void) {
 		delete tmenusymbol->RemoveItem(i--);
 	}
 
+	delete [] tsymbolIds;
+
 	int nRows, nCols;
 	char **result;
 	BMessage *msg;
@@ -1294,6 +1298,8 @@ void tabFaktura::RefreshVatSymbols(void) {
 	while (i>=0) {
 		delete menuvat->RemoveItem(i--);
 	}
+
+	delete vatIds;
 
 	int nRows, nCols;
 	char **result;

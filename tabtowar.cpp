@@ -126,7 +126,7 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	box2->AddChild(brutto);
 	// box2-menu
 	menuvat = new BPopUpMenu("[wybierz]");
-	vatRows = 0;
+	vatRows = 0; vatIds = NULL;
 	RefreshVatSymbols();
 	BMenuField *menuvatField = new BMenuField(BRect(200,15,330,35), "ttmv", "VAT", menuvat);
 	menuvatField->SetDivider(be_plain_font->StringWidth(menuvatField->Label())+15);
@@ -490,6 +490,8 @@ void tabTowar::RefreshVatSymbols(void) {
 	while (i>=0) {
 		delete menuvat->RemoveItem(i--);
 	}
+
+	delete vatIds;
 
 	int nRows, nCols;
 	char **result;
