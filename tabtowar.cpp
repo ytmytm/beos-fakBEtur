@@ -182,7 +182,9 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 }
 
 tabTowar::~tabTowar() {
-
+	delete curdata;
+	delete [] idlist;
+	delete [] vatIds;
 }
 
 void tabTowar::curdataFromTab(void) {
