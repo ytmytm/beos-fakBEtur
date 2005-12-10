@@ -25,4 +25,6 @@
 	#define MSG_REQFIRMALIST	'RQFL'	// refresh firma list
 	#define MSG_REQFAKPOZLIST	'RQFT'	// refresh towar list on faktura, make dirty
 	#define MSG_REQVATUP		'RQVU'	// refresh vat menu - faktura, towar
+	#define MENU_PAGESETUP		'MPRS'	// in faktura - call printsetup
+	#define MENU_PRINTPAGE		'MPRP'	// by faktura's button only?
 #endif

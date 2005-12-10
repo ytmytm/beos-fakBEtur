@@ -59,6 +59,7 @@ class tabFaktura : public beFakTab {
 		void RefreshTowarSymbols(void);
 		void RefreshFirmaSymbols(void);
 		void RefreshVatSymbols(void);
+		status_t PageSetup(const char *docname);
 
 		BView *viewogol, *viewpozy, *viewtable;
 		BTab *tabogol, *tabpozy;
@@ -100,6 +101,8 @@ class tabFaktura : public beFakTab {
 
 		// to control many lists
 		int lasttowarsel;
+		// printing
+		BMessage *printSettings;	// z pagesetup
 };
 
 #endif

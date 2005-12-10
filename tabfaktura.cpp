@@ -12,6 +12,7 @@
 #include "tabfaktura.h"
 #include "printtext.h"
 #include "printhtml.h"
+#include "printview.h"
 #include "dialimport.h"
 #include "dialsymbol.h"
 
@@ -24,6 +25,7 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <PrintJob.h>
 #include <ScrollView.h>
 #include <StringView.h>
 #include <TabView.h>
@@ -67,6 +69,7 @@ const int plistw[] = { 20, 90, 60, 40, 20, 50, 70, 70, 30, 60, 100, -1 };
 tabFaktura::tabFaktura(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr) {
 
 	idlist = NULL;
+	printSettings = NULL;
 	curdata = new fakturadat(db);
 	odbiorca = new firmadat(db);
 	curtowar = new towardat(db);
@@ -867,7 +870,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			curdataFromTab();
 			DoCommitCurdata();
 			curdataToTab();
-			printCurrent();
+			printCurrent();	// XXX check if data was commited, id>0 etc
 			break;
 		case LIST_SEL:
 		case LIST_INV:
@@ -1029,6 +1032,9 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 		case MSG_REQFAKPOZLIST:
 			RefreshTowarList();
 			this->dirty = true;
+			break;
+		case MENU_PAGESETUP:
+			PageSetup(nazwa->Text());
 			break;
 	}
 }
@@ -1324,6 +1330,8 @@ void tabFaktura::RefreshVatSymbols(void) {
 }
 
 void tabFaktura::printCurrent(void) {
+	if (curdata->id<0)
+		return;
 	beFakPrint *print;
 	int p_mode = toint(execSQL("SELECT p_mode FROM konfiguracja WHERE zrobiona = 1"));
 	switch(p_mode) {
@@ -1333,9 +1341,36 @@ void tabFaktura::printCurrent(void) {
 		case 1:
 		case 0:
 		default:
-			print = new printText(curdata->id, this->dbData);
-			break;
+			{
+//				print = new printText(curdata->id, this->dbData);
+				if (printSettings == NULL)
+					if (PageSetup(nazwa->Text()) != B_OK)
+						return;
+				print = new printView(curdata->id, this->dbData, printSettings);
+				break;
+			}
 	}
 	print->Go();
 	delete print;
+}
+
+status_t tabFaktura::PageSetup(const char *documentname) {
+printf("in pagesetup\n");
+printf("with [%s]\n",documentname);
+	status_t result = B_OK;
+
+	BPrintJob printJob(documentname);
+
+	if (printSettings != NULL)
+		printJob.SetSettings(new BMessage(*printSettings));
+
+	result = printJob.ConfigPage();
+
+	if (result == B_NO_ERROR) {
+		delete printSettings;
+		printSettings = printJob.Settings();
+		// XXX need to safe those settings somewhere....
+	}
+
+	return result;
 }

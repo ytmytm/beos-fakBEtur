@@ -69,6 +69,7 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	menu = new BMenu("Plik", B_ITEMS_IN_COLUMN);
 	menu->AddItem(new BMenuItem("O programie", new BMessage(MENU_ABOUT)));
 	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem("Ustawienia strony", new BMessage(MENU_PAGESETUP)));
 	menu->AddItem(new BMenuItem("Zamknij", new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
 
@@ -226,6 +227,7 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 				this->SetTitle(title.String());
 			}
 			break;
+		case MENU_PAGESETUP:
 		case MSG_REQFIRMAUP:
 		case MSG_REQTOWARUP:
 			tabs[FAKTURATAB]->MessageReceived(Message);
