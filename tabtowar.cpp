@@ -126,26 +126,8 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	box2->AddChild(brutto);
 	// box2-menu
 	menuvat = new BPopUpMenu("[wybierz]");
-	int nRows, nCols;
-	char **result;
-	BString sqlQuery;
-	sqlQuery = "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id";
-	sqlite_get_table(dbData, sqlQuery.String(), &result, &nRows, &nCols, &dbErrMsg);
-	if (nRows < 1) {
-		// XXX Panic! empty vat table
-	} else {
-		vatMenuItems = new BMenuItem*[nRows];
-		vatIds = new int[nRows];
-		vatRows = nRows;
-		for (int i=1;i<=nRows;i++) {
-			msg = new BMessage(MENUVAT);
-			msg->AddInt32("_vatid", toint(result[i*nCols+0]));
-			vatIds[i-1] = toint(result[i*nCols+0]);
-			vatMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
-			menuvat->AddItem(vatMenuItems[i-1]);
-		}
-	}
-	sqlite_free_table(result);
+	vatRows = 0;
+	RefreshVatSymbols();
 	BMenuField *menuvatField = new BMenuField(BRect(200,15,330,35), "ttmv", "VAT", menuvat);
 	menuvatField->SetDivider(be_plain_font->StringWidth(menuvatField->Label())+15);
 	box2->AddChild(menuvatField);
@@ -419,6 +401,9 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			}
 			updateTab();
 			break;
+		case MSG_REQVATUP:
+			RefreshVatSymbols();
+			break;
 		case MSG_REQTOWARLIST:
 			{
 				RefreshIndexList();
@@ -495,6 +480,34 @@ void tabTowar::RefreshIndexList(void) {
 			tmp = result[i*nCols+1];
 			tmp << ", " << result[i*nCols+2];
 			list->AddItem(new BStringItem(tmp.String()));
+		}
+	}
+	sqlite_free_table(result);
+}
+
+void tabTowar::RefreshVatSymbols(void) {
+	int i = vatRows;
+	while (i>=0) {
+		delete menuvat->RemoveItem(i--);
+	}
+
+	int nRows, nCols;
+	char **result;
+	BMessage *msg;
+
+	sqlite_get_table(dbData, "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows < 1) {
+		// XXX Panic! empty vat table
+	} else {
+		vatMenuItems = new BMenuItem*[nRows];
+		vatIds = new int[nRows];
+		vatRows = nRows;
+		for (int i=1;i<=nRows;i++) {
+			msg = new BMessage(MENUVAT);
+			msg->AddInt32("_vatid", toint(result[i*nCols+0]));
+			vatIds[i-1] = toint(result[i*nCols+0]);
+			vatMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
+			menuvat->AddItem(vatMenuItems[i-1]);
 		}
 	}
 	sqlite_free_table(result);

@@ -40,6 +40,8 @@ class tabTowar : public beFakTab {
 		bool validateTab(void);
 
 	private:
+		void RefreshVatSymbols(void);
+
 		BButton *but_new, *but_del, *but_restore, *but_save;
 		BButton *but_sell, *but_marza, *but_import;
 		BListView *list;

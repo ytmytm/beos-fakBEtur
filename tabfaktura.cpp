@@ -313,27 +313,10 @@ void tabFaktura::initTab2(void) {
 	BMenuField *tmenusymbolField = new BMenuField(BRect(200,15,300,35), "tfmtsymbol", "Symb.", tmenusymbol);
 	tmenusymbolField->SetDivider(be_plain_font->StringWidth(tmenusymbolField->Label())+15);
 	box6->AddChild(tmenusymbolField);
-	// vat-menu
+	// vat-symbole
 	menuvat = new BPopUpMenu("[wybierz]");
-	int nRows, nCols;
-	char **result;
-
-	sqlite_get_table(dbData, "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
-	if (nRows < 1) {
-		// XXX Panic! empty vat table
-	} else {
-		vatMenuItems = new BMenuItem*[nRows];
-		vatIds = new int[nRows];
-		vatRows = nRows;
-		for (int i=1;i<=nRows;i++) {
-			msg = new BMessage(MENUVAT);
-			msg->AddInt32("_vatid", toint(result[i*nCols+0]));
-			vatIds[i-1] = toint(result[i*nCols+0]);
-			vatMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
-			menuvat->AddItem(vatMenuItems[i-1]);
-		}
-	}
-	sqlite_free_table(result);
+	vatRows = 0;
+	RefreshVatSymbols();
 	BMenuField *menuvatField = new BMenuField(BRect(470,15,555,35), "tfmv", "VAT", menuvat);
 	menuvatField->SetDivider(be_plain_font->StringWidth(menuvatField->Label())+15);
 	box6->AddChild(menuvatField);
@@ -1034,6 +1017,9 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				}
 				break;
 			}
+		case MSG_REQVATUP:
+			RefreshVatSymbols();
+			break;
 		case MSG_REQFIRMAUP:
 			RefreshFirmaSymbols();
 			break;
@@ -1298,6 +1284,34 @@ void tabFaktura::RefreshTowarSymbols(void) {
 			tsymbolIds[i-1] = toint(result[i*nCols+0]);
 			tsymbolMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
 			tmenusymbol->AddItem(tsymbolMenuItems[i-1]);
+		}
+	}
+	sqlite_free_table(result);
+}
+
+void tabFaktura::RefreshVatSymbols(void) {
+	int i = vatRows;
+	while (i>=0) {
+		delete menuvat->RemoveItem(i--);
+	}
+
+	int nRows, nCols;
+	char **result;
+	BMessage *msg;
+
+	sqlite_get_table(dbData, "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows < 1) {
+		// XXX Panic! empty vat table
+	} else {
+		vatMenuItems = new BMenuItem*[nRows];
+		vatIds = new int[nRows];
+		vatRows = nRows;
+		for (int i=1;i<=nRows;i++) {
+			msg = new BMessage(MENUVAT);
+			msg->AddInt32("_vatid", toint(result[i*nCols+0]));
+			vatIds[i-1] = toint(result[i*nCols+0]);
+			vatMenuItems[i-1] = new BMenuItem(result[i*nCols+1], msg);
+			menuvat->AddItem(vatMenuItems[i-1]);
 		}
 	}
 	sqlite_free_table(result);
