@@ -8,6 +8,7 @@
 
 	class beFakTab;
 	class dialFirma;
+	class dialVat;
 	class BButton;
 	class BCheckBox;
 	class BListView;
@@ -46,6 +47,7 @@
 			BTabView *tabView;
 			// dialogs
 			dialFirma *firmaDialog;
+			dialVat *vatDialog;
 			// print menus, options
 			BMenuItem *pmenuo, *pmenuc, *pmenud;
 			BMenuItem *pmenut80, *pmenut136, *pmenuhtml;

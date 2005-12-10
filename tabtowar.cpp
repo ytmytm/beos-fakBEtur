@@ -491,7 +491,7 @@ void tabTowar::RefreshVatSymbols(void) {
 		delete menuvat->RemoveItem(i--);
 	}
 
-	delete vatIds;
+	delete [] vatIds;
 
 	int nRows, nCols;
 	char **result;

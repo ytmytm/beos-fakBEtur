@@ -1,6 +1,5 @@
 //
 // TODO:
-// - dialog do edycji stawek vat
 // - drukowanie przez printjob
 // - usunąć duplikat execSQL() - zrobic jakos globalnie?
 // - prawdziwe validateDate
@@ -18,6 +17,7 @@
 
 #include "mainwindow.h"
 #include "dialfirma.h"
+#include "dialvat.h"
 #include "sqlschema.h"
 #include "tabfirma.h"
 #include "tabtowar.h"
@@ -43,6 +43,8 @@ const uint32 MENU_PRINTT80	= 'MPT8';
 const uint32 MENU_PRINTT136 = 'MPT1';
 const uint32 MENU_PRINTHTML = 'MPHT';
 const uint32 MENU_ABOUT		= 'MABO';
+
+enum { FAKTURATAB = 0, TOWARTAB, FIRMATAB };
 
 BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	BRect(100, 100, 900, 700), windowTitle, B_DOCUMENT_WINDOW, B_OUTLINE_RESIZE, B_CURRENT_WORKSPACE ) {
@@ -102,8 +104,8 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	DoCheckConfig();
 	// initialize datawidgets
 	initTabs(tabView);
-	tabView->Select(0);
-	curTab = tabs[0];
+	curTab = tabs[FAKTURATAB];
+	tabView->Select(FAKTURATAB);
 	updateMenus();
 }
 
@@ -112,9 +114,9 @@ BeFAKMainWindow::~BeFAKMainWindow() {
 }
 
 void BeFAKMainWindow::initTabs(BTabView *tv) {
-	tabs[0] = new tabFaktura(tv, dbData, this);
-	tabs[1] = new tabTowar(tv, dbData, this);
-	tabs[2] = new tabFirma(tv, dbData, this);
+	tabs[FAKTURATAB] = new tabFaktura(tv, dbData, this);
+	tabs[TOWARTAB] = new tabTowar(tv, dbData, this);
+	tabs[FIRMATAB] = new tabFirma(tv, dbData, this);
 }
 
 void BeFAKMainWindow::DoConfigFirma(bool cancancel) {
@@ -122,9 +124,7 @@ void BeFAKMainWindow::DoConfigFirma(bool cancancel) {
 }
 
 void BeFAKMainWindow::DoConfigVAT(void) {
-	// XXX a new db dialog here
-	BAlert *vatalert = new BAlert(APP_NAME, "Tutaj dialog do edycji stawek VAT", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
-	vatalert->Go();
+	vatDialog = new dialVat(dbData, this);
 }
 
 void BeFAKMainWindow::DoCheckConfig(void) {
@@ -228,16 +228,17 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 			break;
 		case MSG_REQFIRMAUP:
 		case MSG_REQTOWARUP:
-			// XXX tab 0 is faktura, make it defined constant
-			tabs[0]->MessageReceived(Message);
+			tabs[FAKTURATAB]->MessageReceived(Message);
 			break;
 		case MSG_REQTOWARLIST:
-			// XXX tab 1 is towar, make it defined constant
-			tabs[1]->MessageReceived(Message);
+			tabs[TOWARTAB]->MessageReceived(Message);
 			break;
 		case MSG_REQFIRMALIST:
-			// XXX tab 2 is firma, make it defined constant
-			tabs[2]->MessageReceived(Message);
+			tabs[FIRMATAB]->MessageReceived(Message);
+			break;
+		case MSG_REQVATUP:
+			tabs[FAKTURATAB]->MessageReceived(Message);
+			tabs[TOWARTAB]->MessageReceived(Message);
 			break;
 		default:
 			curTab = tabs[tabView->Selection()];
