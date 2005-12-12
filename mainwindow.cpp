@@ -11,6 +11,7 @@
 // - dialog kalendarza
 // - DECROUND zaimplementować jako hook i userfunction, nie jako patch na sqlite
 // - dummy menu ze statystykami
+//		np. sprzedaży netto: select nazwa, decround(sum(decround(decround(netto*(100-rabat)/100.0)*ilosc))) as suma from pozycjafakt group by nazwa order by suma desc;
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 // - na koniec - usunac printfy z debugiem
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
