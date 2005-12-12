@@ -22,7 +22,7 @@
 
 printView::printView(int id, sqlite *db, BMessage *pSettings) : beFakPrint(id,db),
 	 BView(BRect(0,0,100,100), "printView", B_FOLLOW_ALL, B_WILL_DRAW) {
-	status_t result;
+	status_t result = B_OK;
 printf("printjob for [%s]\n", fdata->nazwa.String());
 	printJob = new BPrintJob(fdata->nazwa.String());
 	printJob->SetSettings(new BMessage(*pSettings));
@@ -53,42 +53,99 @@ void printView::Go(void) {
 	BRect r = pageRect;
 	r.OffsetBy(20,20);
 	pWindow = new BWindow(r, "Podgląd wydruku", B_TITLED_WINDOW, 0);
-	printViewView *pView = new printViewView(pageRect, "pView");
-	pWindow->AddChild(pView);
-//	pWindow->AddChild(this);
-//	MoveTo(pageRect.LeftTop());
-//	ResizeTo(pageRect.Width(),pageRect.Height());
+	pWindow->AddChild(this);
+	MoveTo(pageRect.LeftTop());
+	ResizeTo(pageRect.Width(),pageRect.Height());
 	pWindow->Show();
 	return;	// XXX removeme!
 	printJob->BeginJob();
 	// for all pages...
-	printJob->DrawView(pView,BRect(pageRect),BPoint(0.0,0.0));	// cala strona, od (0,0)
+	printJob->DrawView(this,BRect(pageRect),BPoint(0.0,0.0));	// cala strona, od (0,0)
 	printJob->SpoolPage();
 	printJob->CommitJob();
 }
 
 printView::~printView() {
-//	if (pWindow->Lock()) {
-////		RemoveSelf();
-//		pWindow->Quit();
-//	}
+	if (pWindow->Lock()) {
+		RemoveSelf();
+		pWindow->Quit();
+	}
 }
 
-printViewView::printViewView(BRect frame, const char *name)
-		: BView(frame, name, B_FOLLOW_ALL, B_WILL_DRAW) {	
-}
+#define LEFT	(pageRect.left+10)
+#define TOP		(pageRect.top+font.Size()+10)
+#define ELINE	(cur.y+font.Size()+5)
+#define ELINEB	(cur.y+fontb.Size()+5)
 
-void printViewView::Draw(BRect pageRect) {
+void printView::Draw(BRect pageRect) {
 	printf("rect:[%f,%f,%f,%f]\n",pageRect.left,pageRect.top,pageRect.right,pageRect.bottom);
 
+	// fonty: font - do napisów zywkłych, fontb - tytuły
 	BFont font(be_plain_font);
 	font.SetFamilyAndStyle("Verdana","Regular");
 	font.SetFlags(B_DISABLE_ANTIALIASING);
 	BFont fontb(be_bold_font);
 	fontb.SetFamilyAndStyle("Arial","Bold");
 	fontb.SetFlags(B_DISABLE_ANTIALIASING);
-
-	font.SetSize(14.0);
+	font.SetSize(12.0);
+	fontb.SetSize(12.0);
+	// line1 - nazwa sprzedawcy, miejsce wyst,datawyst
+	// header
+	BString tmp;
+	BPoint cur;
+	// miejsce, data
+	SetFont(&font);
+	tmp = fdata->ogol[0]; tmp += ", "; tmp += fdata->ogol[2];
+	cur = PenLocation();
+	MovePenTo(pageRect.right-font.StringWidth(tmp.String())-10, TOP);
+	DrawStr(tmp);
+	// nazwasprzedawcy
 	SetFont(&fontb);
-	DrawString("[ąćęłńóśżź ĄĆĘŁŃÓŚŻŹ] ZUPA!", BPoint(10.0,50.0));
+	tmp = own[0];
+	cur = PenLocation(); MovePenTo(LEFT, TOP);
+	DrawStr(tmp);
+	// dane sprzedawcy: kod miejsce, adres
+	SetFont(&font);
+	tmp = own[3]; tmp += " "; tmp += own[4]; tmp += ", "; tmp += own[2];
+	cur = PenLocation(); MovePenTo(LEFT, ELINE);
+	DrawStr(tmp);
+	// telefon, email
+	tmp = "tel. "; tmp += own[5]; tmp += ", "; tmp += own[6];
+	cur = PenLocation(); MovePenTo(LEFT, ELINE);
+	DrawStr(tmp);
+	// bank, konto
+	tmp = own[9]; tmp += " "; tmp += own[10];
+	cur = PenLocation(); MovePenTo(LEFT, ELINE);
+	DrawStr(tmp);
+	// regon, nip
+	tmp = "";
+	if (own[8].Length()>0) { tmp += "REGON: "; tmp += own[8].String(); }
+	if (own[7].Length()>0) { if (tmp.Length()>0) tmp += ", ";
+		tmp += "NIP: ", tmp += own[7];
+	}
+	if (tmp.Length()>0) {
+		cur = PenLocation(); MovePenTo(LEFT,ELINE); DrawStr(tmp);
+	}
+	// tytuł dokumentu
+	fontb.SetSize(20.0);
+	SetFont(&fontb);
+	cur = PenLocation();
+	tmp = "Faktura VAT nr "; tmp += fdata->nazwa;
+	cur.x = pageRect.left+(pageRect.Width() - fontb.StringWidth(tmp.String())) / 2;
+	cur.y += fontb.Size()+fontb.Size()+10;
+	MovePenTo(cur);
+	DrawStr(tmp);
+	// rodzaj dokumentu
+	fontb.SetSize(18.0);
+	SetFont(&fontb);
+	cur = PenLocation();
+	tmp = typfaktury;
+	cur.x = pageRect.left+(pageRect.Width() - fontb.StringWidth(tmp.String())) / 2;
+	cur.y += fontb.Size()+10;
+	MovePenTo(cur);
+	DrawStr(tmp);
+}
+
+void printView::DrawStr(const BString str) {
+	DrawString(str.String());
 }
