@@ -55,7 +55,7 @@ void printView::Go(void) {
 	MoveTo(pageRect.LeftTop());
 	ResizeTo(pageRect.Width(),pageRect.Height());
 	pWindow->Show();
-//	return;	// XXX removeme!
+	return;	// XXX removeme!
 	printJob->BeginJob();
 	// for all pages...
 	printJob->DrawView(this,BRect(pageRect),BPoint(0.0,0.0));	// cala strona, od (0,0)
@@ -180,6 +180,37 @@ void printView::Draw(BRect pageRect) {
 		DrawStr(tmp);
 	}
 	// sposob zaplaty, data zaplaty, termin zaplaty, srodek transportu
+	cur = PenLocation();
+	cur.y = ELINE; cur.y = ELINE;
+	tmp = "Sposób zapłaty: ";
+	cur.x = pageRect.left+(pageRect.Width()/4)-font.StringWidth(tmp.String());
+	MovePenTo(cur);
+	DrawStr(tmp);
+	tmp = fdata->ogol[5];
+	DrawStr(tmp);
+	tmp = "Termin zapłaty: ";
+	cur.x = pageRect.left+(3*pageRect.Width()/4)-font.StringWidth(tmp.String());
+	MovePenTo(cur);
+	DrawStr(tmp);
+	SetFont(&fontb);
+	tmp = fdata->ogol[6];
+	DrawStr(tmp);
+	SetFont(&font);
+	cur.y = ELINE;
+	tmp = "Data sprzedaży: ";
+	cur.x = pageRect.left+(pageRect.Width()/4)-font.StringWidth(tmp.String());
+	MovePenTo(cur);
+	DrawStr(tmp);
+	tmp = fdata->ogol[3];
+	DrawStr(tmp);
+	if (fdata->ogol[4].Length()>0) {
+		tmp = "Środek transportu: ";
+		cur.x = pageRect.left+(3*pageRect.Width()/4)-font.StringWidth(tmp.String());
+		MovePenTo(cur);
+		DrawStr(tmp);
+		tmp = fdata->ogol[4];
+		DrawStr(tmp);
+	}
 	// tabela header
 	// tabela
 	// tabela podsumowanie
