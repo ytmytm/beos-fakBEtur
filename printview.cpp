@@ -131,19 +131,63 @@ void printView::Draw(BRect pageRect) {
 	SetFont(&fontb);
 	cur = PenLocation();
 	tmp = "Faktura VAT nr "; tmp += fdata->nazwa;
-	cur.x = pageRect.left+(pageRect.Width() - fontb.StringWidth(tmp.String())) / 2;
+	cur.x = pageRect.left+(pageRect.Width()-fontb.StringWidth(tmp.String()))/2;
 	cur.y += fontb.Size()+fontb.Size()+10;
 	MovePenTo(cur);
 	DrawStr(tmp);
 	// rodzaj dokumentu
-	fontb.SetSize(18.0);
-	SetFont(&fontb);
 	cur = PenLocation();
 	tmp = typfaktury;
-	cur.x = pageRect.left+(pageRect.Width() - fontb.StringWidth(tmp.String())) / 2;
-	cur.y += fontb.Size()+10;
+	cur.y += fontb.Size()+5;
+	fontb.SetSize(18.0);
+	SetFont(&fontb);
+	cur.x = pageRect.left+(pageRect.Width()-fontb.StringWidth(tmp.String()))/2;
 	MovePenTo(cur);
 	DrawStr(tmp);
+	// nabywca...
+	tmp = "Nabywca: ";
+	cur = PenLocation();
+	cur.y += fontb.Size() + fontb.Size();
+	font.SetSize(12.0);
+	SetFont(&font);
+	cur.x = pageRect.left+(pageRect.Width()/3)-font.StringWidth(tmp.String());
+	MovePenTo(cur);
+	DrawStr(tmp);
+	fontb.SetSize(12.0);
+	SetFont(&fontb);
+	DrawStr(fdata->odata[0]);
+	SetFont(&font);
+	tmp = "Adres: ";
+	cur = PenLocation();
+	cur.x = pageRect.left+(pageRect.Width()/3)-font.StringWidth(tmp.String());
+	cur.y = ELINE;
+	MovePenTo(cur);
+	DrawStr(tmp);
+	cur = PenLocation();
+	tmp = fdata->odata[2]; tmp += ", "; tmp += fdata->odata[3]; tmp += " "; tmp += fdata->odata[4];
+	DrawStr(tmp);
+	cur.y = ELINE;
+	tmp = "tel. "; tmp += fdata->odata[5]; tmp += ", "; tmp += fdata->odata[6];
+	MovePenTo(cur);
+	DrawStr(tmp);
+	cur.y = ELINE;
+	tmp = "";
+	if (fdata->odata[8].Length()>0) { tmp += "REGON: "; tmp += fdata->odata[8]; }
+	if (fdata->odata[7].Length()>0) { if (tmp.Length()>0) tmp += ", ";
+		tmp += "NIP: "; tmp += fdata->odata[7];
+	}
+	if (tmp.Length()>0) {
+		MovePenTo(cur);
+		DrawStr(tmp);
+	}
+	// sposob zaplaty, data zaplaty, termin zaplaty, srodek transportu
+	// tabela header
+	// tabela
+	// tabela podsumowanie
+	// do zaplaty
+	// do zaplaty slownie
+	// wystawil [wystawil] odebral
+	// --------            -------
 }
 
 void printView::DrawStr(const BString str) {
