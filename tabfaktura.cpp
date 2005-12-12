@@ -1351,7 +1351,7 @@ void tabFaktura::printCurrent(void) {
 			}
 	}
 	print->Go();
-	delete print;
+//	delete print;	XXX Go will not return until printed, remove this later
 }
 
 status_t tabFaktura::PageSetup(const char *documentname) {
