@@ -1,6 +1,7 @@
 //
 // TODO:
 // - drukowanie przez printjob
+// - BUG: nie mozna zmienic symbolu towaru/kontrah - 'nie jest unikalny'...
 // - usunąć duplikat execSQL() - zrobic jakos globalnie?
 // - prawdziwe validateDate
 // - menu do sterowania num.uproszczona, # kopii, EOL, wybór pliku szablonu
