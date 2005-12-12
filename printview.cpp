@@ -1,7 +1,5 @@
 //
 // TODO:
-//	- ustalić z podglądem ogólny wygląd strony, potem używać 'this' zamiast
-//	  drugiego, pochodnego view do wypełnienia danymi
 //	- info w dokumentacji jak zrobić embedding fontów w pdfwriterze
 //	- ustalić listę kilku fontów, które mają polskie literki - próbować po
 //		kolei, jak sprawdzać w BFont co zostało ustalone?
@@ -57,7 +55,7 @@ void printView::Go(void) {
 	MoveTo(pageRect.LeftTop());
 	ResizeTo(pageRect.Width(),pageRect.Height());
 	pWindow->Show();
-	return;	// XXX removeme!
+//	return;	// XXX removeme!
 	printJob->BeginJob();
 	// for all pages...
 	printJob->DrawView(this,BRect(pageRect),BPoint(0.0,0.0));	// cala strona, od (0,0)
@@ -166,6 +164,7 @@ void printView::Draw(BRect pageRect) {
 	cur = PenLocation();
 	tmp = fdata->odata[2]; tmp += ", "; tmp += fdata->odata[3]; tmp += " "; tmp += fdata->odata[4];
 	DrawStr(tmp);
+	cur.x = pageRect.left+(pageRect.Width()/3);
 	cur.y = ELINE;
 	tmp = "tel. "; tmp += fdata->odata[5]; tmp += ", "; tmp += fdata->odata[6];
 	MovePenTo(cur);
