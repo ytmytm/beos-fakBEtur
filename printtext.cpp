@@ -1,4 +1,6 @@
 //
+// TODO:
+//		usunąć niepotrzebne .String()?
 // IDEAS:
 //		szerokosci,parametry dla 80/136 do osobnej tabeli, indeksowac
 //
@@ -42,7 +44,7 @@ void printText::Go(void) {
 	line += own[6].String(); line += ELINE;
 	out += line;
 	//[4] banksprz kontosprz
-	line = own[9].String(), line += " "; line += own[10].String(); line += ELINE;
+	line = own[9].String(); line += " "; line += own[10].String(); line += ELINE;
 	out += line;
 	//[5] [REGON: XXX][ NIP XXX]
 	line = "";
