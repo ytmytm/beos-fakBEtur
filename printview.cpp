@@ -85,8 +85,8 @@ void printView::Draw(BRect pageRect) {
 	BFont fontb(be_bold_font);
 	fontb.SetFamilyAndStyle("Arial","Bold");
 	fontb.SetFlags(B_DISABLE_ANTIALIASING);
-	font.SetSize(12.0);
-	fontb.SetSize(12.0);
+	font.SetSize(10.0);
+	fontb.SetSize(10.0);
 	// line1 - nazwa sprzedawcy, miejsce wyst,datawyst
 	// header
 	BString tmp;
@@ -125,7 +125,7 @@ void printView::Draw(BRect pageRect) {
 		cur = PenLocation(); MovePenTo(LEFT,ELINE); DrawStr(tmp);
 	}
 	// tytuł dokumentu
-	fontb.SetSize(20.0);
+	fontb.SetSize(18.0);
 	SetFont(&fontb);
 	cur = PenLocation();
 	tmp = "Faktura VAT nr "; tmp += fdata->nazwa;
@@ -137,7 +137,7 @@ void printView::Draw(BRect pageRect) {
 	cur = PenLocation();
 	tmp = typfaktury;
 	cur.y += fontb.Size()+5;
-	fontb.SetSize(18.0);
+	fontb.SetSize(16.0);
 	SetFont(&fontb);
 	cur.x = pageRect.left+(pageRect.Width()-fontb.StringWidth(tmp.String()))/2;
 	MovePenTo(cur);
@@ -146,12 +146,12 @@ void printView::Draw(BRect pageRect) {
 	tmp = "Nabywca: ";
 	cur = PenLocation();
 	cur.y += fontb.Size() + fontb.Size();
-	font.SetSize(12.0);
+	font.SetSize(10.0);
 	SetFont(&font);
 	cur.x = pageRect.left+(pageRect.Width()/3)-font.StringWidth(tmp.String());
 	MovePenTo(cur);
 	DrawStr(tmp);
-	fontb.SetSize(12.0);
+	fontb.SetSize(10.0);
 	SetFont(&fontb);
 	DrawStr(fdata->odata[0]);
 	SetFont(&font);
@@ -197,7 +197,7 @@ void printView::Draw(BRect pageRect) {
 	DrawStr(tmp);
 	SetFont(&font);
 	cur.y = ELINE;
-	tmp = "Data sprzedaży: ";
+	tmp = "Data sprzedazy: ";	/// 'ż'!
 	cur.x = pageRect.left+(pageRect.Width()/4)-font.StringWidth(tmp.String());
 	MovePenTo(cur);
 	DrawStr(tmp);
@@ -218,6 +218,27 @@ void printView::Draw(BRect pageRect) {
 	// do zaplaty slownie
 	// wystawil [wystawil] odebral
 	// --------            -------
+	font.SetSize(10.0);
+	SetFont(&font);
+	tmp = "wystawił: ";
+	cur.x = pageRect.left + 1*(pageRect.Width()/8) - font.StringWidth(tmp.String());
+	cur.y = pageRect.bottom - 5 * font.Size();
+	MovePenTo(cur);
+	DrawStr(tmp);
+	cur = PenLocation();
+	tmp = fdata->ogol[1];
+	DrawStr(tmp);
+	cur = PenLocation();
+	cur.x = pageRect.left + 1*(pageRect.Width()/8);
+	StrokeLine(BPoint(cur.x,cur.y+5),BPoint(cur.x+pageRect.Width()/4, cur.y+5));
+	tmp = "odebrał: ";
+	cur.x = pageRect.left + 5*(pageRect.Width()/8) - font.StringWidth(tmp.String());
+	cur.y = pageRect.bottom - 5 * font.Size();
+	MovePenTo(cur);
+	DrawStr(tmp);
+	cur = PenLocation();
+	cur.x = pageRect.left + 5*(pageRect.Width()/8);
+	StrokeLine(BPoint(cur.x,cur.y+5),BPoint(cur.x+pageRect.Width()/4, cur.y+5));
 }
 
 void printView::DrawStr(const BString str) {
