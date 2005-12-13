@@ -549,7 +549,7 @@ bool tabFaktura::validateTab(void) {
 	tmp = nazwa->Text(); tmp.ReplaceAll("'","''");	// sql quote
 	sql = "SELECT id FROM faktura WHERE nazwa = '"; sql += tmp; sql += "'";
 	i = toint(execSQL(sql.String()));
-	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != curdata->id))) {
+	if (((curdata->id < 0) && ( i!= 0 )) || ((curdata->id > 0) && (i != 0) && (i != curdata->id))) {
 		error = new BAlert(APP_NAME, "Numer faktury nie jest unikalny!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		error->Go();
 		nazwa->MakeFocus();

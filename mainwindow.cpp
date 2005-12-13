@@ -1,6 +1,6 @@
 //
 // TODO:
-// - BUG: nie mozna zmienic symbolu towaru/kontrah - 'nie jest unikalny'...
+// - printview - lepiej generowane szerokosci do tabelki
 // - usunąć duplikat execSQL() - zrobic jakos globalnie?
 // - prawdziwe validateDate
 // - menu do sterowania num.uproszczona, # kopii, EOL, wybór pliku szablonu
