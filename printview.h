@@ -17,8 +17,12 @@ class printView : public beFakPrint, public BView {
 		virtual ~printView();
 		void Go(void);
 		virtual void Draw(BRect updateRect);
-		void DrawStr(const BString str);
 	private:
+		void DrawStr(const BString str);
+		void DrawStrCenter(const BString str, float l, float r);
+		void DrawStrRight(const BString str, float r);
+		void DrawStrLeft(const BString str, float l);
+
 		BWindow	*pWindow;
 		BPrintJob *printJob;
 };

@@ -1,6 +1,5 @@
 //
 // TODO:
-// - drukowanie przez printjob
 // - BUG: nie mozna zmienic symbolu towaru/kontrah - 'nie jest unikalny'...
 // - usunąć duplikat execSQL() - zrobic jakos globalnie?
 // - prawdziwe validateDate
@@ -41,6 +40,7 @@ const uint32 MENU_PRINTC	= 'MPKO';
 const uint32 MENU_PRINTD	= 'MPKD';
 const uint32 MENU_CONFFIRMA	= 'MKOF';
 const uint32 MENU_CONFVAT	= 'MKOV';
+const uint32 MENU_PRINTPS	= 'MPPS';
 const uint32 MENU_PRINTT80	= 'MPT8';
 const uint32 MENU_PRINTT136 = 'MPT1';
 const uint32 MENU_PRINTHTML = 'MPHT';
@@ -88,6 +88,7 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	menu->AddItem(new BMenuItem("Stawki VAT", new BMessage(MENU_CONFVAT)));
 	menuBar->AddItem(menu);
 
+	printmenu->AddItem(pmenups   = new BMenuItem("Drukarka", new BMessage(MENU_PRINTPS)));
 	printmenu->AddItem(pmenut80  = new BMenuItem("Tekst (80 kol.)", new BMessage(MENU_PRINTT80)));
 	printmenu->AddItem(pmenut136 = new BMenuItem("Tekst (136 kol.)", new BMessage(MENU_PRINTT136)));
 	printmenu->AddItem(pmenuhtml = new BMenuItem("HTML", new BMessage(MENU_PRINTHTML)));
@@ -170,6 +171,7 @@ void BeFAKMainWindow::updateMenus(void) {
 	pmenuo->SetMarked(p_typ == 0);
 	pmenuc->SetMarked(p_typ == 1);
 	pmenud->SetMarked(p_typ == 2);
+	pmenups->SetMarked(p_mode == 0);
 	pmenut80->SetMarked( (p_mode==1) && (p_textcols==80) );
 	pmenut136->SetMarked( (p_mode==1) && (p_textcols==136) );
 	pmenuhtml->SetMarked(p_mode == 2);
@@ -197,6 +199,10 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 			break;
 		case MENU_PRINTD:
 			p_typ = 2;
+			updateMenus();
+			break;
+		case MENU_PRINTPS:
+			p_mode = 0;
 			updateMenus();
 			break;
 		case MENU_PRINTT80:

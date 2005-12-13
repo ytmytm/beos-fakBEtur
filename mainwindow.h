@@ -50,7 +50,7 @@
 			dialVat *vatDialog;
 			// print menus, options
 			BMenuItem *pmenuo, *pmenuc, *pmenud;
-			BMenuItem *pmenut80, *pmenut136, *pmenuhtml;
+			BMenuItem *pmenups, *pmenut80, *pmenut136, *pmenuhtml;
 			// print settings
 			int p_mode;			// 0 - print_server, 1 - text, 2 - html
 			int p_typ;			// 0 - orig, 1 - kopia, 2 - dupl

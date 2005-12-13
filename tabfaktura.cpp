@@ -1339,11 +1339,11 @@ void tabFaktura::printCurrent(void) {
 			print = new printHTML(curdata->id, this->dbData);
 			break;
 		case 1:
+			print = new printText(curdata->id, this->dbData);
+			break;
 		case 0:
 		default:
-			{
-//				print = new printText(curdata->id, this->dbData);
-				if (printSettings == NULL)
+			{	if (printSettings == NULL)
 					if (PageSetup(nazwa->Text()) != B_OK)
 						return;
 				print = new printView(curdata->id, this->dbData, printSettings);
@@ -1351,12 +1351,10 @@ void tabFaktura::printCurrent(void) {
 			}
 	}
 	print->Go();
-//	delete print;	XXX Go will not return until printed, remove this later
+	delete print;
 }
 
 status_t tabFaktura::PageSetup(const char *documentname) {
-printf("in pagesetup\n");
-printf("with [%s]\n",documentname);
 	status_t result = B_OK;
 
 	BPrintJob printJob(documentname);
@@ -1369,7 +1367,6 @@ printf("with [%s]\n",documentname);
 	if (result == B_NO_ERROR) {
 		delete printSettings;
 		printSettings = printJob.Settings();
-		// XXX need to safe those settings somewhere....
 	}
 
 	return result;
