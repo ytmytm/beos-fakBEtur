@@ -1,18 +1,33 @@
 //
 // TODO:
-// - printview - lepiej generowane szerokosci do tabelki
-// - usunąć duplikat execSQL() - zrobic jakos globalnie?
 // - prawdziwe validateDate
-// - menu do sterowania num.uproszczona, # kopii, EOL, wybór pliku szablonu
-// - numeracja uproszczona - uzywac? (wtedy bez miesiaca)
-// - liczba kopii - uzywac? (ale to u mnie, czy w print/page setup?)
+//		- akceptuj yyyy/mm/dd, yyyy-mm-dd, dd-mm-yyyy, dd/mm/yyyy
+//			- zamiana '/' na '-' i dalej
+//		- uzupełniaj yyyy-mm do pierwszego dnia miesiąca
+//		- uzupełniaj yyyy do pierwszego dnia roku
+//		- na wyjściu standard: yyyy-mm-dd
+//		- jeśli nic nie pasuje, to dać datę dzisiejszą
+// - nowy dialog do konfiguracji wydruku:
+//		- rodzaj wydruku: kopia/oryginał/duplikat/oryignał+kopia
+//		- liczba kopii
+//		- system wydruku: print_server/txt/html
+//		- txt: liczba kolumn
+//		- txt: znak końca linii
+// - parametry wydruku przetwarzać w tabfaktura, każdy obiekt print używać raz
+//		- przy zapisie do pliku dołączać typ dokumentu i numer kopii do nazwy
+// - menu do sterowania num.uproszczona
+//	 - numeracja uproszczona - uzywac? (wtedy bez miesiaca)
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - dialog kalendarza
-// - DECROUND zaimplementować jako hook i userfunction, nie jako patch na sqlite
 // - dummy menu ze statystykami
 //		np. sprzedaży netto: select nazwa, decround(sum(decround(decround(netto*(100-rabat)/100.0)*ilosc))) as suma from pozycjafakt group by nazwa order by suma desc;
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
+//		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
+//		- podsumowanie zliczać dynamicznie (nie trzeba wtedy uaktualniać stanu
+//		  przy zmianie faktury)
+// - usunąć duplikat execSQL() - zrobic jakos globalnie?
 // - na koniec - usunac printfy z debugiem
+//
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
 
