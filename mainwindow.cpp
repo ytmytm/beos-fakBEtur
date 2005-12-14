@@ -1,12 +1,6 @@
 //
 // TODO:
-// - prawdziwe validateDate
-//		- akceptuj yyyy/mm/dd, yyyy-mm-dd, dd-mm-yyyy, dd/mm/yyyy
-//			- zamiana '/' na '-' i dalej
-//		- uzupełniaj yyyy-mm do pierwszego dnia miesiąca
-//		- uzupełniaj yyyy do pierwszego dnia roku
-//		- na wyjściu standard: yyyy-mm-dd
-//		- jeśli nic nie pasuje, to dać datę dzisiejszą
+// - konfiguracja: czy ostrzegać o wszystkich błędach?
 // - nowy dialog do konfiguracji wydruku:
 //		- rodzaj wydruku: kopia/oryginał/duplikat/oryignał+kopia
 //		- liczba kopii

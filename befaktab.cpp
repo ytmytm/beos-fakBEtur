@@ -64,11 +64,19 @@ const char *beFakTab::validateDecimal(const char *input) {
 }
 
 const char *beFakTab::validateDate(const char *input) {
-	static BString res;
-	/// XXX implement!
-	/// check for 'YYYY-MM-DD', if missing put '01' or '01-01'
-	res = input;
-	return res.String();
+	static BString tmp;
+	BString sql;
+
+	tmp = input;
+	tmp.ReplaceAll("/","-");
+
+	sql = "SELECT DATE('"; sql += tmp; sql += "')";
+	tmp = execSQL(sql.String());
+	if (tmp.Length()==0) {
+		sql = "SELECT DATE('now')";
+		tmp = execSQL(sql.String());
+	}
+	return tmp.String();
 }
 
 // if returns false -> cancel action and resume editing current data
