@@ -138,6 +138,7 @@ const char *sql_schema =
 "	p_lkopii	INTEGER NOT NULL DEFAULT 1,\n"
 "--- konfiguracja faktur\n"
 "	f_numprosta	INTEGER NOT NULL DEFAULT 0,\n"
+"	paydays		INTEGER NUT NULL DEFAULT 30,\n"
 "--- marker\n"
 "	wersja		TEXT DEFAULT '" APP_DBVERSION "',\n"
 "	zrobiona	INTEGER DEFAULT 1\n"

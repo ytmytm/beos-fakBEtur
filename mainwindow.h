@@ -9,6 +9,7 @@
 	class beFakTab;
 	class dialFirma;
 	class dialVat;
+	class dialNumber;
 	class BButton;
 	class BCheckBox;
 	class BListView;
@@ -30,6 +31,10 @@
 			void DoAbout(void);
 			void DoConfigFirma(bool cancancel = true);
 			void DoConfigVAT(void);
+			void DoConfigCopies(void);
+			void DoConfigCopiesAfter(BMessage *msg);
+			void DoConfigPayday(void);
+			void DoConfigPaydayAfter(BMessage *msg);
 			void DoCheckConfig(void);
 		private:
 			// database handlers
@@ -48,15 +53,15 @@
 			// dialogs
 			dialFirma *firmaDialog;
 			dialVat *vatDialog;
+			dialNumber *numDialog;
 			// print menus, options
-			BMenuItem *pmenuo, *pmenuc, *pmenud;
+			BMenuItem *pmenuo, *pmenuc, *pmenud, *pmenue;
 			BMenuItem *pmenups, *pmenut80, *pmenut136, *pmenuhtml;
 			// print settings
 			int p_mode;			// 0 - print_server, 1 - text, 2 - html
-			int p_typ;			// 0 - orig, 1 - kopia, 2 - dupl
+			int p_typ;			// 0 - orig, 1 - kopie, 2 - dupl, 3 - or+kopie
 			int p_textcols;		// 80/136
 			int p_texteol;		// 0 - CR+LF, 1 - LF, 2 - CR
-			int p_lkopii;		// liczba kopii do druku
 			// faktura settings
 			bool f_numprosta;	// true - numeracja bez miesiąca
 

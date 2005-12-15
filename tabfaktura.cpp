@@ -180,7 +180,7 @@ void tabFaktura::initTab1(void) {
 	// box2-stuff
 	ogol[5] = new BTextControl(BRect(10,10,150,30), "tfd5", "Forma", NULL, new BMessage(DC));
 	ogol[6] = new BTextControl(BRect(10,40,150,60), "tfd6", "Termin", NULL, new BMessage(DC));
-	ogol[7] = new BTextControl(BRect(200,40,270,60), "tfd7", "Dni", "30", new BMessage(TERMCHANGE));
+	ogol[7] = new BTextControl(BRect(200,40,270,60), "tfd7", "Dni", NULL, new BMessage(TERMCHANGE));
 	box2->AddChild(ogol[5]);
 	box2->AddChild(ogol[6]);
 	box2->AddChild(ogol[7]);
@@ -470,8 +470,8 @@ void tabFaktura::makeNewForm(void) {
 	tmp = execSQL("SELECT DATE('now')");
 	curdata->ogol[2] = tmp;
 	curdata->ogol[3] = tmp;
-	// data płatności = dziś+30
-	curdata->ogol[7] = "30";
+	// data płatności = dziś+paydays
+	curdata->ogol[7] = execSQL("SELECT paydays FROM konfiguracja WHERE zrobiona = 1");
 	updateTermin();
 	curdata->ogol[6] = ogol[6]->Text();
 	// 
@@ -1328,7 +1328,7 @@ void tabFaktura::RefreshVatSymbols(void) {
 	}
 	sqlite_free_table(result);
 }
-
+// XXX rewrite so oryginał+kopia and p_lkopii is honored
 void tabFaktura::printCurrent(void) {
 	if (curdata->id<0)
 		return;

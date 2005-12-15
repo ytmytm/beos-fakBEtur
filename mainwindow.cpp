@@ -1,24 +1,28 @@
 //
 // TODO:
-// - konfiguracja: czy ostrzegać o wszystkich błędach?
-// - nowy dialog do konfiguracji wydruku:
-//		- rodzaj wydruku: kopia/oryginał/duplikat/oryignał+kopia
-//		- liczba kopii
-//		- system wydruku: print_server/txt/html
-//		- txt: liczba kolumn
+// - konfiguracja:
+//		- czy ostrzegać o wszystkich błędach?
+//		- czy używać numeracji uproszczonej (bez miesiąca: nr kolejny/rok)
 //		- txt: znak końca linii
-// - parametry wydruku przetwarzać w tabfaktura, każdy obiekt print używać raz
+// - przy wydruku (tabfaktura) honorować:
+//		- liczba kopii
+//		- złożenie oryginał+faktura
+// - parametry wydruku przetwarzać w tabfaktura, każdy obiekt print użyć raz
 //		- przy zapisie do pliku dołączać typ dokumentu i numer kopii do nazwy
-// - menu do sterowania num.uproszczona
-//	 - numeracja uproszczona - uzywac? (wtedy bez miesiaca)
-// - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - dialog kalendarza
-// - dummy menu ze statystykami
-//		np. sprzedaży netto: select nazwa, decround(sum(decround(decround(netto*(100-rabat)/100.0)*ilosc))) as suma from pozycjafakt group by nazwa order by suma desc;
+// - menu ze statystykami
+//		- sprzedaży netto: select nazwa, decround(sum(decround(decround(netto*(100-rabat)/100.0)*ilosc))) as suma from pozycjafakt group by nazwa order by suma desc;
+//			- dodać wybór miesiąca
+//		- niezapłacone faktury
+//		- przeterminowane płatności
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
+//			- dodać pole 'magazyn' i 'datamagazyn' do db
 //		- podsumowanie zliczać dynamicznie (nie trzeba wtedy uaktualniać stanu
 //		  przy zmianie faktury)
+//		- nie robić w/w dla tych, które są 'usługa'
+// - wydruk - cennik
+// - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - usunąć duplikat execSQL() - zrobic jakos globalnie?
 // - na koniec - usunac printfy z debugiem
 //
@@ -28,6 +32,7 @@
 #include "mainwindow.h"
 #include "dialfirma.h"
 #include "dialvat.h"
+#include "dialnumber.h"
 #include "sqlschema.h"
 #include "tabfirma.h"
 #include "tabtowar.h"
@@ -47,6 +52,7 @@
 const uint32 MENU_PRINTO	= 'MPOR';
 const uint32 MENU_PRINTC	= 'MPKO';
 const uint32 MENU_PRINTD	= 'MPKD';
+const uint32 MENU_PRINTE	= 'MPKE';
 const uint32 MENU_CONFFIRMA	= 'MKOF';
 const uint32 MENU_CONFVAT	= 'MKOV';
 const uint32 MENU_PRINTPS	= 'MPPS';
@@ -54,6 +60,11 @@ const uint32 MENU_PRINTT80	= 'MPT8';
 const uint32 MENU_PRINTT136 = 'MPT1';
 const uint32 MENU_PRINTHTML = 'MPHT';
 const uint32 MENU_ABOUT		= 'MABO';
+const uint32 MENU_PAYDAY	= 'MPAY';
+const uint32 MENU_NUMCOPY	= 'MNCO';
+
+const uint32 MSG_NUMCOPY	= 'mNCO';
+const uint32 MSG_PAYDAY		= 'mPAY';
 
 enum { FAKTURATAB = 0, TOWARTAB, FIRMATAB };
 
@@ -88,13 +99,17 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	menu->AddItem(pmenuo = new BMenuItem("Oryginał", new BMessage(MENU_PRINTO)));
 	menu->AddItem(pmenuc = new BMenuItem("Kopia", new BMessage(MENU_PRINTC)));
 	menu->AddItem(pmenud = new BMenuItem("Duplikat", new BMessage(MENU_PRINTD)));
+	menu->AddItem(pmenue = new BMenuItem("Oryginał+kopie", new BMessage(MENU_PRINTE)));
 	menuBar->AddItem(menu);
 
 	menu = new BMenu("Opcje", B_ITEMS_IN_COLUMN);
 	menu->AddItem(new BMenuItem("Dane firmy", new BMessage(MENU_CONFFIRMA)));
+	menu->AddItem(new BMenuItem("Stawki VAT", new BMessage(MENU_CONFVAT)));
+	menu->AddItem(new BMenuItem("Termin płatności", new BMessage(MENU_PAYDAY)));
+	menu->AddSeparatorItem();
 	BMenu *printmenu = new BMenu("Rodzaj wydruku", B_ITEMS_IN_COLUMN);
 	menu->AddItem(printmenu);
-	menu->AddItem(new BMenuItem("Stawki VAT", new BMessage(MENU_CONFVAT)));
+	menu->AddItem(new BMenuItem("Liczba kopii", new BMessage(MENU_NUMCOPY)));
 	menuBar->AddItem(menu);
 
 	printmenu->AddItem(pmenups   = new BMenuItem("Drukarka", new BMessage(MENU_PRINTPS)));
@@ -140,12 +155,48 @@ void BeFAKMainWindow::DoConfigVAT(void) {
 	vatDialog = new dialVat(dbData, this);
 }
 
+void BeFAKMainWindow::DoConfigCopies(void) {
+	BString def;
+	def = tabs[FAKTURATAB]->execSQL("SELECT p_lkopii FROM konfiguracja WHERE zrobiona = 1");
+	numDialog = new dialNumber("Liczba drukowanych kopii", "Liczba kopii", def.String(), MSG_NUMCOPY, this);
+}
+
+void BeFAKMainWindow::DoConfigCopiesAfter(BMessage *msg) {
+	const char *tmp;
+	BString sql;
+	int p_lkopii = 0;
+	if (msg->FindString("_value", &tmp) == B_OK) {
+		sql = "SELECT ABS('0"; sql += tmp; sql += "')";
+		p_lkopii = toint(tabs[FAKTURATAB]->execSQL(sql.String()));
+		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET p_lkopii = %i WHERE zrobiona = 1", 0, 0, &dbErrMsg,
+			p_lkopii);
+	}
+}
+
+void BeFAKMainWindow::DoConfigPayday(void) {
+	BString def;
+	def = tabs[FAKTURATAB]->execSQL("SELECT paydays FROM konfiguracja WHERE zrobiona = 1");
+	numDialog = new dialNumber("Domyślny termin płatności", "Liczba dni", def.String(), MSG_PAYDAY, this);
+}
+
+void BeFAKMainWindow::DoConfigPaydayAfter(BMessage *msg) {
+	const char *tmp;
+	BString sql;
+	int paydays = 0;
+	if (msg->FindString("_value", &tmp) == B_OK) {
+		sql = "SELECT ABS('0"; sql += tmp; sql += "')";
+		paydays = toint(tabs[FAKTURATAB]->execSQL(sql.String()));
+		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET paydays = %i WHERE zrobiona = 1", 0, 0, &dbErrMsg,
+			paydays);
+	}
+}
+
 void BeFAKMainWindow::DoCheckConfig(void) {
 	int nRows, nCols;
 	char **result;
 	BString sql;
 	// select NAZWA and all config data
-	sql = "SELECT nazwa, wersja, p_mode, p_typ, p_textcols, p_texteol, p_lkopii, f_numprosta FROM konfiguracja WHERE zrobiona = 1";
+	sql = "SELECT nazwa, wersja, p_mode, p_typ, p_textcols, p_texteol, f_numprosta FROM konfiguracja WHERE zrobiona = 1";
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i\n", nRows, nCols);
@@ -171,7 +222,6 @@ void BeFAKMainWindow::DoCheckConfig(void) {
 		p_typ = toint(result[i++]);
 		p_textcols = toint(result[i++]);
 		p_texteol = toint(result[i++]);
-		p_lkopii = toint(result[i++]);
 		f_numprosta = toint(result[i++]);
 	}
 }
@@ -180,15 +230,16 @@ void BeFAKMainWindow::updateMenus(void) {
 	pmenuo->SetMarked(p_typ == 0);
 	pmenuc->SetMarked(p_typ == 1);
 	pmenud->SetMarked(p_typ == 2);
+	pmenue->SetMarked(p_typ == 3);
 	pmenups->SetMarked(p_mode == 0);
 	pmenut80->SetMarked( (p_mode==1) && (p_textcols==80) );
 	pmenut136->SetMarked( (p_mode==1) && (p_textcols==136) );
 	pmenuhtml->SetMarked(p_mode == 2);
 	BString sql = "UPDATE konfiguracja SET p_mode = %i, p_typ = %i, p_textcols = %i, "
-		"p_texteol = %i, p_lkopii = %i, f_numprosta = %i "
+		"p_texteol = %i, f_numprosta = %i "
 		"WHERE zrobiona = 1";
 	sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
-		p_mode, p_typ, p_textcols, p_texteol, p_lkopii, f_numprosta);
+		p_mode, p_typ, p_textcols, p_texteol, f_numprosta);
 //printf("result:%s\n",dbErrMsg);
 }
 
@@ -210,6 +261,9 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 			p_typ = 2;
 			updateMenus();
 			break;
+		case MENU_PRINTE:
+			p_typ = 3;
+			updateMenus();
 		case MENU_PRINTPS:
 			p_mode = 0;
 			updateMenus();
@@ -237,6 +291,18 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 			break;
 		case MENU_CONFVAT:
 			DoConfigVAT();
+			break;
+		case MENU_NUMCOPY:
+			DoConfigCopies();
+			break;
+		case MSG_NUMCOPY:
+			DoConfigCopiesAfter(Message);
+			break;
+		case MENU_PAYDAY:
+			DoConfigPayday();
+			break;
+		case MSG_PAYDAY:
+			DoConfigPaydayAfter(Message);
 			break;
 		case MSG_NAMECHANGE:
 			if (Message->FindString("_newtitle", &tmp) == B_OK) {
