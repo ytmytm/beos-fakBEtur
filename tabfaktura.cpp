@@ -472,6 +472,7 @@ void tabFaktura::makeNewForm(void) {
 	curdata->ogol[3] = tmp;
 	// data płatności = dziś+paydays
 	curdata->ogol[7] = execSQL("SELECT paydays FROM konfiguracja WHERE zrobiona = 1");
+	ogol[7]->SetText(curdata->ogol[7].String());
 	updateTermin();
 	curdata->ogol[6] = ogol[6]->Text();
 	// 
