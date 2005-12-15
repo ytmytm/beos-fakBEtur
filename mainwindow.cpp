@@ -6,13 +6,7 @@
 //		- txt: znak końca linii
 // - dialog kalendarza
 // - menu ze statystykami
-//		- sprzedaży netto: select nazwa, decround(sum(decround(decround(netto*(100-rabat)/100.0)*ilosc))) as suma from pozycjafakt group by nazwa order by suma desc;
-//			- "Miesięczne statystyki sprzedaży"
-//			- dodać wybór miesiąca (menu) i roku (text), ukryj o ilości <x, [but] szukaj
-//			- działa between, data końca miesiąca: date('now','+1 month','start of month','-1 day');
-//			- towary grupować po nazwie
-//			- kolumny: nazwa, ilość, wartość netto
-//			- na dole suma: suma netto, saldo podatku vat
+//		- dokończyć statmies
 //		- przeterminowane faktury
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
@@ -30,8 +24,9 @@
 
 #include "mainwindow.h"
 #include "dialfirma.h"
-#include "dialvat.h"
 #include "dialnumber.h"
+#include "dialstat.h"
+#include "dialvat.h"
 #include "sqlschema.h"
 #include "tabfirma.h"
 #include "tabtowar.h"
@@ -61,6 +56,7 @@ const uint32 MENU_PRINTHTML = 'MPHT';
 const uint32 MENU_ABOUT		= 'MABO';
 const uint32 MENU_PAYDAY	= 'MPAY';
 const uint32 MENU_NUMCOPY	= 'MNCO';
+const uint32 MENU_STATMIES	= 'MSTM';
 
 const uint32 MSG_NUMCOPY	= 'mNCO';
 const uint32 MSG_PAYDAY		= 'mPAY';
@@ -109,6 +105,10 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	BMenu *printmenu = new BMenu("Rodzaj wydruku", B_ITEMS_IN_COLUMN);
 	menu->AddItem(printmenu);
 	menu->AddItem(new BMenuItem("Liczba kopii", new BMessage(MENU_NUMCOPY)));
+	menuBar->AddItem(menu);
+
+	menu = new BMenu("Podsumowania", B_ITEMS_IN_COLUMN);
+	menu->AddItem(new BMenuItem("Miesięczna sprzedaż", new BMessage(MENU_STATMIES)));
 	menuBar->AddItem(menu);
 
 	printmenu->AddItem(pmenups   = new BMenuItem("Drukarka", new BMessage(MENU_PRINTPS)));
@@ -188,6 +188,10 @@ void BeFAKMainWindow::DoConfigPaydayAfter(BMessage *msg) {
 		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET paydays = %i WHERE zrobiona = 1", 0, 0, &dbErrMsg,
 			paydays);
 	}
+}
+
+void BeFAKMainWindow::DoStatMies(void) {
+	statDialog = new dialStat(dbData, this);
 }
 
 void BeFAKMainWindow::DoCheckConfig(void) {
@@ -303,6 +307,9 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 			break;
 		case MSG_PAYDAY:
 			DoConfigPaydayAfter(Message);
+			break;
+		case MENU_STATMIES:
+			DoStatMies();
 			break;
 		case MSG_NAMECHANGE:
 			if (Message->FindString("_newtitle", &tmp) == B_OK) {

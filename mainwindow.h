@@ -8,8 +8,9 @@
 
 	class beFakTab;
 	class dialFirma;
-	class dialVat;
 	class dialNumber;
+	class dialStat;
+	class dialVat;
 	class BButton;
 	class BCheckBox;
 	class BListView;
@@ -35,6 +36,7 @@
 			void DoConfigCopiesAfter(BMessage *msg);
 			void DoConfigPayday(void);
 			void DoConfigPaydayAfter(BMessage *msg);
+			void DoStatMies(void);
 			void DoCheckConfig(void);
 		private:
 			// database handlers
@@ -54,6 +56,7 @@
 			dialFirma *firmaDialog;
 			dialVat *vatDialog;
 			dialNumber *numDialog;
+			dialStat *statDialog;
 			// print menus, options
 			BMenuItem *pmenuo, *pmenuc, *pmenud, *pmenue;
 			BMenuItem *pmenups, *pmenut80, *pmenut136, *pmenuhtml;
