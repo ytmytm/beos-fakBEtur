@@ -7,7 +7,6 @@
 
 class BHandler;
 class BMessage;
-class BStringView;
 class BTextControl;
 class BView;
 

@@ -1,7 +1,6 @@
 
 #include <Button.h>
 #include <String.h>
-#include <StringView.h>
 #include <TextControl.h>
 #include <View.h>
 
@@ -9,8 +8,8 @@
 #include "dialnumber.h"
 #include <stdio.h>
 
-const uint32 DC			= 'SYDC';
-const uint32 BUT_OK		= 'SYOK';
+const uint32 DC			= 'NUDC';
+const uint32 BUT_OK		= 'NUOK';
 
 dialNumber::dialNumber(const char *title, const char *name, const char *def, uint32 msg, BHandler *hr) : BWindow(
 	BRect(100, 100, 380, 200),
