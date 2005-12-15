@@ -7,10 +7,13 @@
 // - dialog kalendarza
 // - menu ze statystykami
 //		- sprzedaży netto: select nazwa, decround(sum(decround(decround(netto*(100-rabat)/100.0)*ilosc))) as suma from pozycjafakt group by nazwa order by suma desc;
-//			- dodać wybór miesiąca (menu) i roku (text)
+//			- "Miesięczne statystyki sprzedaży"
+//			- dodać wybór miesiąca (menu) i roku (text), ukryj o ilości <x, [but] szukaj
 //			- działa between, data końca miesiąca: date('now','+1 month','start of month','-1 day');
-//		- niezapłacone faktury
-//		- przeterminowane płatności
+//			- towary grupować po nazwie
+//			- kolumny: nazwa, ilość, wartość netto
+//			- na dole suma: suma netto, saldo podatku vat
+//		- przeterminowane faktury
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
 //			- dodać pole 'magazyn' i 'datamagazyn' do db
