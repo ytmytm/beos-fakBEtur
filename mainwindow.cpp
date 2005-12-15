@@ -18,7 +18,7 @@
 //		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
 //			- dodać pole 'magazyn' i 'datamagazyn' do db
 //		- podsumowanie zliczać dynamicznie (nie trzeba wtedy uaktualniać stanu
-//		  przy zmianie faktury)
+//		  przy zmianie faktury) z data > XXXX
 //		- nie robić w/w dla tych, które są 'usługa'
 // - wydruk - cennik
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
