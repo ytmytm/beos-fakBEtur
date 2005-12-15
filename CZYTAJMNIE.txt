@@ -17,12 +17,15 @@ ZMIANY
 0.3
  - zmiana formatu bazy, dodane wersjonowanie bazy - obecnie brak możliwości upgrade,
    będzie taka możliwość w przypadku kolejnych zmian
- - zapamiętuje ścieżki (katalog zapisu, szablon HTML)
+ - zapamiętywanie ścieżek (katalog zapisu, szablon HTML)
  - w wypadku błędnych danych przenosi focus w miejsce błędu
- - towary/firmy pierwszy raz występujące na fakturze dopisuje do bazy danych
+ - towary/firmy pierwszy raz występujące na fakturze są dopisywane do bazy danych
  - możliwość edycji stawek podatku
  - możliwość importu listy towarów z innego dokumentu
- - [że w menu dostępne wszystkie parametry wydruku]
+ - pełna konfiguracja wydruku (rodzaj eksportu, liczba kopii, rodzaj dokumentu)
+ - po dodaniu towaru do faktury focus przeniesiony na pole "Ilość"
+ - wydruk przez print_server (domyślna czcionka to Arial, dla wydruku do pdf należy w opcjach
+   dołączyć ją (embed) do pliku)
 0.2
  - rezygnacja z SpLocale
  - sprawdzanie poprawności danych

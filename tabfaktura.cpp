@@ -949,6 +949,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				towar[5]->SetText(curtowar->data[3].String());
 				curtowarvatid = curtowar->vatid;
 				updateTab2();
+				towar[4]->MakeFocus();
 				this->dirty = true;
 				towardirty = true;
 			}
