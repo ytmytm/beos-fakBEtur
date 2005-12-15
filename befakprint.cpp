@@ -1,6 +1,6 @@
 //
 // TODO:
-//	- konfiguracja - domyślna ścieżka zapisu
+//
 
 #include "befakprint.h"
 #include "dialfile.h"
@@ -12,13 +12,14 @@
 
 // baseclass with stuff, inherit to print/export/whatever
 
-beFakPrint::beFakPrint(int id, sqlite *db) {
+beFakPrint::beFakPrint(int id, sqlite *db, int numkopii) {
 
 	if (id<1) {
 		printf("illegal id!\n");
 		return;
 	}
 
+	n_kopii = numkopii;
 	dbData = db;
 	fakturaid = id;
 
@@ -28,7 +29,7 @@ beFakPrint::beFakPrint(int id, sqlite *db) {
 	char **result;
 	BString sql;
 	sql = "SELECT p_typ, p_writepath, p_textcols";
-	sql += ", p_texteol, p_htmltemplate, p_lkopii";
+	sql += ", p_texteol, p_htmltemplate";
 	sql += ", nazwa, adres, kod, miejscowosc, telefon, email";
 	sql += ", nip, regon, bank, konto";
 	sql += " FROM konfiguracja WHERE zrobiona = 1";
@@ -44,7 +45,6 @@ beFakPrint::beFakPrint(int id, sqlite *db) {
 		p_textcols = toint(result[i++]);
 		p_texteol = toint(result[i++]);
 		p_htmltemplate = result[i++];
-		p_lkopii = toint(result[i++]);
 		own[0] = result[i++];
 		for (j=2;j<=10;j++) {
 			own[j] = result[i++];
@@ -235,6 +235,21 @@ const char *beFakPrint::makeName(void) {
 	tmp.ReplaceAll("/","-");
 	tmp.ReplaceAll("\\","-");
 	tmp.ReplaceAll(" ","");
+	switch (p_typ) {
+		case 2:
+			tmp += "-";
+			tmp += typfaktury;
+			break;
+		case 1:
+			tmp += "-";
+			tmp += typfaktury;
+			tmp += "-";
+			tmp << n_kopii;
+			break;
+		case 0:
+		default:
+			break;
+	}
 	return tmp.String();
 }
 

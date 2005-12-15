@@ -1328,25 +1328,52 @@ void tabFaktura::RefreshVatSymbols(void) {
 	}
 	sqlite_free_table(result);
 }
-// XXX rewrite so oryginał+kopia and p_lkopii is honored
+
 void tabFaktura::printCurrent(void) {
+	int p_typ = toint(execSQL("SELECT p_typ FROM konfiguracja WHERE zrobiona = 1"));
+	int oldp_typ = p_typ;
+	if (p_typ == 3) {
+		// set typ orig, print
+		execSQL("UPDATE konfiguracja SET p_typ = 0");
+		printAPage();
+		// set typ to copy, fall through
+		execSQL("UPDATE konfiguracja SET p_typ = 1");
+		p_typ = 1;
+	}
+	// print copies?
+	if (p_typ == 1) {
+		int p_lkopii = toint(execSQL("SELECT p_lkopii FROM konfiguracja WHERE zrobiona = 1"));
+		for (int i=1;i<=p_lkopii;i++)
+			printAPage(i);
+	} else {
+		// print dupe or orig
+		printAPage();
+	}
+	// restore original if needed
+	if (p_typ != oldp_typ) {
+		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET p_typ = %i", 0, 0, &dbErrMsg,
+		oldp_typ);
+	}
+}
+
+void tabFaktura::printAPage(int numkopii=0) {
 	if (curdata->id<0)
 		return;
 	beFakPrint *print;
 	int p_mode = toint(execSQL("SELECT p_mode FROM konfiguracja WHERE zrobiona = 1"));
 	switch(p_mode) {
 		case 2:
-			print = new printHTML(curdata->id, this->dbData);
+			print = new printHTML(curdata->id, this->dbData, numkopii);
 			break;
 		case 1:
-			print = new printText(curdata->id, this->dbData);
+			print = new printText(curdata->id, this->dbData, numkopii);
 			break;
 		case 0:
 		default:
 			{	if (printSettings == NULL)
 					if (PageSetup(nazwa->Text()) != B_OK)
 						return;
-				print = new printView(curdata->id, this->dbData, printSettings);
+				print = new printView(curdata->id, this->dbData, numkopii, printSettings);
 				break;
 			}
 	}

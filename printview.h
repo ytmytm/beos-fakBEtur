@@ -13,7 +13,7 @@ class BWindow;
 class printView : public beFakPrint, public BView {
 
 	public:
-		printView(int id, sqlite *db, BMessage *pSettings);
+		printView(int id, sqlite *db, int numkopii, BMessage *pSettings);
 		virtual ~printView();
 		void Go(void);
 		virtual void Draw(BRect updateRect);

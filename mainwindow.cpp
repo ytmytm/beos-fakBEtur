@@ -4,11 +4,6 @@
 //		- czy ostrzegać o wszystkich błędach?
 //		- czy używać numeracji uproszczonej (bez miesiąca: nr kolejny/rok)
 //		- txt: znak końca linii
-// - przy wydruku (tabfaktura) honorować:
-//		- liczba kopii
-//		- złożenie oryginał+faktura
-// - parametry wydruku przetwarzać w tabfaktura, każdy obiekt print użyć raz
-//		- przy zapisie do pliku dołączać typ dokumentu i numer kopii do nazwy
 // - dialog kalendarza
 // - menu ze statystykami
 //		- sprzedaży netto: select nazwa, decround(sum(decround(decround(netto*(100-rabat)/100.0)*ilosc))) as suma from pozycjafakt group by nazwa order by suma desc;
@@ -264,6 +259,7 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 		case MENU_PRINTE:
 			p_typ = 3;
 			updateMenus();
+			break;
 		case MENU_PRINTPS:
 			p_mode = 0;
 			updateMenus();

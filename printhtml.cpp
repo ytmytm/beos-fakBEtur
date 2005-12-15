@@ -12,7 +12,7 @@
 #include <Path.h>
 #include <stdio.h>
 
-printHTML::printHTML(int id, sqlite *db) : beFakPrint(id,db) {
+printHTML::printHTML(int id, sqlite *db, int numkopii) : beFakPrint(id,db, numkopii) {
 
 }
 

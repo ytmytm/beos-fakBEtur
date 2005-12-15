@@ -23,7 +23,7 @@ const char *tabhline1[] = { "Lp.", "Nazwa towaru/usługi", "PKWiU", "Ilość", "
 const char *tabhline2[] = { "",    "",                    "",      "",      "",     "(%)",   "z rabatem", "netto", "", "VAT", "brutto", NULL };
 const char *tabhline3[] = { "88",  "MMMMMMMMMMMMMMMMMM", "MM.MM.MM.MM", "88888.88", "MMMMM", "88.88", "88888.88", "888888.88", "88.88%", "888888.88", "888888.88", NULL };
 
-printView::printView(int id, sqlite *db, BMessage *pSettings) : beFakPrint(id,db),
+printView::printView(int id, sqlite *db, int numkopii, BMessage *pSettings) : beFakPrint(id,db,numkopii),
 	 BView(BRect(0,0,100,100), "printView", B_FOLLOW_ALL, B_WILL_DRAW) {
 	status_t result = B_OK;
 	printJob = new BPrintJob(fdata->nazwa.String());

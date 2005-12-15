@@ -9,7 +9,7 @@
 #include "globals.h"
 #include <stdio.h>
 
-printText::printText(int id, sqlite *db) : beFakPrint(id,db) {
+printText::printText(int id, sqlite *db, int numkopii) : beFakPrint(id,db,numkopii) {
 	wide = ( p_textcols > 80 );
 	switch ( p_texteol ) {
 		case 2:

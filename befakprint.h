@@ -8,7 +8,7 @@
 
 class beFakPrint {
 	public:
-		beFakPrint(int id, sqlite *db);
+		beFakPrint(int id, sqlite *db, int numkopii);
 		// if destructor override -> call it at the end of own
 		virtual ~beFakPrint();
 		virtual void Go(void);
@@ -28,7 +28,7 @@ class beFakPrint {
 		int p_textcols;
 		int p_texteol;
 		BString p_htmltemplate;
-		int p_lkopii;
+		int n_kopii;
 		// data holders
 		fakturadat *fdata;
 		pozfaklist *flist;
