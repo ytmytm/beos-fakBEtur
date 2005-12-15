@@ -26,7 +26,9 @@ class dialStat : public BWindow {
 
 		BHandler *handler;
 		BView *view, *viewtable;
+		BButton *but_find;
 		BListView *listcol[3];
+		int lastsel;
 		BPopUpMenu *menu;
 		BTextControl *rok, *minilosc;
 		BStringView *suma[2];	// netto, vat

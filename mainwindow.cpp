@@ -6,7 +6,6 @@
 //		- txt: znak końca linii
 // - dialog kalendarza
 // - menu ze statystykami
-//		- dokończyć statmies
 //		- przeterminowane faktury
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
@@ -16,7 +15,7 @@
 //		- nie robić w/w dla tych, które są 'usługa'
 // - wydruk - cennik
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
-// - usunąć duplikat execSQL() - zrobic jakos globalnie?
+// - usunąć duplikaty execSQL() - zrobic jakos globalnie?
 // - na koniec - usunac printfy z debugiem
 //
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
