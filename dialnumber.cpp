@@ -27,8 +27,9 @@ dialNumber::dialNumber(const char *title, const char *name, const char *def, uin
 
 	view->AddChild(number = new BTextControl(BRect(35,20,240,40), "numberSymbol", name, def, new BMessage(DC)));
 	number->SetDivider(be_plain_font->StringWidth(number->Label())+5);
-	view->AddChild(new BButton(BRect(210,55,260,80), "numberButok", "OK", new BMessage(BUT_OK)));
+	view->AddChild(but_ok = new BButton(BRect(210,55,260,80), "numberButok", "OK", new BMessage(BUT_OK)));
 	number->MakeFocus();
+	but_ok->MakeDefault(true);
 	this->Show();
 }
 

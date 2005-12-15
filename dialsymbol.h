@@ -6,6 +6,7 @@
 #include <sqlite.h>
 
 class dbdat;
+class BButton;
 class BHandler;
 class BMessage;
 class BStringView;
@@ -23,6 +24,7 @@ class dialSymbol : public BWindow {
 
 		BHandler *handler;
 		BView *view;
+		BButton *but_ok;
 		BStringView *nazwa, *error;
 		BTextControl *symbol;
 
