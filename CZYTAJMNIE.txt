@@ -12,6 +12,8 @@ przechowywania danych kontrahentów i towarów.
 LICENCJA
 Programu wolno używać w dowolny sposób w celu testowania na potrzeby konkursu
 zorganizowanego przez portal http://www.haiku-os.pl/
+Autor dołożył wszelkich starań, ale nie daje żadnej gwarancji na poprawność działania
+programu, ani generowanych przez program dokumentów.
 
 ZMIANY
 0.3
@@ -30,6 +32,7 @@ ZMIANY
  - wydruk oryginał/kopie, oryginał+kopie, możliwość konfiguracji liczby kopii
  - konfiguracja domyślnej liczby dni na zapłatę (licząc od dnia sprzedaży)
  - nowa obsługa list
+ - dialog z kalendarzem do wyboru daty
 0.2
  - rezygnacja z SpLocale
  - sprawdzanie poprawności danych
@@ -42,8 +45,7 @@ ZMIANY
  - pierwsza publiczna wersja
 
 NOTATKI DO WERSJI 0.3
-Nie działają żadne skróty klawiaturowe, nie ma kalendarza do wyboru daty, nie ma statystyk
-nieopłaconych faktur.
+Nie działają żadne skróty klawiaturowe, nie ma statystyk nieopłaconych faktur.
 
 
 
