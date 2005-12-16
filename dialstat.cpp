@@ -31,7 +31,7 @@ tab3ListItem::tab3ListItem(const char *col0, const char *col1, const char *col2)
 }
 
 dialStat::dialStat(sqlite *db, BHandler *hr) : BWindow(
-	BRect(100, 100, 740, 580),
+	BRect(100+20, 100+20, 740+20, 580+20),
 	NULL,
 	B_TITLED_WINDOW,
 	B_NOT_RESIZABLE ) {
