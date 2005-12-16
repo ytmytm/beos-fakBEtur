@@ -9,10 +9,10 @@
 class BBox;
 class BButton;
 class BHandler;
-class BListView;
 class BMessage;
 class BTextControl;
 class BView;
+class ColumnListView;
 
 class dialVat : public BWindow, public beFakTab {
 	public:
@@ -29,9 +29,8 @@ class dialVat : public BWindow, public beFakTab {
 	private:
 		BBox *box1;
 		BButton *but_new, *but_save, *but_del;
-		BListView *list;
+		ColumnListView *list;
 
-		int *idlist;
 		int id;
 		BTextControl *nazwa, *stawka;
 };

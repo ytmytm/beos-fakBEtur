@@ -2,11 +2,10 @@
 #include <Alert.h>
 #include <Box.h>
 #include <Button.h>
-#include <ListView.h>
-#include <ScrollView.h>
 #include <String.h>
 #include <TextControl.h>
 #include <View.h>
+#include "ColumnListView.h"
 
 #include "globals.h"
 #include "dialvat.h"
@@ -26,16 +25,20 @@ dialVat::dialVat(sqlite *db, BHandler *hr) : BWindow(
 	B_TITLED_WINDOW,
 	B_NOT_RESIZABLE ), beFakTab(NULL, db, hr) {
 
-	idlist = NULL;
-
 	this->SetFeel(B_FLOATING_APP_WINDOW_FEEL);
 
 	view = new BView(this->Bounds(), "vatView", B_FOLLOW_ALL_SIDES, 0);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	this->AddChild(view);
 
-	list = new BListView(BRect(10,10,110,180), "dVListView");
-	this->view->AddChild(new BScrollView("dVScrollView", list, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, true));
+	CLVContainerView *containerView;
+	list = new ColumnListView(BRect(10,10,120,175), &containerView, NULL, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM,
+		B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE, B_SINGLE_SELECTION_LIST, false, true, true, true,
+		B_FANCY_BORDER);
+	list->AddColumn(new CLVColumn("Nazwa", 55, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
+	list->AddColumn(new CLVColumn("Stawka", 54, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
+	list->SetSortFunction(CLVEasyItem::CompareItems);
+	this->view->AddChild(containerView);
 	list->SetInvocationMessage(new BMessage(LIST_INV));
 	list->SetSelectionMessage(new BMessage(LIST_SEL));
 
@@ -66,7 +69,7 @@ dialVat::dialVat(sqlite *db, BHandler *hr) : BWindow(
 }
 
 dialVat::~dialVat() {
-	delete [] idlist;
+
 }
 
 bool dialVat::QuitRequested(void) {
@@ -127,11 +130,13 @@ void dialVat::MessageReceived(BMessage *Message) {
 			break;
 		case LIST_SEL:
 		case LIST_INV:
-			{
-				int i = list->CurrentSelection(0);
+			{	int i = list->CurrentSelection(0);
 				if (i>=0) {
-					printf("sel:%i,id=%i\n",i,idlist[i]);
-					ChangedSelection(idlist[i]);
+					i = ((tab2ListItem*)list->ItemAt(list->CurrentSelection(0)))->Id();
+					if (i>=0)
+						ChangedSelection(i);
+				} else {
+					// deselection, what to do?
 				}
 				break;
 			}
@@ -164,16 +169,11 @@ void dialVat::ChangedSelection(int newid) {
 void dialVat::RefreshIndexList(void) {
 	// clear current list
 	if (list->CountItems()>0) {
-		BStringItem *anItem;
-		for (int i=0; (anItem=(BStringItem*)list->ItemAt(i)); i++)
+		tab2ListItem *anItem;
+		for (int i=0; (anItem=(tab2ListItem*)list->ItemAt(i)); i++)
 			delete anItem;
 		if (!list->IsEmpty())
 			list->MakeEmpty();
-	}
-	// clear current idlist
-	if (idlist!=NULL) {
-		delete [] idlist;
-		idlist = NULL;
 	}
 	// select list from db
 	int nRows, nCols;
@@ -182,14 +182,8 @@ void dialVat::RefreshIndexList(void) {
 	if (nRows < 1) {
 		// no entries
 	} else {
-		BString tmp;
-		idlist = new int[nRows];
-		for (int i=1;i<=nRows;i++) {
-			idlist[i-1] = toint(result[i*nCols+0]);
-			tmp = result[i*nCols+1];
-			tmp << ", " << result[i*nCols+2];
-			list->AddItem(new BStringItem(tmp.String()));
-		}
+		for (int i=1;i<=nRows;i++)
+			list->AddItem(new tab2ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2]));
 	}
 	sqlite_free_table(result);
 }

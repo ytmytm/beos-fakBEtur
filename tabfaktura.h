@@ -9,13 +9,13 @@ class BBox;
 class BButton;
 class BCheckBox;
 class BHandler;
-class BListView;
 class BTab;
 class BTabView;
 class BTextControl;
 class BTextView;
 class BStringView;
 class BView;
+class ColumnListView;
 
 class tabFaktura : public beFakTab {
 
@@ -69,7 +69,7 @@ class tabFaktura : public beFakTab {
 
 		BButton *but_new, *but_del, *but_restore, *but_save, *but_print;
 		BButton *but_psave, *but_pnew, *but_pimport, *but_pdel;
-		BListView *list;
+		ColumnListView *list;
 
 		BTextControl *nazwa;
 		BTextControl *ogol[10], *data[11], *towar[6];
@@ -96,7 +96,6 @@ class tabFaktura : public beFakTab {
 		fakturadat *curdata;
 		towardat *curtowar;
 		pozfaklist *faklista;
-		int *idlist;
 		int towarmark;
 		bool towardirty;
 
