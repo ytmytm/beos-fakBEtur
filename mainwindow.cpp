@@ -4,8 +4,9 @@
 //		- czy ostrzegać o wszystkich błędach?
 //		- czy używać numeracji uproszczonej (bez miesiąca: nr kolejny/rok)
 //		- txt: znak końca linii
-// - menu ze statystykami:
-//		- przeterminowane faktury (jak w bizmaster)
+// - należności:
+//		- niech guziki płacenia działają
+//		- drugi dialog z podsumowaniem odbiorcy
 // - skróty klawiaturowe i ergonomia:
 //		- F-y do przełączania tabów
 //		- na tabach - jednakowe F-y do standardowych działań
@@ -18,6 +19,7 @@
 //		  przy zmianie faktury) z data > XXXX
 //		- nie robić w/w dla tych, które są 'usługa'
 //		- co z remanentami?
+// - pole 'faktura.zaplacono' zamienic na integer
 // - przemyśleć czy wszystkie kolumny w tabfaktura są potrzebne (pkwiu?)
 // - wydruk - cennik
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
@@ -29,6 +31,7 @@
 
 #include "mainwindow.h"
 #include "dialfirma.h"
+#include "dialnaleznosci.h"
 #include "dialnumber.h"
 #include "dialstat.h"
 #include "dialvat.h"
@@ -62,6 +65,7 @@ const uint32 MENU_ABOUT		= 'MABO';
 const uint32 MENU_PAYDAY	= 'MPAY';
 const uint32 MENU_NUMCOPY	= 'MNCO';
 const uint32 MENU_STATMIES	= 'MSTM';
+const uint32 MENU_STATNALEZ	= 'MSTN';
 
 const uint32 MSG_NUMCOPY	= 'mNCO';
 const uint32 MSG_PAYDAY		= 'mPAY';
@@ -114,6 +118,7 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 
 	menu = new BMenu("Podsumowania", B_ITEMS_IN_COLUMN);
 	menu->AddItem(new BMenuItem("Miesięczna sprzedaż", new BMessage(MENU_STATMIES)));
+	menu->AddItem(new BMenuItem("Należności", new BMessage(MENU_STATNALEZ)));
 	menuBar->AddItem(menu);
 
 	printmenu->AddItem(pmenups   = new BMenuItem("Drukarka", new BMessage(MENU_PRINTPS)));
@@ -197,6 +202,10 @@ void BeFAKMainWindow::DoConfigPaydayAfter(BMessage *msg) {
 
 void BeFAKMainWindow::DoStatMies(void) {
 	statDialog = new dialStat(dbData, this);
+}
+
+void BeFAKMainWindow::DoStatNaleznosci(void) {
+	nalezDialog = new dialNaleznosci(dbData);
 }
 
 void BeFAKMainWindow::DoCheckConfig(void) {
@@ -315,6 +324,9 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 			break;
 		case MENU_STATMIES:
 			DoStatMies();
+			break;
+		case MENU_STATNALEZ:
+			DoStatNaleznosci();
 			break;
 		case MSG_NAMECHANGE:
 			if (Message->FindString("_newtitle", &tmp) == B_OK) {
