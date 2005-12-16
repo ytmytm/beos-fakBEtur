@@ -460,7 +460,6 @@ void tabFaktura::makeNewForm(void) {
 	BString rok, mies;
 	int nRows, nCols;
 	char **result;
-	char *dbErrMsg;
 
 	curdata->clear();
 	faklista->clear();

@@ -467,7 +467,6 @@ void tabTowar::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	char *dbErrMsg;
 	sqlite_get_table(dbData, "SELECT id, symbol, nazwa FROM towar ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries

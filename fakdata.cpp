@@ -588,7 +588,6 @@ char **pozfaklist::calcBrutto(const char *cnetto, const char *rabat, const char 
 	int ret;
 	int nRows, nCols;
 	char **result;
-	char *dbErrMsg;
 
 	sql = "SELECT DECROUND(0"; sql += cnetto; sql += "*(100-0";
 	sql += rabat; sql += ")/100.0)";

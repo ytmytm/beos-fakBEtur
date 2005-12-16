@@ -39,7 +39,6 @@ dialImport::dialImport(sqlite *db, int aktualna, pozfaklist *faklista, BHandler 
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	char *dbErrMsg;
 	BString tmp;
 	sqlite_get_table(dbData, "SELECT id, nazwa, data_wystawienia FROM faktura ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
