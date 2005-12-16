@@ -8,6 +8,8 @@
 // - menu ze statystykami:
 //		- przeterminowane faktury (jak w bizmaster)
 // - zamienić własne listboxy na clv z santa's bag
+//		- faktowartab
+//		- statmies
 //		- przemyśleć czy wszystkie kolumny są niezbędne (zwłaszcza w tabfaktura)
 // - skróty klawiaturowe i ergonomia:
 //		- F-y do przełączania tabów
