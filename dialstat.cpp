@@ -61,7 +61,7 @@ dialStat::dialStat(sqlite *db, BHandler *hr) : BWindow(
 	view->AddChild(suma[1] = new BStringView(BRect(560,450,630,465), "statSum1v", NULL));
 	// add column list
 	CLVContainerView *containerView;
-	list = new ColumnListView(BRect(5,50,625,405), &containerView, NULL, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM,
+	list = new ColumnListView(BRect(5,50,625,405), &containerView, NULL, B_FOLLOW_ALL_SIDES,
 		B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE, B_SINGLE_SELECTION_LIST, false, true, true, true,
 		B_FANCY_BORDER);
 	list->AddColumn(new CLVColumn("Nazwa", 420, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
@@ -123,7 +123,6 @@ void dialStat::DoFind(void) {
 			val = toint(execSQL(sql.String()));
 			if (val)
 				list->AddItem(new tab3ListItem(result[i*nCols+0], result[i*nCols+1], result[i*nCols+2]));
-//					listcol[j]->AddItem(new BStringItem(result[i*nCols+j]));
 		}
 	}
 	sqlite_free_table(result);
