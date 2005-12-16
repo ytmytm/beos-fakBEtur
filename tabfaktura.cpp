@@ -15,6 +15,7 @@
 #include "printview.h"
 #include "dialimport.h"
 #include "dialsymbol.h"
+#include "dialcalendar.h"
 
 #include <Alert.h>
 #include <Box.h>
@@ -937,13 +938,10 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 				if (Message->FindPointer("_datefield", &ptr) == B_OK) {
 					dateField = static_cast<BTextControl*>(ptr);
 					curDate = validateDate(dateField->Text());
-					curDate.Prepend("Tutaj dialog z kalendarzem do wyboru daty, startujemy od ");
-					BAlert *calendar = new BAlert(APP_NAME, curDate.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
-					calendar->Go();
+					dialCalendar *calendarDialog = new dialCalendar(curDate.String(), dateField, DC, handler);
+					calendarDialog->Show();
 				}
 				break;
-				// XXX if not canceled:
-				// this->dirty = true;
 			}
 		case BUT_PIMPORT:
 			{
