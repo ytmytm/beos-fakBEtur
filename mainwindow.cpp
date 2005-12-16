@@ -4,7 +4,6 @@
 //		- czy ostrzegać o wszystkich błędach?
 //		- czy używać numeracji uproszczonej (bez miesiąca: nr kolejny/rok)
 //		- txt: znak końca linii
-// - columnlistview w dialimport
 // - menu ze statystykami:
 //		- przeterminowane faktury (jak w bizmaster)
 // - skróty klawiaturowe i ergonomia:
