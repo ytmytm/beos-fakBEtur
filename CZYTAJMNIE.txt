@@ -20,7 +20,7 @@ ZMIANY
  - zmiana formatu bazy, dodane wersjonowanie bazy - obecnie brak możliwości upgrade,
    będzie taka możliwość w przypadku kolejnych zmian
  - zapamiętywanie ścieżek (katalog zapisu, szablon HTML)
- - w wypadku błędnych danych focus przenoszony w pole z błędnymi danymi
+ - w wypadku błędnych danych focus przenoszony w odpowiednie pole
  - towary/firmy pierwszy raz występujące na fakturze są dopisywane do bazy danych
  - możliwość edycji stawek podatku
  - możliwość importu listy towarów z innego dokumentu
@@ -33,6 +33,7 @@ ZMIANY
  - konfiguracja domyślnej liczby dni na zapłatę (licząc od dnia sprzedaży)
  - nowa obsługa list
  - dialog z kalendarzem do wyboru daty
+ - raport o zaległych należnościach
 0.2
  - rezygnacja z SpLocale
  - sprawdzanie poprawności danych
@@ -45,7 +46,7 @@ ZMIANY
  - pierwsza publiczna wersja
 
 NOTATKI DO WERSJI 0.3
-Nie działają żadne skróty klawiaturowe, nie ma statystyk nieopłaconych faktur.
+Nie działają żadne skróty klawiaturowe, nie ma raportu należności danego odbiorcy.
 
 
 

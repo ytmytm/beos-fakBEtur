@@ -1,12 +1,11 @@
 //
 // TODO:
+// - linkuje się z SpLocale??? (via tracker)
 // - konfiguracja:
 //		- czy ostrzegać o wszystkich błędach?
 //		- czy używać numeracji uproszczonej (bez miesiąca: nr kolejny/rok)
 //		- txt: znak końca linii
-// - należności:
-//		- niech guziki płacenia działają
-//		- drugi dialog z podsumowaniem odbiorcy
+// - należności - drugi dialog z podsumowaniem odbiorcy
 // - skróty klawiaturowe i ergonomia:
 //		- F-y do przełączania tabów
 //		- na tabach - jednakowe F-y do standardowych działań

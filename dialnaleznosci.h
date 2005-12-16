@@ -20,6 +20,8 @@ class dialNaleznosci : public BWindow {
 
 	private:
 		void DoFind(void);
+		void DoPayFor(int item);
+		void DoPayForAll(void);
 		const char *execSQL(const char *input);
 		const char *validateDecimal(const char *input);
 

@@ -38,7 +38,7 @@ class tab5ListItem : public CLVEasyItem {
 };
 
 dialNaleznosci::dialNaleznosci(sqlite *db) : BWindow(
-	BRect(100, 100, 740, 580),
+	BRect(100+20, 100+20, 740+20, 580+20),
 	"Należności",
 	B_TITLED_WINDOW,
 	B_NOT_RESIZABLE ) {
@@ -147,6 +147,26 @@ void dialNaleznosci::DoFind(void) {
 	sqlite_free_table(result);
 }
 
+void dialNaleznosci::DoPayForAll(void) {
+	int items = list->CountItems();
+
+	for (int i=0;i<items;i++)
+		DoPayFor(i);
+}
+
+void dialNaleznosci::DoPayFor(int item) {
+	tab5ListItem *it = ((tab5ListItem*)list->ItemAt(item));
+	if (it->Id() <= 0)
+		return;
+	BString sql = "UPDATE faktura SET zaplacono = 1, zapl_kwota = DECROUND(0";
+	sql += it->GetColumnContentText(3);
+	sql += "+0";
+	sql += it->GetColumnContentText(4);
+	sql += "), zapl_dnia = DATE('now') WHERE id = ";
+	sql << it->Id();
+	execSQL(sql.String());
+}
+
 void dialNaleznosci::MessageReceived(BMessage *Message) {
 	switch (Message->what) {
 		case DC:
@@ -161,8 +181,16 @@ void dialNaleznosci::MessageReceived(BMessage *Message) {
 		case BUT_WHO:
 			break;
 		case BUT_PAY:
+			{	int i = list->CurrentSelection(0);
+				if (i>=0)
+					DoPayFor(i);
+				DoFind();
+				break;
+			}
 			break;
 		case BUT_PAYALL:
+			DoPayForAll();
+			DoFind();
 			break;
 		default:
 			BWindow::MessageReceived(Message);
