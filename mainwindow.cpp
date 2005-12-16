@@ -5,14 +5,21 @@
 //		- czy używać numeracji uproszczonej (bez miesiąca: nr kolejny/rok)
 //		- txt: znak końca linii
 // - dialog kalendarza
-// - menu ze statystykami
-//		- przeterminowane faktury
+// - menu ze statystykami:
+//		- przeterminowane faktury (jak w bizmaster)
+// - zamienić własne listboxy na clv z santa's bag
+//		- przemyśleć czy wszystkie kolumny są niezbędne (zwłaszcza w tabfaktura)
+// - skróty klawiaturowe i ergonomia:
+//		- F-y do przełączania tabów
+//		- na tabach - jednakowe F-y do standardowych działań
+//		- sprawdzić sensowność i ergonomię kolejności przechodzenia TABem
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
 //			- dodać pole 'magazyn' i 'datamagazyn' do db
 //		- podsumowanie zliczać dynamicznie (nie trzeba wtedy uaktualniać stanu
 //		  przy zmianie faktury) z data > XXXX
 //		- nie robić w/w dla tych, które są 'usługa'
+//		- co z remanentami?
 // - wydruk - cennik
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - usunąć duplikaty execSQL() - zrobic jakos globalnie?
