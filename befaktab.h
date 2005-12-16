@@ -2,6 +2,7 @@
 #ifndef _BEFAKTAB_H
 #define _BEFAKTAB_H
 
+#include "CLVEasyItem.h"
 #include <sqlite.h>
 
 class BHandler;
@@ -37,6 +38,14 @@ class beFakTab {
 
 	protected:
 		bool dirty;
+};
+
+class tab2ListItem : public CLVEasyItem {
+	public:
+		tab2ListItem(int id, const char *col0, const char *col1);
+		int Id(void) { return fId; };
+	private:
+		int fId;
 };
 
 #define MSG_NAMECHANGE	'BFNC'

@@ -107,3 +107,10 @@ printf("commiting data\n");
 	};
 	return true;
 }
+
+tab2ListItem::tab2ListItem(int id, const char *col0, const char *col1) : CLVEasyItem(
+	0, false, false, 20.0) {
+	fId = id;
+	SetColumnContent(0,col0);
+	SetColumnContent(1,col1);
+}

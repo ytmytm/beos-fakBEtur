@@ -9,12 +9,12 @@ class BBox;
 class BButton;
 class BCheckBox;
 class BHandler;
-class BListView;
 class BMessage;
 class BPopUpMenu;
 class BStringView;
 class BTextControl;
 class BTextView;
+class ColumnListView;
 
 class tabTowar : public beFakTab {
 
@@ -44,7 +44,7 @@ class tabTowar : public beFakTab {
 
 		BButton *but_new, *but_del, *but_restore, *but_save;
 		BButton *but_sell, *but_marza, *but_import;
-		BListView *list;
+		ColumnListView *list;
 		BBox *box1, *box2, *box3;
 		BTextControl *data[4], *ceny[6];
 		BCheckBox *usluga;
@@ -55,7 +55,6 @@ class tabTowar : public beFakTab {
 		int *vatIds, vatRows;
 
 		towardat *curdata;
-		int *idlist;
 };
 
 #endif

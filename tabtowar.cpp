@@ -16,15 +16,14 @@
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
-#include <ListView.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
-#include <ScrollView.h>
 #include <StringView.h>
 #include <TabView.h>
 #include <TextControl.h>
+#include "ColumnListView.h"
 #include <stdio.h>
 
 const uint32 LIST_INV	= 'TTLI';
@@ -46,7 +45,6 @@ const char *jmiary[] = { "szt.", "kg", "kpl.", "m", "mb", "m2", "km", "l", NULL 
 
 tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr) {
 
-	idlist = NULL;
 	curdata = new towardat(db);
 	this->dirty = false;
 
@@ -55,9 +53,15 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	r = this->view->Bounds();
 
 	// listview in scrollview
-	r.left = 5; r.right = 160; r.top = 30; r.bottom = 500;
-	list = new BListView(r, "tTListView");
-	this->view->AddChild(new BScrollView("tTScrollView", list, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, true));
+	r.left = 5; r.right = 160; r.top = 30; r.bottom = 490;
+	CLVContainerView *containerView;
+	list = new ColumnListView(r, &containerView, NULL, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM,
+		B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE, B_SINGLE_SELECTION_LIST, false, true, true, true,
+		B_FANCY_BORDER);
+	list->AddColumn(new CLVColumn("Symbol", 54, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
+	list->AddColumn(new CLVColumn("Nazwa", 100, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
+	list->SetSortFunction(CLVEasyItem::CompareItems);
+	this->view->AddChild(containerView);
 	list->SetInvocationMessage(new BMessage(LIST_INV));
 	list->SetSelectionMessage(new BMessage(LIST_SEL));
 	// buttons
@@ -165,7 +169,6 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 
 tabTowar::~tabTowar() {
 	delete curdata;
-	delete [] idlist;
 	delete [] vatIds;
 }
 
@@ -295,7 +298,6 @@ bool tabTowar::validateTab(void) {
 }
 
 void tabTowar::MessageReceived(BMessage *Message) {
-	int i;
 	int32 item;
 	const char *tmp;
 	BString result,sql;
@@ -378,16 +380,16 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			break;
 		case LIST_SEL:
 		case LIST_INV:
-//			printf("list selection/invoc\n");
-			i = list->CurrentSelection(0);
-//			printf("got:%i\n",i);
-			if (i>=0) {
-//				printf("sel:%i,id=%i\n",i,idlist[i]);
-				ChangedSelection(idlist[i]);
-			} else {
-				// XXX deselection? what to do???
+			{	int i = list->CurrentSelection(0);
+				if (i>=0) {
+					i = ((tab2ListItem*)list->ItemAt(list->CurrentSelection(0)))->Id();
+					if (i>=0)
+						ChangedSelection(i);
+				} else {
+					// deselection, what to do?				
+				}
+				break;
 			}
-			break;
 		case MENUJM:
 			if (Message->FindString("_jm", &tmp) == B_OK) {
 				data[3]->SetText(tmp);
@@ -411,6 +413,8 @@ void tabTowar::MessageReceived(BMessage *Message) {
 				handler->Looper()->PostMessage(msg);
 				break;
 			}
+		default:
+			break;
 	}
 }
 
@@ -454,16 +458,11 @@ void tabTowar::DoFetchCurdata(void) {
 void tabTowar::RefreshIndexList(void) {
 	// clear current list
 	if (list->CountItems()>0) {
-		BStringItem *anItem;
-		for (int i=0; (anItem=(BStringItem*)list->ItemAt(i)); i++)
+		tab2ListItem *anItem;
+		for (int i=0; (anItem=(tab2ListItem*)list->ItemAt(i)); i++)
 			delete anItem;
 		if (!list->IsEmpty())
 			list->MakeEmpty();
-	}
-	// clear current idlist
-	if (idlist!=NULL) {
-		delete [] idlist;
-		idlist = NULL;
 	}
 	// select list from db
 	int nRows, nCols;
@@ -473,14 +472,8 @@ void tabTowar::RefreshIndexList(void) {
 	if (nRows < 1) {
 		// no entries
 	} else {
-		BString tmp;
-		idlist = new int[nRows];
-		for (int i=1;i<=nRows;i++) {
-			idlist[i-1] = toint(result[i*nCols+0]);
-			tmp = result[i*nCols+1];
-			tmp << ", " << result[i*nCols+2];
-			list->AddItem(new BStringItem(tmp.String()));
-		}
+		for (int i=1;i<=nRows;i++)
+			list->AddItem(new tab2ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2]));
 	}
 	sqlite_free_table(result);
 }

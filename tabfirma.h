@@ -9,9 +9,9 @@ class BBox;
 class BButton;
 class BCheckBox;
 class BHandler;
-class BListView;
 class BMessage;
 class BTextControl;
+class ColumnListView;
 
 class tabFirma : public beFakTab {
 
@@ -37,12 +37,11 @@ class tabFirma : public beFakTab {
 
 	private:
 		BButton *but_new, *but_del, *but_restore, *but_save;
-		BListView *list;
+		ColumnListView *list;
 		BBox *box1, *box2, *box3, *box4;
 		BTextControl *data[11];
 		BCheckBox *odbiorca, *dostawca, *aktywny, *zablokowany;
 		firmadat *curdata;
-		int *idlist;
 };
 
 #endif
