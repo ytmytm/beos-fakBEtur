@@ -50,7 +50,8 @@ dialImport::dialImport(sqlite *db, int aktualna, pozfaklist *faklista, BHandler 
 		// no entries
 	} else {
 		for (int i=1;i<=nRows;i++)
-			list->AddItem(new tab2ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2]));
+			if (toint(result[i*nCols+0]) != aktualna)
+				list->AddItem(new tab2ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2]));
 	}
 	sqlite_free_table(result);
 	list->MakeFocus();
