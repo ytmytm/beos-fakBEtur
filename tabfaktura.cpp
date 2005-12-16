@@ -467,7 +467,9 @@ void tabFaktura::updateTab2(void) {
 void tabFaktura::updateTermin(void) {
 	BString tmp;
 
-	tmp = "SELECT DATE('now', '0";
+	tmp = "SELECT DATE('";
+	tmp += ogol[3]->Text();
+	tmp += "', '0";
 	tmp += ogol[7]->Text();
 	tmp += " days')";
 	ogol[6]->SetText(execSQL(tmp.String()));
@@ -493,6 +495,7 @@ void tabFaktura::makeNewForm(void) {
 	curdata->ogol[3] = tmp;
 	// data płatności = dziś+paydays
 	curdata->ogol[7] = execSQL("SELECT paydays FROM konfiguracja WHERE zrobiona = 1");
+	ogol[3]->SetText(curdata->ogol[3].String());
 	ogol[7]->SetText(curdata->ogol[7].String());
 	updateTermin();
 	curdata->ogol[6] = ogol[6]->Text();
@@ -930,6 +933,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			break;
 		case TERMCHANGE:
 			updateTermin();
+			this->dirty = true;
 			break;
 		case CBUT:
 			{	void *ptr;
