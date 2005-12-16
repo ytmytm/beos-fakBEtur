@@ -7,9 +7,9 @@
 
 class pozfaklist;
 class BHandler;
-class BListView;
 class BMessage;
 class BView;
+class ColumnListView;
 
 class dialImport : public BWindow {
 	public:
@@ -22,9 +22,8 @@ class dialImport : public BWindow {
 
 		BHandler *handler;
 		BView *view;
-		BListView *list;
+		ColumnListView *list;
 
-		int *idlist;
 		pozfaklist *flist;
 
 		sqlite *dbData;

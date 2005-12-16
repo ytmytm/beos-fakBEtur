@@ -1,13 +1,13 @@
 
 #include <Alert.h>
 #include <Button.h>
-#include <ListView.h>
-#include <ScrollView.h>
 #include <String.h>
 #include <View.h>
+#include "ColumnListView.h"
 
 #include "globals.h"
 #include "dialimport.h"
+#include "befaktab.h"	// tab2list
 #include "fakdata.h"
 #include <stdio.h>
 
@@ -31,36 +31,32 @@ dialImport::dialImport(sqlite *db, int aktualna, pozfaklist *faklista, BHandler 
 
 	view->AddChild(new BButton(BRect(40,330,140,360), "importButImport", "Import", new BMessage(BUT_IMPORT)));
 
-	list = new BListView(BRect(10,10,170,320), "dIListView");
-	this->view->AddChild(new BScrollView("dIScrollView", list, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, true));
+	// columnlistview
+	CLVContainerView *containerView;
+	list = new ColumnListView(BRect(10,10,170,310), &containerView, NULL, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM,
+		B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE, B_SINGLE_SELECTION_LIST, false, true, true, true,
+		B_FANCY_BORDER);
+	list->AddColumn(new CLVColumn("Numer", 80, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
+	list->AddColumn(new CLVColumn("Data sprzedaży", 79, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
+	list->SetSortFunction(CLVEasyItem::CompareItems);
+	this->view->AddChild(containerView);
 	list->SetInvocationMessage(new BMessage(LIST_INV));
-
 	// refresh list (mostly XXX dupe from tabfaktura)
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	BString tmp;
-	sqlite_get_table(dbData, "SELECT id, nazwa, data_wystawienia FROM faktura ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, nazwa, data_sprzedazy FROM faktura ORDER BY data_sprzedazy, nazwa", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
-		BString tmp;
-		idlist = new int[nRows];
-		for (int i=1;i<=nRows;i++) {
-			if (toint(result[i*nCols+0]) != aktualna) {
-				idlist[i-1] = toint(result[i*nCols+0]);
-				tmp = result[i*nCols+1];
-				tmp << ", " << result[i*nCols+2];
-				list->AddItem(new BStringItem(tmp.String()));
-			}
-		}
+		for (int i=1;i<=nRows;i++)
+			list->AddItem(new tab2ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2]));
 	}
 	sqlite_free_table(result);
 	list->MakeFocus();
 }
 
 dialImport::~dialImport() {
-	delete [] idlist;
 }
 
 bool dialImport::commit(void) {
@@ -75,10 +71,11 @@ bool dialImport::commit(void) {
 	fakturadat *olddata = new fakturadat(dbData);
 	pozfaklist *olista = new pozfaklist(dbData);
 	pozfakdata *curdata;
-
-	olddata->id = idlist[i];
+	// find id of old one
+	i = ((tab2ListItem*)list->ItemAt(list->CurrentSelection(0)))->Id();
+	olddata->id = i;
 	olddata->fetch();
-	olista->fetch(idlist[i]);
+	olista->fetch(i);
 	// dla wszystkich towarów na starej:
 	pozfakitem *cur = olista->start;
 	pozfakitem *ncur;
@@ -130,8 +127,7 @@ bool dialImport::commit(void) {
 	delete olista;
 	delete olddata;
 	// notify, refresh, make dirty
-	BMessage *msg;
-	msg = new BMessage(MSG_REQFAKPOZLIST);
+	BMessage *msg = new BMessage(MSG_REQFAKPOZLIST);
 	handler->Looper()->PostMessage(msg);
 	return true;
 }
