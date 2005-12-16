@@ -7,14 +7,11 @@
 // - dialog kalendarza
 // - menu ze statystykami:
 //		- przeterminowane faktury (jak w bizmaster)
-// - zamienić własne listboxy na clv z santa's bag
-//		- faktowartab
-//		- statmies
-//		- przemyśleć czy wszystkie kolumny są niezbędne (zwłaszcza w tabfaktura)
 // - skróty klawiaturowe i ergonomia:
 //		- F-y do przełączania tabów
 //		- na tabach - jednakowe F-y do standardowych działań
 //		- sprawdzić sensowność i ergonomię kolejności przechodzenia TABem
+//		- sprawdzić flagi bboxów i w głąb do zmiany rozmiaru
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
 //			- dodać pole 'magazyn' i 'datamagazyn' do db
@@ -22,6 +19,7 @@
 //		  przy zmianie faktury) z data > XXXX
 //		- nie robić w/w dla tych, które są 'usługa'
 //		- co z remanentami?
+// - przemyśleć czy wszystkie kolumny w tabfaktura są potrzebne (pkwiu?)
 // - wydruk - cennik
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - usunąć duplikaty execSQL() - zrobic jakos globalnie?

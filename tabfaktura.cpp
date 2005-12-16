@@ -61,9 +61,29 @@ const uint32 PLIST_SEL	= 'TFPS';
 
 const char *stransportu[] = { "własny sprzedawcy", "własny odbiorcy", NULL };
 const char *fplatnosci[] = { "gotówką", "przelewem", "czekiem", "kartą płatniczą", "kartą kredytową", NULL };
-extern const char *jmiary[];
-const char *plisthead[] = { "Lp", "Nazwa", "PKWiU", "Ilość", "Jm", "Rabat (%)", "Cena jedn.", "W. netto", "VAT", "W. VAT", "W. brutto", NULL };
-const int plistw[] = { 20, 90, 60, 40, 20, 50, 70, 70, 30, 60, 100, -1 };
+extern const char *jmiary[];	// tabtowar.cpp
+const char *plisthead[] = { "#", "Nazwa", "PKWiU", "Ilość", "Jm", "Rabat (%)", "Cena jedn.", "W. netto", "VAT", "W. VAT", "W. brutto", NULL };
+const int plistw[] = { 15, 90, 60, 40, 20, 50, 70, 70, 30, 60, 70, -1 };
+
+class pozCListItem : public CLVEasyItem {
+	public:
+		pozCListItem(int col0, const char *col1, const char *col2, const char *col3, const char *col4, const char *col5, const char *col6, const char *col7, const char *col8, const char *col9, const char *col10) : CLVEasyItem(
+			0, false, false, 20.0) {
+			BString tmp = "";
+			tmp << col0;
+			SetColumnContent(0,tmp.String(), true, true);	// lp
+			SetColumnContent(1,col1);				// nazwa
+			SetColumnContent(2,col2);				// pkwiu
+			SetColumnContent(3,col3, true, true);	// ilosc
+			SetColumnContent(4,col4, true, true);	// jm
+			SetColumnContent(5,col5, true, true);	// rabat
+			SetColumnContent(6,col6, true, true);	//
+			SetColumnContent(7,col7, true, true);	//
+			SetColumnContent(8,col8, true, true);	//
+			SetColumnContent(9,col9, true, true);	//
+			SetColumnContent(10,col10, true, true);	//
+		}
+};
 
 tabFaktura::tabFaktura(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr) {
 
@@ -76,7 +96,6 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db
 
 	curtowarvatid = -1;
 	towarmark = -1;
-	lasttowarsel = -1;
 	towardirty = false;
 
 	this->tab->SetLabel("Faktury");
@@ -282,22 +301,21 @@ void tabFaktura::initTab2(void) {
 	BMessage *msg;
 	int i;
 	// box5
-	box5 = new BBox(BRect(10,10,590,350),"tfbox5");
+	box5 = new BBox(BRect(10,10,590,350),"tfbox5", B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP);
 	box5->SetLabel("Pozycje");
 	viewpozy->AddChild(box5);
 	// box5-stuff
-	viewtable = new BView(BRect(10,20,560,160), "tableview", B_FOLLOW_ALL_SIDES, 0);
-	r = viewtable->Bounds();
-	r.right = plistw[0];
+	CLVContainerView *containerView;
+	pozlist = new ColumnListView(BRect(10,20,560,150), &containerView, NULL, B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE, B_SINGLE_SELECTION_LIST, false, true, true, true,
+		B_FANCY_BORDER);
 	for (i=0;i<=10;i++) {
-		pozcolumn[i] = new BListView(r, NULL);
-		pozcolumn[i]->SetInvocationMessage(new BMessage(PLIST_INV));
-		pozcolumn[i]->SetSelectionMessage(new BMessage(PLIST_SEL));
-		viewtable->AddChild(pozcolumn[i]);
-		r.OffsetBy(plistw[i],0);
-		r.right = r.left + plistw[i+1];
+		pozlist->AddColumn(new CLVColumn(plisthead[i], plistw[i], CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE));
 	}
-	box5->AddChild(new BScrollView("ftablescroll", viewtable, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, true));
+	pozlist->SetSortFunction(CLVEasyItem::CompareItems);
+	box5->AddChild(containerView);
+	pozlist->SetInvocationMessage(new BMessage(PLIST_INV));
+	pozlist->SetSelectionMessage(new BMessage(PLIST_SEL));
 	// box6
 	box6 = new BBox(BRect(10,170,570,250), "tfbox6");
 	box6->SetLabel("Nowa pozycja");
@@ -531,8 +549,7 @@ void tabFaktura::makeNewTowar(void) {
 	towardirty = false;
 	// un-mark list
 	towarmark = -1;
-	for (i=0;i<=10;i++)
-		pozcolumn[i]->DeselectAll();
+	pozlist->DeselectAll();
 	updateTab2();
 }
 
@@ -984,7 +1001,7 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			}
 			break;
 		case BUT_PDEL:
-			i = pozcolumn[0]->CurrentSelection(0);
+			i = pozlist->CurrentSelection(0)+1;
 			if (i>0) {
 //				printf("delete %i-th\n",i);
 				faklista->remove(i);
@@ -996,31 +1013,11 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			break;
 		case PLIST_SEL:
 		case PLIST_INV:
-			{	int j;
-				void *ptr;
-				BListView *plist;
-
-				i = -1;
-				if (Message->FindPointer("source", &ptr) == B_OK) {
-					plist = static_cast<BListView*>(ptr);
-					i = plist->CurrentSelection(0);
-				}
-				if (i != lasttowarsel) {
-					lasttowarsel = i;
-					// zmiana wybranego towaru, uaktualnienie towarmark
-					ChangedTowarSelection(lasttowarsel);
-					if (towarmark != 0) {
-						for (j=0; j<=10; j++) {
-							pozcolumn[j]->Select(towarmark);
-							pozcolumn[j]->ScrollToSelection();
-						}
-					} else {
-						for (j=0; j<=10; j++) {
-							pozcolumn[j]->Select(0);
-							pozcolumn[j]->ScrollToSelection();
-							pozcolumn[j]->DeselectAll();
-						}
-					}
+			{	int i = pozlist->CurrentSelection(0);
+				if (i>=0) {
+					ChangedTowarSelection(i+1);
+				} else {
+					// deselection, what to do?				
 				}
 				break;
 			}
@@ -1202,34 +1199,21 @@ bool tabFaktura::DoCommitTowardata(void) {
 }
 
 void tabFaktura::RefreshTowarList(void) {
-	// clear current lists
-	BListView *list;
-	BString tmp;
-	int i;
-
-	for (i=0;i<=10;i++) {
-		list = pozcolumn[i];
-		if (list->CountItems()>0) {
-			BStringItem *anItem;
-			for (int i=0; (anItem=(BStringItem*)list->ItemAt(i)); i++)
-				delete anItem;
-			if (!list->IsEmpty())
-				list->MakeEmpty();
-		}
+	// clear current list
+	if (pozlist->CountItems()>0) {
+		pozCListItem *anItem;
+		for (int i=0; (anItem=(pozCListItem*)pozlist->ItemAt(i)); i++)
+			delete anItem;
+		if (!pozlist->IsEmpty())
+			pozlist->MakeEmpty();
 	}
 	// fill with current data
 	pozfakitem *cur = faklista->start;
-	for (i=0;i<=10;i++) {
-		pozcolumn[i]->AddItem(new BStringItem(plisthead[i]));
-	}
-
 	while (cur!=NULL) {
-//printf("[%i] - %s\n",cur->lp, cur->data->data[1].String());
-		tmp = ""; tmp << cur->lp;
-		pozcolumn[0]->AddItem(new BStringItem(tmp.String()));
-		for (i=1;i<=10;i++) {
-			pozcolumn[i]->AddItem(new BStringItem(cur->data->data[i].String()));
-		}
+		pozlist->AddItem(new pozCListItem(cur->lp,
+			cur->data->data[1].String(), cur->data->data[2].String(), cur->data->data[3].String(), cur->data->data[4].String(), cur->data->data[5].String(),
+			cur->data->data[6].String(), cur->data->data[7].String(), cur->data->data[8].String(), cur->data->data[9].String(), cur->data->data[10].String()
+		));
 		cur = cur->nxt;
 	}
 }

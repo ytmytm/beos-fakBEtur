@@ -77,7 +77,7 @@ class tabFaktura : public beFakTab {
 		BTextView *uwagi;
 		BButton *cbut[5];
 		BCheckBox *cbzaplacono;
-		BListView *pozcolumn[11];	// columns
+		ColumnListView *pozlist;
 
 		BPopUpMenu *menusymbol;
 		BMenuItem **symbolMenuItems;
@@ -99,8 +99,6 @@ class tabFaktura : public beFakTab {
 		int towarmark;
 		bool towardirty;
 
-		// to control many lists
-		int lasttowarsel;
 		// printing
 		BMessage *printSettings;	// z pagesetup
 };
