@@ -1126,7 +1126,7 @@ void tabFaktura::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, nazwa, data_sprzedazy FROM faktura ORDER BY data_sprzedazy", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite_get_table(dbData, "SELECT id, nazwa, data_sprzedazy FROM faktura ORDER BY data_sprzedazy, nazwa", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
