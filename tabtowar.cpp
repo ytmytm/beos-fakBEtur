@@ -52,7 +52,7 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	BRect r;
 	r = this->view->Bounds();
 
-	// listview in scrollview
+	// columnlistview
 	r.left = 5; r.right = 160; r.top = 30; r.bottom = 490;
 	CLVContainerView *containerView;
 	list = new ColumnListView(r, &containerView, NULL, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM,
