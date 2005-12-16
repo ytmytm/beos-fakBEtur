@@ -431,10 +431,13 @@ void tabFaktura::updateTab(void) {
 	ogol[8]->SetEnabled(state);
 	ogol[9]->SetEnabled(state);
 	cbut[3]->SetEnabled(state);
+	if (state) {
+		ogol[8]->SetText(validateDecimal(ogol[8]->Text()));
+		ogol[9]->SetText(validateDate(ogol[9]->Text()));
+	}
 	ogol[2]->SetText(validateDate(ogol[2]->Text()));
 	ogol[3]->SetText(validateDate(ogol[3]->Text()));
 	ogol[6]->SetText(validateDate(ogol[6]->Text()));
-	ogol[9]->SetText(validateDate(ogol[9]->Text()));
 }
 
 void tabFaktura::updateTab2(void) {
