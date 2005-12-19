@@ -507,6 +507,8 @@ void tabFaktura::makeNewForm(void) {
 	cbzaplacono->SetValue(B_CONTROL_OFF);
 	// miejsce wystawienia - weź z danych firmy
 	curdata->ogol[0] = execSQL("SELECT miejscowosc FROM konfiguracja WHERE zrobiona = 1");
+	// wystawiający - z konfiguracji
+	curdata->ogol[1] = execSQL("SELECT f_wystawil FROM konfiguracja WHERE zrobiona = 1");
 	// wygenerowanie nowej nazwy
 	// identyfikator z daty
 	rok = tmp; mies = tmp;
