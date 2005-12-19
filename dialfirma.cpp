@@ -14,7 +14,7 @@ const uint32 BUT_OK		= 'FIOK';
 const uint32 BUT_CANCEL	= 'FICA';
 
 dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
-	BRect(120, 120, 120+460, 120+330+40),
+	BRect(120, 120, 120+460, 120+330+30+40),
 	"Informacje o Twojej firmie",
 	B_TITLED_WINDOW,
 	B_NOT_RESIZABLE ) {
@@ -76,13 +76,17 @@ dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
 	data[7]->SetDivider(d); data[8]->SetDivider(d);
 	data[9]->SetDivider(d); data[10]->SetDivider(d);
 	// XXX end of ripped stuff
+	wystawil = new BTextControl(BRect(10,335,300,350), "tfWystawia", "Wystawiający dokumenty", NULL, new BMessage(DC));
+	wystawil->SetDivider(be_plain_font->StringWidth(wystawil->Label())+5);
+	view->AddChild(wystawil);
 	// buttons - OK, CANCEL
-	but_ok = new BButton(BRect(400,340,450,360), "firma_butok", "OK", new BMessage(BUT_OK));
+	but_ok = new BButton(BRect(400,360,450,380), "firma_butok", "OK", new BMessage(BUT_OK));
 	if (cancancel) {
-		but_cancel = new BButton(BRect(10,340,60,360), "firma_butcancel", "Anuluj", new BMessage(BUT_CANCEL));
+		but_cancel = new BButton(BRect(10,360,60,380), "firma_butcancel", "Anuluj", new BMessage(BUT_CANCEL));
 		view->AddChild(but_cancel);
 	}
 	view->AddChild(but_ok);
+	but_ok->MakeDefault(true);
 	// fetch i wypelnij boxy danymi
 	int i, j;
 	int nRows, nCols;
@@ -90,7 +94,7 @@ dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
 	BString sql;
 	sql = "SELECT ";
 	sql += "nazwa, adres, kod, miejscowosc, telefon, email";
-	sql += ", nip, regon, bank, konto";
+	sql += ", nip, regon, bank, konto, f_wystawil";
 	sql += " FROM konfiguracja WHERE zrobiona = 1";
 //printf("sql:%s\n",sql.String());
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
@@ -106,6 +110,7 @@ dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
 		for (j=2;j<=10;j++) {
 			data[j]->SetText(result[i++]);
 		}
+		wystawil->SetText(result[i++]);
 	}
 	Show();
 }
@@ -116,15 +121,16 @@ void dialFirma::commit(void) {
 //printf("commit");
 	sql = "UPDATE konfiguracja SET ";
 	sql += "nazwa = %Q, adres = %Q, kod = %Q, miejscowosc = %Q, telefon = %Q, email = %Q";
-	sql += ", nip = %Q, regon = %Q, bank = %Q, konto = %Q";
+	sql += ", nip = %Q, regon = %Q, bank = %Q, konto = %Q, f_wystawil = %Q";
 	sql += " WHERE zrobiona = 1";
-printf("sql:[%s]\n",sql.String());
+//printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		data[0]->Text(), data[2]->Text(), data[3]->Text(),
 		data[4]->Text(), data[5]->Text(), data[6]->Text(), data[7]->Text(),
-		data[8]->Text(), data[9]->Text(), data[10]->Text()
+		data[8]->Text(), data[9]->Text(), data[10]->Text(),
+		wystawil->Text()
 		);
-printf("result: %i, %s;\n", ret, dbErrMsg);
+//printf("result: %i, %s;\n", ret, dbErrMsg);
 }
 
 void dialFirma::MessageReceived(BMessage *Message) {

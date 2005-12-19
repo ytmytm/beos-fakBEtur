@@ -24,6 +24,7 @@ class dialFirma : public BWindow {
 		BButton *but_ok, *but_cancel;
 
 		BTextControl *data[11];
+		BTextControl *wystawil;
 
 		sqlite *dbData;
 		char *dbErrMsg;
