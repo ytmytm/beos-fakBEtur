@@ -1,10 +1,12 @@
 //
 // TODO:
+// - podsumowanie faktury pod uwagami
 // - należności
 //		- drugi dialog z podsumowaniem odbiorcy
 //		- na dwukilk na liście (invoke)
 //		- button w kontrahentach
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
+//		- stan magazynu w stringview pomiędzy buttonami
 //		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
 //		- podsumowanie zliczać dynamicznie (nie trzeba wtedy uaktualniać stanu
 //		  przy zmianie faktury) z data > XXXX
