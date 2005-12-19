@@ -1,6 +1,5 @@
 //
 // TODO:
-// - printview: drobnym "podpis i pieczęć..."
 // - należności
 //		- drugi dialog z podsumowaniem odbiorcy
 //		- na dwukilk na liście (invoke)

@@ -341,11 +341,19 @@ void printView::Draw(BRect pageRect) {
 	font.SetSize(12.0);
 	SetFont(&font);
 	DrawStr(tmp);
-	font.SetSize(10.0);
-	SetFont(&font);
+
 	cur = PenLocation();
 	cur.x = pageRect.left + 1*(pageRect.Width()/8);
 	StrokeLine(BPoint(cur.x,cur.y+5),BPoint(cur.x+pageRect.Width()/4, cur.y+5));
+	cur.y = ELINE;
+	MovePenTo(cur);
+	font.SetSize(5.0);
+	SetFont(&font);
+	tmp = "podpis osoby upow.";
+	DrawStrCenter(tmp, cur.x, cur.x+pageRect.Width()/4);
+	
+	font.SetSize(10.0);
+	SetFont(&font);
 	tmp = "odebrał: ";
 	cur.x = pageRect.left + 5*(pageRect.Width()/8) - font.StringWidth(tmp.String());
 	cur.y = pageRect.bottom - 7 * font.Size();
@@ -354,6 +362,12 @@ void printView::Draw(BRect pageRect) {
 	cur = PenLocation();
 	cur.x = pageRect.left + 5*(pageRect.Width()/8);
 	StrokeLine(BPoint(cur.x,cur.y+5),BPoint(cur.x+pageRect.Width()/4, cur.y+5));
+	cur.y = ELINE;
+	MovePenTo(cur);
+	font.SetSize(5.0);
+	SetFont(&font);
+	tmp = "podpis osoby upow.";
+	DrawStrCenter(tmp, cur.x, cur.x+pageRect.Width()/4);
 }
 
 void printView::DrawStr(const BString str) {
