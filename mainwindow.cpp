@@ -1,11 +1,9 @@
 //
 // TODO:
-// - linkuje się z SpLocale??? (via tracker)
-// - konfiguracja:
-//		- czy ostrzegać o wszystkich błędach?
-//		- czy używać numeracji uproszczonej (bez miesiąca: nr kolejny/rok)
-//		- txt: znak końca linii
-// - należności - drugi dialog z podsumowaniem odbiorcy
+// - należności
+//		- drugi dialog z podsumowaniem odbiorcy
+//		- na dwukilk na liście (invoke)
+//		- button w kontrahentach
 // - skróty klawiaturowe i ergonomia:
 //		- F-y do przełączania tabów
 //		- na tabach - jednakowe F-y do standardowych działań
@@ -13,17 +11,23 @@
 //		- sprawdzić flagi bboxów i w głąb do zmiany rozmiaru
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
-//			- dodać pole 'magazyn' i 'datamagazyn' do db
 //		- podsumowanie zliczać dynamicznie (nie trzeba wtedy uaktualniać stanu
 //		  przy zmianie faktury) z data > XXXX
 //		- nie robić w/w dla tych, które są 'usługa'
 //		- co z remanentami?
-// - pole 'faktura.zaplacono' zamienic na integer
+//	    LUB
+//		- trzymać pole magazyn, do zmiany w tabie towarów
+//		- przy edycji faktur o dacie < data_magazynu nic nie robić
+//		- else: magazyn+stara_ilość-nowa_ilość
 // - przemyśleć czy wszystkie kolumny w tabfaktura są potrzebne (pkwiu?)
 // - wydruk - cennik
+// - konfiguracja:
+//		- czy ostrzegać o wszystkich błędach?
+//		- txt: znak końca linii
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - usunąć duplikaty execSQL() - zrobic jakos globalnie?
 // - na koniec - usunac printfy z debugiem
+// - na koniec - porównać opis w CZYTAJMNIE z listą zmian i uaktualnić
 //
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
@@ -63,6 +67,7 @@ const uint32 MENU_PRINTHTML = 'MPHT';
 const uint32 MENU_ABOUT		= 'MABO';
 const uint32 MENU_PAYDAY	= 'MPAY';
 const uint32 MENU_NUMCOPY	= 'MNCO';
+const uint32 MENU_FNUMSIMP	= 'MFSI';
 const uint32 MENU_STATMIES	= 'MSTM';
 const uint32 MENU_STATNALEZ	= 'MSTN';
 
@@ -113,6 +118,8 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	BMenu *printmenu = new BMenu("Rodzaj wydruku", B_ITEMS_IN_COLUMN);
 	menu->AddItem(printmenu);
 	menu->AddItem(new BMenuItem("Liczba kopii", new BMessage(MENU_NUMCOPY)));
+	menu->AddSeparatorItem();
+	menu->AddItem(fmenunum = new BMenuItem("Numeracja uproszczona", new BMessage(MENU_FNUMSIMP)));
 	menuBar->AddItem(menu);
 
 	menu = new BMenu("Podsumowania", B_ITEMS_IN_COLUMN);
@@ -251,6 +258,7 @@ void BeFAKMainWindow::updateMenus(void) {
 	pmenut80->SetMarked( (p_mode==1) && (p_textcols==80) );
 	pmenut136->SetMarked( (p_mode==1) && (p_textcols==136) );
 	pmenuhtml->SetMarked(p_mode == 2);
+	fmenunum->SetMarked(f_numprosta);
 	BString sql = "UPDATE konfiguracja SET p_mode = %i, p_typ = %i, p_textcols = %i, "
 		"p_texteol = %i, f_numprosta = %i "
 		"WHERE zrobiona = 1";
@@ -314,6 +322,10 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 			break;
 		case MSG_NUMCOPY:
 			DoConfigCopiesAfter(Message);
+			break;
+		case MENU_FNUMSIMP:
+			f_numprosta = !f_numprosta;
+			updateMenus();
 			break;
 		case MENU_PAYDAY:
 			DoConfigPayday();

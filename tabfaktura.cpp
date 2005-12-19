@@ -535,7 +535,11 @@ void tabFaktura::makeNewForm(void) {
 	}
 	sqlite_free_table(result);
 	// dodaj 1
-	tmp = ""; tmp << curmax+1; tmp << "/"; tmp << mies; tmp << "/"; tmp << rok;
+	tmp = ""; tmp << curmax+1; tmp << "/";
+	if (!(toint(execSQL("SELECT f_numprosta FROM konfiguracja WHERE zrobiona = 1")))) {
+		tmp << mies; tmp << "/";
+	}
+	tmp << rok;
 	// wygeneruj string, zapisz
 	curdata->nazwa = tmp;
 	curdataToTab();

@@ -63,6 +63,7 @@
 			// print menus, options
 			BMenuItem *pmenuo, *pmenuc, *pmenud, *pmenue;
 			BMenuItem *pmenups, *pmenut80, *pmenut136, *pmenuhtml;
+			BMenuItem *fmenunum;
 			// print settings
 			int p_mode;			// 0 - print_server, 1 - text, 2 - html
 			int p_typ;			// 0 - orig, 1 - kopie, 2 - dupl, 3 - or+kopie

@@ -25,6 +25,8 @@ ZMIANY
  - nowa obsługa list
  - dialog z kalendarzem do wyboru daty
  - raport o zaległych należnościach
+ - możliwość ustawienia wartości domyślnej dla pola 'Wystawił'
+ - opcja - numeracja uproszczona dokumentów (bez miesiąca)
 0.3
  - zmiana formatu bazy, dodane wersjonowanie bazy - obecnie brak możliwości upgrade,
    będzie taka możliwość w przypadku kolejnych zmian
