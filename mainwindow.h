@@ -27,7 +27,7 @@
 			~BeFAKMainWindow();
 //			virtual void FrameResized(float width, float height);
 			virtual void MessageReceived(BMessage *Message);
-//			virtual void DispatchMessage(BMessage *message, BHandler *handler);
+			virtual void DispatchMessage(BMessage *message, BHandler *handler);
 			virtual bool QuitRequested();
 //			virtual void RefsReceived(BMessage *Message);
 			void DoAbout(void);
@@ -45,8 +45,6 @@
 			int OpenDatabase(void);
 			void CloseDatabase(void);
 			void InitDatabase(void);
-			// tab handlers
-			void initTabs(BTabView *tv);
 			// other
 			void updateMenus(void);
 

@@ -1,14 +1,10 @@
 //
 // TODO:
+// - printview: drobnym "podpis i pieczęć..."
 // - należności
 //		- drugi dialog z podsumowaniem odbiorcy
 //		- na dwukilk na liście (invoke)
 //		- button w kontrahentach
-// - skróty klawiaturowe i ergonomia:
-//		- F-y do przełączania tabów
-//		- na tabach - jednakowe F-y do standardowych działań
-//		- sprawdzić sensowność i ergonomię kolejności przechodzenia TABem
-//		- sprawdzić flagi bboxów i w głąb do zmiany rozmiaru
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
 //		- podsumowanie zliczać dynamicznie (nie trzeba wtedy uaktualniać stanu
@@ -20,6 +16,8 @@
 //		- przy edycji faktur o dacie < data_magazynu nic nie robić
 //		- else: magazyn+stara_ilość-nowa_ilość
 // - przemyśleć czy wszystkie kolumny w tabfaktura są potrzebne (pkwiu?)
+// - skróty klawiaturowe i ergonomia:
+//		- sprawdzić sensowność i ergonomię kolejności przechodzenia TABem
 // - wydruk - cennik
 // - konfiguracja:
 //		- czy ostrzegać o wszystkich błędach?
@@ -146,7 +144,9 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 	// check if configuration is there
 	DoCheckConfig();
 	// initialize datawidgets
-	initTabs(tabView);
+	tabs[FAKTURATAB] = new tabFaktura(tabView, dbData, this);
+	tabs[TOWARTAB] = new tabTowar(tabView, dbData, this);
+	tabs[FIRMATAB] = new tabFirma(tabView, dbData, this);
 	curTab = tabs[FAKTURATAB];
 	tabView->Select(FAKTURATAB);
 	updateMenus();
@@ -154,12 +154,6 @@ BeFAKMainWindow::BeFAKMainWindow(const char *windowTitle) : BWindow(
 
 BeFAKMainWindow::~BeFAKMainWindow() {
 	CloseDatabase();
-}
-
-void BeFAKMainWindow::initTabs(BTabView *tv) {
-	tabs[FAKTURATAB] = new tabFaktura(tv, dbData, this);
-	tabs[TOWARTAB] = new tabTowar(tv, dbData, this);
-	tabs[FIRMATAB] = new tabFirma(tv, dbData, this);
 }
 
 void BeFAKMainWindow::DoConfigFirma(bool cancancel) {
@@ -273,6 +267,15 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 
 	this->DisableUpdates();
 	switch (Message->what) {
+		case B_F2_KEY:
+			tabView->Select(0);
+			break;
+		case B_F3_KEY:
+			tabView->Select(1);
+			break;
+		case B_F4_KEY:
+			tabView->Select(2);
+			break;
 		case MENU_PRINTO:
 			p_typ = 0;
 			updateMenus();
@@ -367,6 +370,22 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 	}
 	BWindow::MessageReceived(Message);
 	this->EnableUpdates();
+}
+
+void BeFAKMainWindow::DispatchMessage(BMessage *message, BHandler *handler) {
+	if (message->what == B_KEY_DOWN) {
+		int8 byte;
+		if (message->FindInt8("byte", 0, &byte) == B_OK) {
+			if (byte == B_FUNCTION_KEY) {
+				int32 key;
+				if (message->FindInt32("key", &key) == B_OK) {		
+					message->MakeEmpty();
+					message->what=key;
+				}
+			}
+		}
+	}
+	BWindow::DispatchMessage(message,handler);	
 }
 
 bool BeFAKMainWindow::QuitRequested() {

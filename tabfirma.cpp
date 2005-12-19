@@ -32,7 +32,7 @@ tabFirma::tabFirma(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	curdata = new firmadat(db);
 	this->dirty = false;
 
-	this->tab->SetLabel("Kontrahenci");
+	this->tab->SetLabel("Kontrahenci [F4]");
 	BRect r;
 	r = this->view->Bounds();
 
@@ -49,9 +49,9 @@ tabFirma::tabFirma(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	list->SetInvocationMessage(new BMessage(LIST_INV));
 	list->SetSelectionMessage(new BMessage(LIST_SEL));
 	// buttons
-	but_new = new BButton(BRect(40,0,130,24), "tf_but_new", "Nowy kontrahent", new BMessage(BUT_NEW), B_FOLLOW_LEFT|B_FOLLOW_TOP);
-	but_del = new BButton(BRect(40,510,130,534), "tf_but_del", "Usuń zaznaczone", new BMessage(BUT_DEL), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
-	but_restore = new BButton(BRect(235,510,325,534), "tf_but_restore", "Przywróć", new BMessage(BUT_RESTORE), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
+	but_new = new BButton(BRect(30,0,140,24), "tf_but_new", "Nowy kontrahent [F5]", new BMessage(BUT_NEW), B_FOLLOW_LEFT|B_FOLLOW_TOP);
+	but_del = new BButton(BRect(30,510,140,534), "tf_but_del", "Usuń zaznaczone [F8]", new BMessage(BUT_DEL), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
+	but_restore = new BButton(BRect(235,510,325,534), "tf_but_restore", "Przywróć [F6]", new BMessage(BUT_RESTORE), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
 	but_save = new BButton(BRect(580,510,670,534), "tf_but_save", "Zapisz", new BMessage(BUT_SAVE), B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
 	this->view->AddChild(but_new);
 	this->view->AddChild(but_del);
@@ -117,8 +117,10 @@ tabFirma::tabFirma(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	d = max(data[10]->Divider(), d);
 	data[7]->SetDivider(d); data[8]->SetDivider(d);
 	data[9]->SetDivider(d); data[10]->SetDivider(d);
+	//
+	but_save->MakeDefault(true);
+	//
 	curdataToTab();
-
 	RefreshIndexList();
 }
 
@@ -244,6 +246,7 @@ void tabFirma::MessageReceived(BMessage *Message) {
 			this->dirty = true;
 			updateTab();
 			break;
+		case B_F5_KEY:
 		case BUT_NEW:
 			if (CommitCurdata()) {
 				list->DeselectAll();
@@ -253,9 +256,11 @@ void tabFirma::MessageReceived(BMessage *Message) {
 				curdataToTab();
 			}
 			break;
+		case B_F6_KEY:
 		case BUT_RESTORE:
 			DoFetchCurdata();
 			break;
+		case B_F8_KEY:
 		case BUT_DEL:
 			DoDeleteCurdata();
 			break;
