@@ -53,7 +53,7 @@ dialStat::dialStat(sqlite *db, BHandler *hr) : BWindow(
 	}
 	view->AddChild(new BMenuField(BRect(10,10,150,30), "statMenuf", "Dane za", menu));
 	view->AddChild(rok = new BTextControl(BRect(160,10,230,30), "statRok", "Rok", NULL, new BMessage(DC)));
-	view->AddChild(minilosc = new BTextControl(BRect(240,10,500,30), "statRok", "Nie pokazuj towarów o sprzedanej ilości <=", NULL, new BMessage(DC)));
+	view->AddChild(minilosc = new BTextControl(BRect(240,10,500,30), "statRok", "Ukryj towary o sprzedanej ilości <=", NULL, new BMessage(DC)));
 	view->AddChild(but_find = new BButton(BRect(560,10,630,20), "statButFind", "Znajdź", new BMessage(BUT_FIND)));
 	view->AddChild(new BStringView(BRect(490,430,550,445), "statSum0d", "Suma netto:"));
 	view->AddChild(suma[0] = new BStringView(BRect(560,430,630,445), "statSum0v", NULL));
