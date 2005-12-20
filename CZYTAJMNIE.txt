@@ -28,6 +28,7 @@ ZMIANY
  - możliwość ustawienia wartości domyślnej dla pola 'Wystawił'
  - opcja - numeracja uproszczona dokumentów (bez miesiąca)
  - jednolite skróty klawiaturowe: F2/3/4 - zmiana zakładki, F5/6/8/9 - działanie, ENTER - zapis
+ - podsumowanie na zakładce z listą pozycji faktury
 0.3
  - zmiana formatu bazy, dodane wersjonowanie bazy - obecnie brak możliwości upgrade,
    będzie taka możliwość w przypadku kolejnych zmian
