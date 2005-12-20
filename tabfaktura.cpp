@@ -135,12 +135,12 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db
 	viewogol->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	tabogol = new BTab(viewogol);
 	tbv2->AddTab(viewogol, tabogol);
-	tabogol->SetLabel("Dane ogólne");
+	tabogol->SetLabel("Dane ogólne [F10]");
 	viewpozy = new BView(r, "tfviewpozy", B_FOLLOW_ALL_SIDES, 0);
 	viewpozy->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	tabpozy = new BTab(viewpozy);
 	tbv2->AddTab(viewpozy, tabpozy);
-	tabpozy->SetLabel("Pozycje");
+	tabpozy->SetLabel("Pozycje [F11]");
 
 	initTab1();
 	initTab2();
@@ -898,6 +898,12 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 	BString result,sql;
 
 	switch (Message->what) {
+		case B_F10_KEY:
+			tbv2->Select(0);
+			break;
+		case B_F11_KEY:
+			tbv2->Select(1);
+			break;
 		case DC:
 			this->dirty = true;
 			updateTab();
