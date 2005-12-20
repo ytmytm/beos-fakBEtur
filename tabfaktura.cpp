@@ -384,7 +384,7 @@ void tabFaktura::initTab2(void) {
 			s.OffsetBy(80,0);
 	}
 	// box7
-	box7 = new BBox(BRect(10,360,590,450), "tfbox7");
+	box7 = new BBox(BRect(10,360,590,435), "tfbox7");
 	box7->SetLabel("Uwagi");
 	viewpozy->AddChild(box7);
 	// box7-stuff
@@ -393,6 +393,15 @@ void tabFaktura::initTab2(void) {
 	s = r; s.OffsetTo(0,0);
 	uwagi = new BTextView(r, "tfuwagi", s, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
 	box7->AddChild(uwagi);
+	// payment
+	sumasuma = new BStringView(BRect(10,440,90,455), "tfssd", "Do zapłaty:");
+	viewpozy->AddChild(sumasuma);
+	BFont fontb(be_bold_font);
+	sumasuma->SetFont(&fontb);
+	sumasuma->SetAlignment(B_ALIGN_RIGHT);
+	sumasuma = new BStringView(BRect(100,440,400,455), "tfssv", NULL);
+	viewpozy->AddChild(sumasuma);
+	sumasuma->SetFont(&fontb);
 	// fix widths
 	for (i=0;i<=5;i++)
 		towar[i]->SetDivider(be_plain_font->StringWidth(towar[i]->Label())+5);
@@ -440,6 +449,7 @@ void tabFaktura::updateTab(void) {
 	ogol[2]->SetText(validateDate(ogol[2]->Text()));
 	ogol[3]->SetText(validateDate(ogol[3]->Text()));
 	ogol[6]->SetText(validateDate(ogol[6]->Text()));
+	updatePayment();
 }
 
 void tabFaktura::updateTab2(void) {
@@ -466,7 +476,15 @@ void tabFaktura::updateTab2(void) {
 		for (int j=0;j<6;j++)
 			suma[j]->SetText(result[nCols+j]);
 	}
+	// update summary
+	updatePayment();
 	faklista->calcBruttoFin(result);
+}
+
+void tabFaktura::updatePayment(void) {
+	BString tmp = faklista->calcSumPayment();
+	tmp += " zł";
+	sumasuma->SetText(tmp.String());
 }
 
 void tabFaktura::updateTermin(void) {

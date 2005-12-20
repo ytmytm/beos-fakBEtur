@@ -1,6 +1,5 @@
 //
 // TODO:
-// - podsumowanie faktury pod uwagami
 // - należności
 //		- drugi dialog z podsumowaniem odbiorcy
 //		- na dwukilk na liście (invoke)

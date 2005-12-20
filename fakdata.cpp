@@ -627,6 +627,25 @@ void pozfaklist::calcBruttoFin(char **result) {
 	execSQL("DROP TABLE calcs");
 }
 
+const char *pozfaklist::calcSumPayment(void) {
+	static BString result;
+	int ret;
+
+	execSQL("CREATE TEMPORARY TABLE sumpayment ( cbrutto )");
+
+	pozfakitem *cur = start;
+
+	while (cur!=NULL) {
+		ret = sqlite_exec_printf(dbData,
+		"INSERT INTO sumpayment (cbrutto) VALUES (%Q);",
+		0, 0, &dbErrMsg, cur->data->data[10].String() );
+		cur = cur->nxt;
+	}
+	result = execSQL("SELECT DECROUND(SUM(cbrutto)) FROM sumpayment");
+	execSQL("DROP TABLE sumpayment");
+	return result.String();
+}
+
 // XXX this is duplicated in befaktab!
 const char *pozfaklist::execSQL(const char *input) {
 	int nRows, nCols;

@@ -47,6 +47,7 @@ class tabFaktura : public beFakTab {
 		void curdataToTab(void);
 		void updateTab(void);
 		void updateTab2(void);
+		void updatePayment(void);
 		void updateTermin(void);
 		bool validateTab(void);
 		bool validateTowar(void);
@@ -74,6 +75,7 @@ class tabFaktura : public beFakTab {
 		BTextControl *nazwa;
 		BTextControl *ogol[10], *data[11], *towar[6];
 		BStringView *suma[6];
+		BStringView *sumasuma;
 		BTextView *uwagi;
 		BButton *cbut[5];
 		BCheckBox *cbzaplacono;
