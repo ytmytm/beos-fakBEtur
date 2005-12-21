@@ -54,10 +54,12 @@ dialVat::dialVat(sqlite *db, BHandler *hr) : BWindow(
 	but_new = new BButton(BRect(160,200,240,230), "dv_but_new", "Nowa", new BMessage(BUT_NEW), B_FOLLOW_BOTTOM);
 	but_del = new BButton(BRect(30,200,110,230), "dv_but_del", "Usuń", new BMessage(BUT_DEL), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
 	but_save = new BButton(BRect(290,200,370,230), "dv_but_save", "Zapisz", new BMessage(BUT_SAVE), B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
-
 	view->AddChild(but_new);
 	view->AddChild(but_del);
 	view->AddChild(but_save);
+	but_new->ResizeToPreferred();
+	but_del->ResizeToPreferred();
+	but_save->ResizeToPreferred();
 
 	// fix widths
 	float d = max(be_plain_font->StringWidth(nazwa->Label())+5,be_plain_font->StringWidth(stawka->Label())+5);

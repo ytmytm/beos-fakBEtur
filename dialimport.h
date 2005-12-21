@@ -6,6 +6,7 @@
 #include <sqlite.h>
 
 class pozfaklist;
+class BButton;
 class BHandler;
 class BMessage;
 class BView;
@@ -22,6 +23,7 @@ class dialImport : public BWindow {
 
 		BHandler *handler;
 		BView *view;
+		BButton *but_import;
 		ColumnListView *list;
 
 		pozfaklist *flist;

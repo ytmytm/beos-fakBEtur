@@ -57,6 +57,10 @@ tabFirma::tabFirma(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	this->view->AddChild(but_del);
 	this->view->AddChild(but_restore);
 	this->view->AddChild(but_save);
+	but_new->ResizeToPreferred();
+	but_del->ResizeToPreferred();
+	but_restore->ResizeToPreferred();
+	but_save->ResizeToPreferred();
 	// box1
 	box1 = new BBox(BRect(230,30,670,180), "tf_box1");
 	box1->SetLabel("Dane adresowe");

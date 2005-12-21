@@ -48,6 +48,7 @@ dialCalendar::dialCalendar(const char *inidate, BTextControl *ptr, int32 msg, BH
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	this->AddChild(view);
 	view->AddChild(monthyear = new BStringView(BRect(60,5,135,25), "calendarMonthYear", NULL));
+	monthyear->SetAlignment(B_ALIGN_CENTER);
 	view->AddChild(but_prevy = new BButton(BRect(10,5,30,25), "calendarButPrevy", "<<", new BMessage(BUT_PREVY)));
 	view->AddChild(but_prevm = new BButton(BRect(35,5,55,25), "calendarButPrevm", "<", new BMessage(BUT_PREVM)));
 	view->AddChild(but_nextm = new BButton(BRect(140,5,160,25), "calendarButNextm", ">", new BMessage(BUT_NEXTM)));
@@ -66,8 +67,9 @@ dialCalendar::dialCalendar(const char *inidate, BTextControl *ptr, int32 msg, BH
 			view->AddChild(caltab[i][j] = new BButton(BRect(10+i*25,55+j*25,30+i*25,75+j*25), NULL, "33", msg));
 		}
 	}
-	view->AddChild(but_ok = new BButton(BRect(150,218,185,235), "calendarButOk", "OK", new BMessage(BUT_OK)));
+	view->AddChild(but_ok = new BButton(BRect(120,210,165,230), "calendarButOk", "OK", new BMessage(BUT_OK)));
 	but_ok->MakeDefault(true);
+	but_ok->ResizeToPreferred();
 	RefreshCalendar();
 }
 

@@ -29,7 +29,9 @@ dialImport::dialImport(sqlite *db, int aktualna, pozfaklist *faklista, BHandler 
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	this->AddChild(view);
 
-	view->AddChild(new BButton(BRect(40,330,140,360), "importButImport", "Import", new BMessage(BUT_IMPORT)));
+	view->AddChild(but_import = new BButton(BRect(40,330,140,360), "importButImport", "Import", new BMessage(BUT_IMPORT)));
+	but_import->ResizeToPreferred();
+	but_import->MakeDefault(true);
 
 	// columnlistview
 	CLVContainerView *containerView;

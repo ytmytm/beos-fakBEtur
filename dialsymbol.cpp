@@ -38,7 +38,9 @@ dialSymbol::dialSymbol(sqlite *db, bool towar, dbdat *data, BHandler *hr) : BWin
 	view->AddChild(nazwa = new BStringView(r, "symbolNazwa", NULL));
 	view->AddChild(error = new BStringView(BRect(70,80,240,100), "symbolError", NULL));
 	view->AddChild(but_ok = new BButton(BRect(240,110,290,140), "symbolButok", "OK", new BMessage(BUT_OK)));
-	view->AddChild(new BButton(BRect(15,110,70,140), "symbolButCancel", "Anuluj", new BMessage(BUT_CANCEL)));
+	view->AddChild(but_cancel = new BButton(BRect(15,110,70,140), "symbolButCancel", "Anuluj", new BMessage(BUT_CANCEL)));
+	but_ok->ResizeToPreferred();
+	but_cancel->ResizeToPreferred();
 
 	if (istowar) {
 		nazwa->SetText(((towardat*)curdata)->data[0].String());

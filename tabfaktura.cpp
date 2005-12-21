@@ -126,6 +126,11 @@ tabFaktura::tabFaktura(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db
 	this->view->AddChild(but_restore);
 	this->view->AddChild(but_save);
 	this->view->AddChild(but_print);
+	but_new->ResizeToPreferred();
+	but_del->ResizeToPreferred();
+	but_restore->ResizeToPreferred();
+	but_save->ResizeToPreferred();
+	but_print->ResizeToPreferred();
 
 	tbv2 = new BTabView(BRect(180,0,790,500), "tftbv2");
 	this->view->AddChild(tbv2);
@@ -359,17 +364,21 @@ void tabFaktura::initTab2(void) {
 	box6->AddChild(menujmField);
 	// box5-stuff-cont
 	but_psave = new BButton(BRect(10,260,70,290), "tf_but_psave", "Zapisz", new BMessage(BUT_PSAVE));
-	but_pnew = new BButton(BRect(330,260,390,290), "tf_but_pnew", "Nowy", new BMessage(BUT_PNEW));
-	but_pimport = new BButton(BRect(400,260,480,290), "tf_but_pimport", "Import z innej", new BMessage(BUT_PIMPORT));
+	but_pnew = new BButton(BRect(310,260,370,290), "tf_but_pnew", "Nowy", new BMessage(BUT_PNEW));
+	but_pimport = new BButton(BRect(390,260,480,290), "tf_but_pimport", "Import z innej", new BMessage(BUT_PIMPORT));
 	but_pdel = new BButton(BRect(490,260,560,290), "tf_but_pdel", "Usuń", new BMessage(BUT_PDEL));
 	box5->AddChild(but_psave);
 	box5->AddChild(but_pnew);
 	box5->AddChild(but_pimport);
 	box5->AddChild(but_pdel);
+	but_psave->ResizeToPreferred();
+	but_pnew->ResizeToPreferred();
+	but_pimport->ResizeToPreferred();
+	but_pdel->ResizeToPreferred();
 
 	r.left = 10; r.right = 100; r.top = 290; r.bottom = 310;
 	s = r; s.OffsetBy(0,20);
-	box5->AddChild(new BStringView(r, "tf_ss0", "Cena jednostkowa")); r.OffsetBy(100,0);
+	box5->AddChild(new BStringView(r, "tf_ss0", "Cena jednost.")); r.OffsetBy(100,0);
 	box5->AddChild(new BStringView(r, "tf_ss1", "Cena brutto")); r.OffsetBy(80,0);
 	box5->AddChild(new BStringView(r, "tf_ss2", "Ilość")); r.OffsetBy(80,0);
 	box5->AddChild(new BStringView(r, "tf_ss3", "Wartość netto")); r.OffsetBy(80,0);

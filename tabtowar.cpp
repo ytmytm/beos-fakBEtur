@@ -73,6 +73,10 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	this->view->AddChild(but_del);
 	this->view->AddChild(but_restore);
 	this->view->AddChild(but_save);
+	but_new->ResizeToPreferred();
+	but_del->ResizeToPreferred();
+	but_restore->ResizeToPreferred();
+	but_save->ResizeToPreferred();
 	// box1
 	box1 = new BBox(BRect(230,30,710,140), "tt_box1");
 	box1->SetLabel("Dane towaru");
@@ -124,6 +128,9 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	box2->AddChild(but_sell);
 	box2->AddChild(but_marza);
 	box2->AddChild(but_import);
+	but_sell->ResizeToPreferred();
+	but_marza->ResizeToPreferred();
+	but_import->ResizeToPreferred();
 	brutto = new BStringView(BRect(330,15,390,35), "ttb0", "Cena brutto:");
 	box2->AddChild(brutto);
 	brutto = new BStringView(BRect(400,15,475,35), "ttbr", "XXXX,YY zł");

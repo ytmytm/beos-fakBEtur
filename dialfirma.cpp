@@ -80,12 +80,14 @@ dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
 	wystawil->SetDivider(be_plain_font->StringWidth(wystawil->Label())+5);
 	view->AddChild(wystawil);
 	// buttons - OK, CANCEL
-	but_ok = new BButton(BRect(400,360,450,380), "firma_butok", "OK", new BMessage(BUT_OK));
+	but_ok = new BButton(BRect(370,360,420,380), "firma_butok", "OK", new BMessage(BUT_OK));
 	if (cancancel) {
 		but_cancel = new BButton(BRect(10,360,60,380), "firma_butcancel", "Anuluj", new BMessage(BUT_CANCEL));
 		view->AddChild(but_cancel);
+		but_cancel->ResizeToPreferred();
 	}
 	view->AddChild(but_ok);
+	but_ok->ResizeToPreferred();
 	but_ok->MakeDefault(true);
 	// fetch i wypelnij boxy danymi
 	int i, j;

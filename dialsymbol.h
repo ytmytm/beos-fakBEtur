@@ -24,7 +24,7 @@ class dialSymbol : public BWindow {
 
 		BHandler *handler;
 		BView *view;
-		BButton *but_ok;
+		BButton *but_ok, *but_cancel;
 		BStringView *nazwa, *error;
 		BTextControl *symbol;
 

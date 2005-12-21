@@ -71,7 +71,10 @@ dialNaleznosci::dialNaleznosci(sqlite *db) : BWindow(
 
 	view->AddChild(but_whoowes = new BButton(BRect(10,440,110,460), "nalezButWho", "Należności odbiorcy", new BMessage(BUT_WHO)));
 	view->AddChild(but_pay = new BButton(BRect(240,440,360,460), "nalezButPay", "Zapłacono za wybraną", new BMessage(BUT_PAY)));
-	view->AddChild(but_payall = new BButton(BRect(510,440,630,460), "nalezButPayAll", "Zapłacono za wszystkie", new BMessage(BUT_PAYALL)));
+	view->AddChild(but_payall = new BButton(BRect(500,440,620,460), "nalezButPayAll", "Zapłacono za wszystkie", new BMessage(BUT_PAYALL)));
+	but_whoowes->ResizeToPreferred();
+	but_pay->ResizeToPreferred();
+	but_payall->ResizeToPreferred();
 
 	but_whoowes->SetEnabled(false);
 	but_find->MakeDefault(true);
