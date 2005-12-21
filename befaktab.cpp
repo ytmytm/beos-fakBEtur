@@ -7,6 +7,7 @@
 #include <String.h>
 #include <TabView.h>
 #include <View.h>
+#include <parsedate.h>
 #include <stdio.h>
 
 beFakTab::beFakTab(BTabView *tv, sqlite *db, BHandler *hr) {
@@ -65,16 +66,15 @@ const char *beFakTab::validateDecimal(const char *input) {
 
 const char *beFakTab::validateDate(const char *input) {
 	static BString tmp;
-	BString sql;
-
-	tmp = input;
-	tmp.ReplaceAll("/","-");
-
-	sql = "SELECT DATE('"; sql += tmp; sql += "')";
-	tmp = execSQL(sql.String());
-	if (tmp.Length()==0) {
-		sql = "SELECT DATE('now')";
-		tmp = execSQL(sql.String());
+	time_t date = parsedate(input,-1);
+	if (date<0) {
+		tmp = execSQL("SELECT DATE('now')");
+	} else {
+		char result[11];
+		struct tm t;
+		localtime_r(&date,&t);
+		strftime(result,sizeof(result),"%F",&t);
+		tmp = result;
 	}
 	return tmp.String();
 }
