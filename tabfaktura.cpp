@@ -206,9 +206,9 @@ void tabFaktura::initTab1(void) {
 	box2->SetLabel("Płatność");
 	viewogol->AddChild(box2);
 	// box2-stuff
-	ogol[5] = new BTextControl(BRect(10,10,150,30), "tfd5", "Forma", NULL, new BMessage(DC));
-	ogol[6] = new BTextControl(BRect(10,40,150,60), "tfd6", "Termin", NULL, new BMessage(DC));
-	ogol[7] = new BTextControl(BRect(200,40,270,60), "tfd7", "Dni", NULL, new BMessage(TERMCHANGE));
+	ogol[5] = new BTextControl(BRect(10,20,150,40), "tfd5", "Forma", NULL, new BMessage(DC));
+	ogol[6] = new BTextControl(BRect(10,50,150,70), "tfd6", "Termin", NULL, new BMessage(DC));
+	ogol[7] = new BTextControl(BRect(200,50,270,70), "tfd7", "Dni", NULL, new BMessage(TERMCHANGE));
 	box2->AddChild(ogol[5]);
 	box2->AddChild(ogol[6]);
 	box2->AddChild(ogol[7]);
@@ -220,11 +220,11 @@ void tabFaktura::initTab1(void) {
 		menufp->AddItem(new BMenuItem(fplatnosci[j], msg));
 		j++;
 	}
-	BMenuField *menufpField = new BMenuField(BRect(160,10,180,30), "tfmffp", NULL, menufp);
+	BMenuField *menufpField = new BMenuField(BRect(160,20,180,40), "tfmffp", NULL, menufp);
 	box2->AddChild(menufpField);
 	msg = new BMessage(CBUT);
 	msg->AddPointer("_datefield", ogol[6]);
-	cbut[2] = new BButton(BRect(160,40,180,60), "tfcbut2", "+", msg);
+	cbut[2] = new BButton(BRect(160,50,180,70), "tfcbut2", "+", msg);
 	box2->AddChild(cbut[2]);
 	// box3
 	box3 = new BBox(BRect(310,130,590,210),"tf1box3");
