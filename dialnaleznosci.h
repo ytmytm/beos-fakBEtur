@@ -11,6 +11,7 @@ class BStringView;
 class BTextControl;
 class BView;
 class ColumnListView;
+class dialNalodb;
 
 class dialNaleznosci : public BWindow {
 	public:
@@ -22,6 +23,7 @@ class dialNaleznosci : public BWindow {
 		void DoFind(void);
 		void DoPayFor(int item);
 		void DoPayForAll(void);
+		void DoShowNaleznosciOdb(int item);
 		const char *execSQL(const char *input);
 		const char *validateDecimal(const char *input);
 
@@ -29,6 +31,8 @@ class dialNaleznosci : public BWindow {
 		BButton *but_find, *but_whoowes, *but_pay, *but_payall;
 		BTextControl *daysago;
 		ColumnListView *list;
+
+		dialNalodb *nalodbDialog;
 
 		sqlite *dbData;
 		char *dbErrMsg;

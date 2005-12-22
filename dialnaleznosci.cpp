@@ -10,6 +10,7 @@
 #include "globals.h"
 #include "fakdata.h"	// toint...
 #include "dialnaleznosci.h"
+#include "dialnalodb.h"
 #include <stdio.h>
 #include <time.h>
 #include <parsedate.h>
@@ -26,6 +27,7 @@ class tab5ListItem : public CLVEasyItem {
 		tab5ListItem(int id, const char *col0, const char *col1, const char *col2, const char *col3, const char *col4) : CLVEasyItem(
 			0, false, false, 20.0) {
 			fId = id;
+			fOdbiorca = col1;
 			SetColumnContent(0,col0);
 			SetColumnContent(1,col1);
 			SetColumnContent(2,col2,true,true);
@@ -33,8 +35,10 @@ class tab5ListItem : public CLVEasyItem {
 			SetColumnContent(4,col4,true,true);
 		};
 		int Id(void) { return fId; };
+		const char *Odbiorca(void) { return fOdbiorca.String(); };
 	private:
 		int fId;
+		BString fOdbiorca;
 };
 
 dialNaleznosci::dialNaleznosci(sqlite *db) : BWindow(
@@ -170,6 +174,11 @@ void dialNaleznosci::DoPayFor(int item) {
 	execSQL(sql.String());
 }
 
+void dialNaleznosci::DoShowNaleznosciOdb(int item) {
+	tab5ListItem *it = ((tab5ListItem*)list->ItemAt(item));
+	nalodbDialog = new dialNalodb(dbData, it->Odbiorca());
+}
+
 void dialNaleznosci::MessageReceived(BMessage *Message) {
 	switch (Message->what) {
 		case DC:
@@ -195,6 +204,12 @@ void dialNaleznosci::MessageReceived(BMessage *Message) {
 			DoPayForAll();
 			DoFind();
 			break;
+		case LIST_INV:
+			{	int i = list->CurrentSelection(0);
+				if (i>=0)
+					DoShowNaleznosciOdb(i);
+				break;
+			}
 		default:
 			BWindow::MessageReceived(Message);
 			break;
