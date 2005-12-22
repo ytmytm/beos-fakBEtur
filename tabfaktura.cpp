@@ -458,7 +458,6 @@ void tabFaktura::updateTab(void) {
 	ogol[2]->SetText(validateDate(ogol[2]->Text()));
 	ogol[3]->SetText(validateDate(ogol[3]->Text()));
 	ogol[6]->SetText(validateDate(ogol[6]->Text()));
-	updatePayment();
 }
 
 void tabFaktura::updateTab2(void) {
@@ -485,8 +484,6 @@ void tabFaktura::updateTab2(void) {
 		for (int j=0;j<6;j++)
 			suma[j]->SetText(result[nCols+j]);
 	}
-	// update summary
-	updatePayment();
 	faklista->calcBruttoFin(result);
 }
 
@@ -933,12 +930,16 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			DoDeleteCurdata();
 			break;
 		case BUT_SAVE:
+			updateTab();		// ensure that data is validated, DC might not be delivered
+			updateTab2();		// ensure that data is validated, DC might not be delivered
 			curdataFromTab();
 			DoCommitCurdata();
 			curdataToTab();
 			break;
 		case B_F9_KEY:
 		case BUT_PRINT:
+			updateTab();		// ensure that data is validated, DC might not be delivered
+			updateTab2();		// ensure that data is validated, DC might not be delivered
 			curdataFromTab();
 			DoCommitCurdata();
 			curdataToTab();
@@ -1266,6 +1267,8 @@ void tabFaktura::RefreshTowarList(void) {
 		));
 		cur = cur->nxt;
 	}
+	// refresh summary
+	updatePayment();
 }
 
 void tabFaktura::RefreshFirmaSymbols(void) {
