@@ -5,6 +5,7 @@
 #include <String.h>
 #include <Window.h>
 #include <sqlite.h>
+#include "befaktab.h"
 #include "CLVEasyItem.h"
 
 class BButton;
@@ -15,7 +16,7 @@ class BView;
 class ColumnListView;
 class dialNalodb;
 
-class dialNaleznosci : public BWindow {
+class dialNaleznosci : public BWindow, public beFakTab {
 	public:
 		dialNaleznosci(sqlite *db);
 		void MessageReceived(BMessage *Message);
@@ -26,8 +27,6 @@ class dialNaleznosci : public BWindow {
 		void DoPayFor(int item);
 		void DoPayForAll(void);
 		void DoShowNaleznosciOdb(int item);
-		const char *execSQL(const char *input);
-		const char *validateDecimal(const char *input);
 
 		BView *view;
 		BButton *but_find, *but_whoowes, *but_pay, *but_payall;
@@ -35,9 +34,6 @@ class dialNaleznosci : public BWindow {
 		ColumnListView *list;
 
 		dialNalodb *nalodbDialog;
-
-		sqlite *dbData;
-		char *dbErrMsg;
 };
 
 class tab5ListItem : public CLVEasyItem {

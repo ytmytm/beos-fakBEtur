@@ -34,7 +34,7 @@ dialStat::dialStat(sqlite *db, BHandler *hr) : BWindow(
 	BRect(100+20, 100+20, 740+20, 580+20),
 	NULL,
 	B_TITLED_WINDOW,
-	B_NOT_RESIZABLE ) {
+	B_NOT_RESIZABLE ), beFakTab(NULL,db,NULL) {
 
 	handler = hr;
 	dbData = db;
@@ -179,20 +179,4 @@ void dialStat::MessageReceived(BMessage *Message) {
 			BWindow::MessageReceived(Message);
 			break;
 	}
-}
-
-// XXX this is 3rd duplicated in befaktab, fakdata!
-const char *dialStat::execSQL(const char *input) {
-	int nRows, nCols;
-	char **result;
-	static BString res;
-//printf("sql=[%s]\n",sql.String());
-	sqlite_get_table(dbData, input, &result, &nRows, &nCols, &dbErrMsg);
-//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
-	if (nRows < 1)
-		res = "";
-	else
-		res = result[1];
-	sqlite_free_table(result);
-	return res.String();
 }

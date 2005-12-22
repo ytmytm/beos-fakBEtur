@@ -1,7 +1,9 @@
 //
 // TODO:
 // - automatyczna numeracja faktur popsuta?
+// - tytuł kolumny w dialstat - netto czy brutto?
 // - należności
+//		- prawidłowe rozdzielanie l/r
 //		- button w kontrahentach
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- stan magazynu w stringview pomiędzy buttonami

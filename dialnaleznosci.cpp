@@ -24,7 +24,7 @@ dialNaleznosci::dialNaleznosci(sqlite *db) : BWindow(
 	BRect(100+20, 100+20, 740+20, 580+20),
 	"Należności",
 	B_TITLED_WINDOW,
-	B_NOT_RESIZABLE ) {
+	B_NOT_RESIZABLE ), beFakTab(NULL, db, NULL) {
 
 	dbData = db;
 
@@ -170,33 +170,4 @@ void dialNaleznosci::MessageReceived(BMessage *Message) {
 			BWindow::MessageReceived(Message);
 			break;
 	}
-}
-
-// XXX this is 4th duplicated in befaktab, fakdata, dialstat
-const char *dialNaleznosci::execSQL(const char *input) {
-	int nRows, nCols;
-	char **result;
-	static BString res;
-//printf("sql=[%s]\n",sql.String());
-	sqlite_get_table(dbData, input, &result, &nRows, &nCols, &dbErrMsg);
-//printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
-	if (nRows < 1)
-		res = "";
-	else
-		res = result[1];
-	sqlite_free_table(result);
-	return res.String();
-}
-
-// XXX dupe from befaktab
-const char *dialNaleznosci::validateDecimal(const char *input) {
-	BString sql, tmp;
-
-	tmp = input;
-	if (tmp.Length() == 0)
-		tmp = "0";
-	tmp.ReplaceAll(",",".");	// XXX more safeguards?
-
-	sql = "SELECT DECROUND(ABS(0"; sql += tmp; sql += "))";
-	return execSQL(sql.String());
 }

@@ -5,6 +5,7 @@
 #include <Window.h>
 #include "CLVEasyItem.h"
 #include <sqlite.h>
+#include "befaktab.h"
 
 class BHandler;
 class BMessage;
@@ -14,7 +15,7 @@ class BTextControl;
 class BView;
 class ColumnListView;
 
-class dialStat : public BWindow {
+class dialStat : public BWindow, public beFakTab {
 	public:
 		dialStat(sqlite *db, BHandler *hr);
 		virtual void MessageReceived(BMessage *Message);
@@ -22,7 +23,6 @@ class dialStat : public BWindow {
 
 	private:
 		void DoFind(void);
-		const char *execSQL(const char *input);
 
 		BHandler *handler;
 		BView *view, *viewtable;
@@ -33,9 +33,6 @@ class dialStat : public BWindow {
 		BStringView *suma[2];	// netto, vat
 
 		int mies;
-
-		sqlite *dbData;
-		char *dbErrMsg;
 };
 
 class tab3ListItem : public CLVEasyItem {
