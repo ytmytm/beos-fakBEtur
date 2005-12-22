@@ -225,6 +225,32 @@ int toint(const char *input) {
 		return 0;
 }
 
+#include <time.h>
+#include <parsedate.h>
+
+int calcdaysago(const char *olddate) {
+	time_t ago;
+	double secs;
+	int days;
+
+	ago = parsedate(olddate, -1);
+	secs = difftime(time(NULL), ago);
+	days = int(secs/(60*60*24));
+	return days;
+}
+
+const char *daysagostring(int days) {
+	static char result[11];
+	time_t cur;
+	struct tm t;
+
+	cur = time(NULL);
+	cur -= 60*60*24*days;
+	localtime_r(&cur,&t);
+	strftime(result,sizeof(result),"%F",&t);
+	return result;
+}
+
 //----------------------
 
 fakturadat::fakturadat(sqlite *db) : dbdat(db) {

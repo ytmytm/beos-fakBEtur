@@ -1,8 +1,7 @@
 //
 // TODO:
+// - automatyczna numeracja faktur popsuta?
 // - należności
-//		- drugi dialog z podsumowaniem odbiorcy
-//		- na dwukilk na liście (invoke)
 //		- button w kontrahentach
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- stan magazynu w stringview pomiędzy buttonami
@@ -24,6 +23,7 @@
 //		- txt: znak końca linii
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - usunąć duplikaty execSQL() - zrobic jakos globalnie?
+//		- dziedziczyc pusty befaktab
 // - na koniec - usunac printfy z debugiem
 // - na koniec - porównać opis w CZYTAJMNIE z listą zmian i uaktualnić
 //

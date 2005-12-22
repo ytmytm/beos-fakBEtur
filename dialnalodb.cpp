@@ -1,4 +1,9 @@
 
+//
+// podsumowanie i rozdział na L i R nieprawidłowe
+//
+//
+
 #include <Box.h>
 #include <Button.h>
 #include <String.h>
@@ -8,26 +13,14 @@
 #include "CLVEasyItem.h"
 
 #include "globals.h"
+#include "dialnaleznosci.h"
 #include "dialnalodb.h"
 #include "fakdata.h"
 #include <stdio.h>
 
 const uint32 BUT_CLOSE	= 'DNOC';
 
-class tab4ListItem : public CLVEasyItem {
-	public:
-		tab4ListItem(int id, const char *col0, const char *col1, const char *col2, const char *col3) : CLVEasyItem(
-			0, false, false, 20.0) {
-			fId = id;
-			SetColumnContent(0,col0);
-			SetColumnContent(1,col1);
-			SetColumnContent(2,col2,true,true);
-			SetColumnContent(3,col3,true,true);
-		};
-		int Id(void) { return fId; };
-	private:
-		int fId;
-};
+enum { F_ZALEGLA = 1, F_NIEZAPL, F_ZAPLACONA };
 
 dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 	BRect(100, 100, 740, 580),
@@ -64,6 +57,7 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 		B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE, B_SINGLE_SELECTION_LIST, false, true, true, true,
 		B_FANCY_BORDER);
 	listl->AddColumn(new CLVColumn("Numer", 67, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
+	listl->AddColumn(new CLVColumn("Nazwa odbiorcy", 240, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE|CLV_HIDDEN));
 	listl->AddColumn(new CLVColumn("Dni", 60, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
 	listl->AddColumn(new CLVColumn("Zapłacono", 75, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
 	listl->AddColumn(new CLVColumn("Pozostało", 75, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
@@ -82,7 +76,6 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 	view->AddChild(but_close = new BButton(BRect(540,440,620,470), "nalodbButClose", "Zamknij", new BMessage(BUT_CLOSE)));
 	but_close->ResizeToPreferred();
 	but_close->MakeDefault(true);
-	this->Show();
 
 	BString tmp = "SELECT id FROM firma WHERE nazwa = '";
 	tmp += odb; tmp += "'";
@@ -92,9 +85,67 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 	tmp = "Wykaz należności: "; tmp += odb;
 	this->SetTitle(tmp.String());
 
-	// fill left list (4)
-	// fill right list (2)
+	BString sql;
+	int nRows, nCols;
+	char **result;
+	int typ;
+
+	// prepare temporary for stats
+	execSQL("CREATE TEMPORARY TABLE nalodbsuma ( kwota DECIMAL(12,2), typ INTEGER )");
+
+	sql = "SELECT f.id, f.nazwa, f.onazwa, f.termin_zaplaty, f.zaplacono, f.zapl_kwota";
+	sql += " FROM faktura AS f, firma AS k WHERE k.nazwa = f.onazwa ORDER BY f.data_sprzedazy";
+	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	if (nRows < 1) {
+		// no entries
+	} else {
+		int nRows2, nCols2;
+		char **result2;
+		for (int i=1;i<=nRows;i++) {
+			// brutto 'do zaplaty'
+			sql = "SELECT DECROUND(SUM(DECROUND(DECROUND(DECROUND(p.netto*(100-p.rabat)/100.0)*p.ilosc)*(100+s.stawka)/100.0))) AS sumabrutto ";
+			sql += "FROM faktura AS f, pozycjafakt AS p, stawka_vat AS s ";
+			sql += "WHERE p.fakturaid = f.id AND p.vatid = s.id AND f.id = ";
+			sql << result[i*nCols+0];
+			sqlite_get_table(dbData, sql.String(), &result2, &nRows2, &nCols2, &dbErrMsg);
+			// pozostalo - czy zaplacona_kwota < brutto?
+			sql = "SELECT 0"; sql += result[i*nCols+5]; sql += "<0"; sql += result2[nCols2];
+			if (toint(execSQL(sql.String()))) {
+				// niezapłacona
+				BString dnizaleg;
+				BString reszta;
+				sql = "SELECT DECROUND(0"; sql += result2[nCols2]; sql += "-0"; sql += result[i*nCols+5]; sql += ")";
+				reszta = validateDecimal(execSQL(sql.String()));
+				dnizaleg << calcdaysago(result[i*nCols+3]);
+				listl->AddItem(new tab5ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2], dnizaleg.String(), validateDecimal(result[i*nCols+5]), reszta.String()));
+				// update summary
+				if (toint(dnizaleg.String()) > 0)
+					typ = F_ZALEGLA;
+				else
+					typ = F_NIEZAPL;
+				sqlite_exec_printf(dbData, "INSERT INTO nalodbsuma VALUES ( %Q, %i )", 0, 0, &dbErrMsg,
+					reszta.String(), typ);
+			} else {
+				// zapłacona
+				listr->AddItem(new tab2ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result2[nCols2]));
+				typ = F_ZAPLACONA;
+				sqlite_exec_printf(dbData, "INSERT INTO nalodbsuma VALUES ( %Q, %i )", 0, 0, &dbErrMsg,
+					result2[nCols2], typ);
+			}
+			sqlite_free_table(result2);
+		}
+	}
+	sqlite_free_table(result);
 	// fill summaries
+	sql = "SELECT DECROUND(SUM(kwota)) FROM nalodbsuma WHERE typ = ";
+	tmp = sql; tmp << F_ZALEGLA;
+	razemnold->SetText(execSQL(tmp.String()));
+	tmp = sql; tmp << F_ZALEGLA; tmp += " OR typ = "; tmp << F_NIEZAPL;
+	razemn->SetText(execSQL(tmp.String()));
+	tmp = sql; tmp << F_ZAPLACONA;
+	razemp->SetText(execSQL(tmp.String()));
+	execSQL("DROP TABLE nalodbsuma");
+	this->Show();
 }
 
 void dialNalodb::MessageReceived(BMessage *Message) {

@@ -12,8 +12,6 @@
 #include "dialnaleznosci.h"
 #include "dialnalodb.h"
 #include <stdio.h>
-#include <time.h>
-#include <parsedate.h>
 
 const uint32 DC			= 'NADC';
 const uint32 BUT_FIND	= 'NAFI';
@@ -21,25 +19,6 @@ const uint32 BUT_WHO	= 'NAWO';
 const uint32 BUT_PAY	= 'NAPY';
 const uint32 BUT_PAYALL	= 'NAPA';
 const uint32 LIST_INV	= 'NALI';
-
-class tab5ListItem : public CLVEasyItem {
-	public:
-		tab5ListItem(int id, const char *col0, const char *col1, const char *col2, const char *col3, const char *col4) : CLVEasyItem(
-			0, false, false, 20.0) {
-			fId = id;
-			fOdbiorca = col1;
-			SetColumnContent(0,col0);
-			SetColumnContent(1,col1);
-			SetColumnContent(2,col2,true,true);
-			SetColumnContent(3,col3,true,true);
-			SetColumnContent(4,col4,true,true);
-		};
-		int Id(void) { return fId; };
-		const char *Odbiorca(void) { return fOdbiorca.String(); };
-	private:
-		int fId;
-		BString fOdbiorca;
-};
 
 dialNaleznosci::dialNaleznosci(sqlite *db) : BWindow(
 	BRect(100+20, 100+20, 740+20, 580+20),
@@ -84,29 +63,6 @@ dialNaleznosci::dialNaleznosci(sqlite *db) : BWindow(
 	but_find->MakeDefault(true);
 	daysago->MakeFocus();
 	this->Show();
-}
-
-int calcdaysago(const char *olddate) {
-	time_t ago;
-	double secs;
-	int days;
-
-	ago = parsedate(olddate, -1);
-	secs = difftime(time(NULL), ago);
-	days = int(secs/(60*60*24));
-	return days;
-}
-
-const char *daysagostring(int days) {
-	static char result[11];
-	time_t cur;
-	struct tm t;
-
-	cur = time(NULL);
-	cur -= 60*60*24*days;
-	localtime_r(&cur,&t);
-	strftime(result,sizeof(result),"%F",&t);
-	return result;
 }
 
 void dialNaleznosci::DoFind(void) {

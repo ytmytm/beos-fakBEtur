@@ -132,5 +132,7 @@
 
 	// helpers
 	int toint(const char *input);
+	int calcdaysago(const char *olddate);
+	const char *daysagostring(int days);
 
 #endif
