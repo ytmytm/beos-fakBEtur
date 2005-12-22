@@ -1,7 +1,6 @@
 
 //
-// podsumowanie i rozdział na L i R nieprawidłowe
-//
+// XXX mostly most of db stuff is duped from dialnaleznosci
 //
 
 #include <Box.h>
@@ -23,7 +22,7 @@ const uint32 BUT_CLOSE	= 'DNOC';
 enum { F_ZALEGLA = 1, F_NIEZAPL, F_ZAPLACONA };
 
 dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
-	BRect(100, 100, 740, 580),
+	BRect(100+40, 100+40, 740+40, 580+40),
 	NULL,
 	B_TITLED_WINDOW,
 	B_NOT_RESIZABLE ), beFakTab(NULL,db,NULL) {
