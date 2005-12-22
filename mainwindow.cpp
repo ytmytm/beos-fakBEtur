@@ -1,10 +1,7 @@
 //
 // TODO:
-// - automatyczna numeracja faktur popsuta?
-// - tytuł kolumny w dialstat - netto czy brutto?
-// - należności
-//		- prawidłowe rozdzielanie l/r
-//		- button w kontrahentach
+// - checkbox (i pole) 'zaplacono' - usunąć, wyrównać, wstawić button
+//   'zapłacono'
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- stan magazynu w stringview pomiędzy buttonami
 //		- info o stanie magazynowym z dnia XXXX do ustawienia w towary

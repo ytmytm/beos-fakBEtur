@@ -36,7 +36,7 @@ class tabFirma : public beFakTab {
 		bool validateTab(void);
 
 	private:
-		BButton *but_new, *but_del, *but_restore, *but_save;
+		BButton *but_new, *but_del, *but_restore, *but_save, *but_payments;
 		ColumnListView *list;
 		BBox *box1, *box2, *box3, *box4;
 		BTextControl *data[11];

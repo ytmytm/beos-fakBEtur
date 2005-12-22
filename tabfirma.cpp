@@ -9,6 +9,7 @@
 #include "globals.h"
 #include "tabfirma.h"
 #include "fakdata.h"
+#include "dialnalodb.h"
 
 #include <Alert.h>
 #include <Box.h>
@@ -25,6 +26,7 @@ const uint32 BUT_NEW	= 'TFBN';
 const uint32 BUT_DEL	= 'TFBD';
 const uint32 BUT_RESTORE= 'TFBR';
 const uint32 BUT_SAVE	= 'TFBS';
+const uint32 BUT_PAYMENT= 'TFBP';
 const uint32 DC			= 'TFDC';
 
 tabFirma::tabFirma(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr) {
@@ -53,14 +55,17 @@ tabFirma::tabFirma(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	but_del = new BButton(BRect(30,510,140,534), "tf_but_del", "Usuń zaznaczone [F8]", new BMessage(BUT_DEL), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
 	but_restore = new BButton(BRect(235,510,325,534), "tf_but_restore", "Przywróć [F6]", new BMessage(BUT_RESTORE), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
 	but_save = new BButton(BRect(580,510,670,534), "tf_but_save", "Zapisz", new BMessage(BUT_SAVE), B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
+	but_payments = new BButton(BRect(405,510,485,534), "tf_but_payment", "Należności [F9]", new BMessage(BUT_PAYMENT), B_FOLLOW_LEFT_RIGHT|B_FOLLOW_BOTTOM);
 	this->view->AddChild(but_new);
 	this->view->AddChild(but_del);
 	this->view->AddChild(but_restore);
 	this->view->AddChild(but_save);
+	this->view->AddChild(but_payments);
 	but_new->ResizeToPreferred();
 	but_del->ResizeToPreferred();
 	but_restore->ResizeToPreferred();
 	but_save->ResizeToPreferred();
+	but_payments->ResizeToPreferred();
 	// box1
 	box1 = new BBox(BRect(230,30,670,180), "tf_box1");
 	box1->SetLabel("Dane adresowe");
@@ -273,6 +278,13 @@ void tabFirma::MessageReceived(BMessage *Message) {
 			DoCommitCurdata();
 			curdataToTab();
 			break;
+		case B_F9_KEY:
+		case BUT_PAYMENT:
+			{	dialNalodb *nalodbDialog;
+				if (curdata->id>0) {
+					nalodbDialog = new dialNalodb(dbData, curdata->data[0].String());
+				}
+			}
 		case MSG_REQFIRMALIST:
 			{
 				RefreshIndexList();
