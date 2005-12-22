@@ -22,13 +22,14 @@ ZMIANY
  - miesięczne podsumowanie sprzedaży
  - wydruk oryginał/kopie, oryginał+kopie, możliwość konfiguracji liczby kopii
  - konfiguracja domyślnej liczby dni na zapłatę (licząc od dnia sprzedaży)
- - nowa obsługa list
+ - nowa obsługa list, możliwość sortowania wg wybranych kolumn
  - dialog z kalendarzem do wyboru daty
  - raport o zaległych należnościach
  - możliwość ustawienia wartości domyślnej dla pola 'Wystawił'
  - opcja - numeracja uproszczona dokumentów (bez miesiąca)
  - jednolite skróty klawiaturowe: F2/3/4 - zmiana zakładki, F5/6/8/9 - działanie, ENTER - zapis
  - podsumowanie na zakładce z listą pozycji faktury
+ - raport o zapłaconych/niezapłaconych fakturach kontrahenta, dostępny z należności i zakładki firm
 0.3
  - zmiana formatu bazy, dodane wersjonowanie bazy - obecnie brak możliwości upgrade,
    będzie taka możliwość w przypadku kolejnych zmian
