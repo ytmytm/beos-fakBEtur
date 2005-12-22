@@ -67,7 +67,7 @@ dialStat::dialStat(sqlite *db, BHandler *hr) : BWindow(
 		B_FANCY_BORDER);
 	list->AddColumn(new CLVColumn("Nazwa", 420, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
 	list->AddColumn(new CLVColumn("Ilość", 100, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
-	list->AddColumn(new CLVColumn("Wartość brutto", 98, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
+	list->AddColumn(new CLVColumn("Wartość netto", 98, CLV_TELL_ITEMS_WIDTH|CLV_HEADER_TRUNCATE|CLV_SORT_KEYABLE));
 	list->SetSortFunction(CLVEasyItem::CompareItems);
 	this->view->AddChild(containerView);
 	list->SetInvocationMessage(new BMessage(LIST_INV));
