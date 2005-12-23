@@ -9,7 +9,6 @@
 		public:
 			dbdat(sqlite *db) { dbData = db; clear(); };
 			virtual ~dbdat() { };
-			virtual void dump(void) { };
 			virtual void clear(void) { id = -1; };
 			// data management
 			virtual void commit(void) { };
@@ -25,7 +24,6 @@
 		public:
 			firmadat(sqlite *db);
 			~firmadat() { };
-			void dump(void);
 			void clear(void);
 			// data management
 			int generate_id(void);
@@ -41,7 +39,6 @@
 		public:
 			towardat(sqlite *db);
 			~towardat() { };
-			void dump(void);
 			void clear(void);
 			// data management
 			int generate_id(void);
@@ -58,7 +55,6 @@
 		public:
 			fakturadat(sqlite *db);
 			~fakturadat() { };
-			void dump(void);
 			void clear(void);
 			// data management
 			int generate_id(void);
@@ -68,7 +64,6 @@
 			// data itself
 			BString nazwa, uwagi;
 			BString ogol[10], odata[11];
-			bool zaplacono;
 	};
 
 	class pozfakdata {
@@ -101,7 +96,6 @@
 			~pozfaklist();
 	
 			void clear(void);
-			void dump(void);
 			void setlp(void);
 	
 			void addlast(pozfakdata *data);

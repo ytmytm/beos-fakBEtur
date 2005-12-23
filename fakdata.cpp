@@ -14,14 +14,6 @@ firmadat::firmadat(sqlite *db) : dbdat(db) {
 	clear();
 }
 
-void firmadat::dump(void) {
-	int i;
-	for (i=0;i<=10;i++) {
-		printf("%i:[%s] ",i,this->data[i].String());
-	}
-	printf("\n,odb:%i,dos:%i,akt:%i,zab:%i\n-----\n",odbiorca,dostawca,aktywny,zablokowany);
-}
-
 void firmadat::clear(void) {
 	id = -1;
 	for (int i=0;i<=10;i++) {
@@ -115,10 +107,6 @@ void firmadat::del(void) {
 
 towardat::towardat(sqlite *db) : dbdat(db) {
 	clear();
-}
-
-void towardat::dump(void) {
-	printf("towardat: id=%i, implement rest\n", id);
 }
 
 void towardat::clear(void) {
@@ -257,10 +245,6 @@ fakturadat::fakturadat(sqlite *db) : dbdat(db) {
 	clear();
 }
 
-void fakturadat::dump(void) {
-	printf("fakturadat: id=%i, implement rest\n", id);
-}
-
 void fakturadat::clear(void) {
 	int i;
 	id = -1;
@@ -269,7 +253,6 @@ void fakturadat::clear(void) {
 		ogol[i] = "";
 	for (i=0;i<=10;i++)
 		odata[i] = "";
-	zaplacono = false;
 	uwagi = "";
 }
 
@@ -295,7 +278,7 @@ void fakturadat::commit(void) {
 		sql += "nazwa = %Q";
 		sql += ", miejsce_wystawienia = %Q, wystawil = %Q, data_wystawienia = %Q, data_sprzedazy = %Q";
 		sql += ", srodek_transportu = %Q, sposob_zaplaty = %Q, termin_zaplaty = %Q",
-		sql += ", zapl_kwota = %Q, zapl_dnia = %Q, zaplacono = %i, uwagi = %Q";
+		sql += ", zapl_kwota = %Q, zapl_dnia = %Q, uwagi = %Q";
 		sql += ", onazwa = %Q, oadres = %Q, okod = %Q, omiejscowosc = %Q, otelefon = %Q, oemail = %Q";
 		sql += ", onip = %Q, oregon = %Q, obank = %Q, okonto = %Q";
 		sql += " WHERE id = %i";
@@ -305,14 +288,14 @@ void fakturadat::commit(void) {
 		sql += "nazwa";
 		sql += ", miejsce_wystawienia, wystawil, data_wystawienia, data_sprzedazy";
 		sql += ", srodek_transportu, sposob_zaplaty, termin_zaplaty";
-		sql += ", zapl_kwota, zapl_dnia, zaplacono, uwagi";
+		sql += ", zapl_kwota, zapl_dnia, uwagi";
 		sql += ", onazwa, oadres, okod, omiejscowosc, otelefon, oemail";
 		sql += ", onip, oregon, obank, okonto";
 		sql += ", id ) VALUES ( ";
 		sql += "%Q";
 		sql += ", %Q, %Q, %Q, %Q";
 		sql += ", %Q, %Q, %Q";
-		sql += ", %Q, %Q, %i, %Q";
+		sql += ", %Q, %Q, %Q";
 		sql += ", %Q, %Q, %Q, %Q, %Q, %Q";
 		sql += ", %Q, %Q, %Q, %Q";
 		sql += ", %i)";
@@ -321,7 +304,7 @@ void fakturadat::commit(void) {
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		nazwa.String(), ogol[0].String(), ogol[1].String(), ogol[2].String(), ogol[3].String(),
 		ogol[4].String(), ogol[5].String(), ogol[6].String(),
-		ogol[8].String(), ogol[9].String(), zaplacono, uwagi.String(),
+		ogol[8].String(), ogol[9].String(), uwagi.String(),
 		odata[0].String(), odata[2].String(), odata[3].String(), odata[4].String(), odata[5].String(), odata[6].String(),
 		odata[7].String(), odata[8].String(), odata[9].String(), odata[10].String(),
 		id);
@@ -338,7 +321,7 @@ void fakturadat::fetch(void) {
 	sql += "nazwa";
 	sql += ", miejsce_wystawienia, wystawil, data_wystawienia, data_sprzedazy";
 	sql += ", srodek_transportu, sposob_zaplaty, termin_zaplaty";
-	sql += ", zapl_kwota, zapl_dnia, zaplacono, uwagi";
+	sql += ", zapl_kwota, zapl_dnia, uwagi";
 	sql += ", onazwa, oadres, okod, omiejscowosc, otelefon, oemail";
 	sql += ", onip, oregon, obank, okonto";
 	sql += " FROM faktura WHERE id = ";
@@ -354,7 +337,6 @@ void fakturadat::fetch(void) {
 	}
 	ogol[8] = result[i++];
 	ogol[9] = result[i++];
-	zaplacono = toint(result[i++]);
 	uwagi = result[i++];
 	odata[0] = result[i++];
 	for (j=2;j<=10;j++) {
@@ -403,16 +385,6 @@ void pozfaklist::clear(void) {
 	}
 	start = NULL;
 	end = start;
-}
-
-void pozfaklist::dump(void) {
-	pozfakitem *cur = start;
-	int i = 1;
-
-	while (cur!=NULL) {
-		printf("[%i] %i - %s\n",i++,cur->lp, cur->data->data[1].String());
-		cur = cur->nxt;
-	}
 }
 
 void pozfaklist::setlp(void) {

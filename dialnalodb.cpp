@@ -92,7 +92,7 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 	// prepare temporary for stats
 	execSQL("CREATE TEMPORARY TABLE nalodbsuma ( kwota DECIMAL(12,2), typ INTEGER )");
 
-	sql = "SELECT f.id, f.nazwa, f.onazwa, f.termin_zaplaty, f.zaplacono, f.zapl_kwota";
+	sql = "SELECT f.id, f.nazwa, f.onazwa, f.termin_zaplaty, f.zapl_kwota";
 	sql += " FROM faktura AS f, firma AS k WHERE k.nazwa = f.onazwa ORDER BY f.data_sprzedazy";
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
@@ -108,15 +108,15 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 			sql << result[i*nCols+0];
 			sqlite_get_table(dbData, sql.String(), &result2, &nRows2, &nCols2, &dbErrMsg);
 			// pozostalo - czy zaplacona_kwota < brutto?
-			sql = "SELECT 0"; sql += result[i*nCols+5]; sql += "<0"; sql += result2[nCols2];
+			sql = "SELECT 0"; sql += result[i*nCols+4]; sql += "<0"; sql += result2[nCols2];
 			if (toint(execSQL(sql.String()))) {
 				// niezapłacona
 				BString dnizaleg;
 				BString reszta;
-				sql = "SELECT DECROUND(0"; sql += result2[nCols2]; sql += "-0"; sql += result[i*nCols+5]; sql += ")";
+				sql = "SELECT DECROUND(0"; sql += result2[nCols2]; sql += "-0"; sql += result[i*nCols+4]; sql += ")";
 				reszta = validateDecimal(execSQL(sql.String()));
 				dnizaleg << calcdaysago(result[i*nCols+3]);
-				listl->AddItem(new tab5ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2], dnizaleg.String(), validateDecimal(result[i*nCols+5]), reszta.String()));
+				listl->AddItem(new tab5ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2], dnizaleg.String(), validateDecimal(result[i*nCols+4]), reszta.String()));
 				// update summary
 				if (toint(dnizaleg.String()) > 0)
 					typ = F_ZALEGLA;

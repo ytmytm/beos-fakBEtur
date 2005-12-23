@@ -20,7 +20,6 @@
 #include <Alert.h>
 #include <Box.h>
 #include <Button.h>
-#include <CheckBox.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -41,6 +40,7 @@ const uint32 BUT_DEL	= 'TFBD';
 const uint32 BUT_RESTORE= 'TFBR';
 const uint32 BUT_SAVE	= 'TFBS';
 const uint32 BUT_PRINT	= 'TFBP';
+const uint32 BUT_PAID	= 'TFBI';
 const uint32 DC			= 'TFDC';
 
 const uint32 CBUT		= 'TFCB';
@@ -231,17 +231,17 @@ void tabFaktura::initTab1(void) {
 	box3->SetLabel("Zaliczka");
 	viewogol->AddChild(box3);
 	// box3-stuff
-	cbzaplacono = new BCheckBox(BRect(10,25,80,40), "tfzap", "Zapłacono", new BMessage(DC));
-	box3->AddChild(cbzaplacono);
-	ogol[8] = new BTextControl(BRect(90,20,230,40), "tfd8", "Kwota (zł)", NULL, new BMessage(DC));
+	ogol[8] = new BTextControl(BRect(10,20,170,40), "tfd8", "Kwota (zł)", NULL, new BMessage(DC));
 	ogol[9] = new BTextControl(BRect(10,50,170,70), "tfd9", "Data", NULL, new BMessage(DC));
 	box3->AddChild(ogol[8]);
 	box3->AddChild(ogol[9]);
-	ogol[8]->SetDivider(50); ogol[9]->SetDivider(50);
 	msg = new BMessage(CBUT);
 	msg->AddPointer("_datefield", ogol[9]);
 	cbut[3] = new BButton(BRect(180,50,200,70), "tfcbut3", "+", msg);
 	box3->AddChild(cbut[3]);
+	but_paid = new BButton(BRect(180,20,230,40), "tfbutpaid", "Zapłacono", new BMessage(BUT_PAID));
+	box3->AddChild(but_paid);
+	but_paid->ResizeToPreferred();
 	// box4
 	box4 = new BBox(BRect(10,220,590,460),"tfbox4");
 	box4->SetLabel("Odbiorca");
@@ -287,6 +287,10 @@ void tabFaktura::initTab1(void) {
 	// platnosc
 	d = max(ogol[5]->Divider(), ogol[6]->Divider());
 	ogol[5]->SetDivider(d); ogol[6]->SetDivider(d);
+	// zaliczka
+	d = max(ogol[8]->Divider(), ogol[9]->Divider());
+	ogol[8]->SetDivider(d); ogol[9]->SetDivider(d);
+
 	for (i=0;i<=10;i++) {
 		if (i!=1)
 		data[i]->SetDivider(be_plain_font->StringWidth(data[i]->Label())+5);
@@ -425,7 +429,6 @@ void tabFaktura::curdataFromTab(void) {
 	for (i=0;i<=10;i++)
 		if (i!=1)
 			curdata->odata[i]=data[i]->Text();
-	curdata->zaplacono = (cbzaplacono->Value() == B_CONTROL_ON);
 	curdata->uwagi = uwagi->Text();
 }
 
@@ -437,7 +440,6 @@ void tabFaktura::curdataToTab(void) {
 	for (i=0;i<=10;i++)
 		if (i!=1)
 			data[i]->SetText(curdata->odata[i].String());
-	cbzaplacono->SetValue(curdata->zaplacono ? B_CONTROL_ON : B_CONTROL_OFF);
 	uwagi->SetText(curdata->uwagi.String());
 	updateTab();
 }
@@ -447,17 +449,11 @@ void tabFaktura::updateTab(void) {
 	msg->AddString("_newtitle", nazwa->Text());
 	handler->Looper()->PostMessage(msg);
 
-	bool state = (cbzaplacono->Value() == B_CONTROL_ON);
-	ogol[8]->SetEnabled(state);
-	ogol[9]->SetEnabled(state);
-	cbut[3]->SetEnabled(state);
-	if (state) {
-		ogol[8]->SetText(validateDecimal(ogol[8]->Text()));
-		ogol[9]->SetText(validateDate(ogol[9]->Text()));
-	}
 	ogol[2]->SetText(validateDate(ogol[2]->Text()));
 	ogol[3]->SetText(validateDate(ogol[3]->Text()));
 	ogol[6]->SetText(validateDate(ogol[6]->Text()));
+	ogol[8]->SetText(validateDecimal(ogol[8]->Text()));
+	ogol[9]->SetText(validateDate(ogol[9]->Text()));
 }
 
 void tabFaktura::updateTab2(void) {
@@ -530,7 +526,6 @@ void tabFaktura::makeNewForm(void) {
 	curdata->ogol[6] = ogol[6]->Text();
 	// 
 	uwagi->SetText("");
-	cbzaplacono->SetValue(B_CONTROL_OFF);
 	// miejsce wystawienia - weź z danych firmy
 	curdata->ogol[0] = execSQL("SELECT miejscowosc FROM konfiguracja WHERE zrobiona = 1");
 	// wystawiający - z konfiguracji
@@ -656,23 +651,6 @@ bool tabFaktura::validateTab(void) {
 		error->Go();
 		ogol[6]->MakeFocus();
 		return false;
-	}
-	// jesli (zaplacono), to data i kwota
-	if (cbzaplacono->Value() == B_CONTROL_ON) {
-		// kwota płatności - niepusta
-		if (strlen(ogol[8]->Text()) == 0) {
-			error = new BAlert(APP_NAME, "Nie wpisano kwoty wykonanej płatności!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-			error->Go();
-			ogol[8]->MakeFocus();
-			return false;
-		}
-		// data płatności - niepusta
-		if (strlen(ogol[9]->Text()) == 0) {
-			error = new BAlert(APP_NAME, "Nie wpisano daty wykonanej płatności!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-			error->Go();
-			ogol[9]->MakeFocus();
-			return false;
-		}
 	}
 	// lista towarów niepusta
 	if ((faklista->start == faklista->end) && (faklista->start == NULL)) {
@@ -945,6 +923,17 @@ void tabFaktura::MessageReceived(BMessage *Message) {
 			curdataToTab();
 			printCurrent();	// XXX check if data was commited, id>0 etc
 			break;
+		case BUT_PAID:
+			if (curdata->id>0) {
+				updatePayment();
+				ogol[8]->SetText(faklista->calcSumPayment());
+				ogol[9]->SetText(execSQL("SELECT DATE('now')"));
+				updateTab();
+				updateTab2();
+				curdataFromTab();
+				DoCommitCurdata();
+				curdataToTab();
+			}
 		case LIST_SEL:
 		case LIST_INV:
 			{	int i = list->CurrentSelection(0);

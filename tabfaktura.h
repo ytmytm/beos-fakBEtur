@@ -7,7 +7,6 @@
 
 class BBox;
 class BButton;
-class BCheckBox;
 class BHandler;
 class BTab;
 class BTabView;
@@ -68,7 +67,7 @@ class tabFaktura : public beFakTab {
 		BTabView *tbv2;
 		BBox *box1, *box2, *box3, *box4, *box5, *box6, *box7;
 
-		BButton *but_new, *but_del, *but_restore, *but_save, *but_print;
+		BButton *but_new, *but_del, *but_restore, *but_save, *but_print, *but_paid;
 		BButton *but_psave, *but_pnew, *but_pimport, *but_pdel;
 		ColumnListView *list;
 
@@ -78,7 +77,6 @@ class tabFaktura : public beFakTab {
 		BStringView *sumasuma;
 		BTextView *uwagi;
 		BButton *cbut[5];
-		BCheckBox *cbzaplacono;
 		ColumnListView *pozlist;
 
 		BPopUpMenu *menusymbol;

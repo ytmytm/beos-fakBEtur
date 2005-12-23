@@ -1,7 +1,6 @@
 //
 // TODO:
-// - checkbox (i pole) 'zaplacono' - usunąć, wyrównać, wstawić button
-//   'zapłacono'
+// - usunąć faktura.zaplacono ze schema
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- stan magazynu w stringview pomiędzy buttonami
 //		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
