@@ -489,9 +489,14 @@ void tabFaktura::updateTab2(void) {
 	faklista->calcBruttoFin(result);
 	// retr magazyn state
 	BString sql;
-	sql = "SELECT magazyn FROM towar WHERE nazwa = '"; sql += towar[0]->Text();
-	sql += "'";
-	magazyn->SetText(execSQL(sql.String()));
+	sql = "SELECT usluga FROM towar WHERE nazwa = '"; sql += towar[0]->Text(); sql += "'";
+	if (!toint(execSQL(sql.String()))) {
+		sql = "SELECT magazyn FROM towar WHERE nazwa = '"; sql += towar[0]->Text();	sql += "'";
+		sql = execSQL(sql.String());
+	}
+	else
+		sql = "[usługa]";
+	magazyn->SetText(sql.String());
 }
 
 void tabFaktura::updatePayment(void) {
