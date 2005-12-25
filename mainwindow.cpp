@@ -12,6 +12,7 @@
 //		- trzymać pole magazyn, do zmiany w tabie towarów
 //		- przy edycji faktur o dacie < data_magazynu nic nie robić
 //		- else: magazyn+stara_ilość-nowa_ilość
+// - dwuklik na należności - powrót na fakturę
 // - przemyśleć czy wszystkie kolumny w tabfaktura są potrzebne (pkwiu?)
 // - skróty klawiaturowe i ergonomia:
 //		- sprawdzić sensowność i ergonomię kolejności przechodzenia TABem
@@ -266,13 +267,13 @@ void BeFAKMainWindow::MessageReceived(BMessage *Message) {
 	this->DisableUpdates();
 	switch (Message->what) {
 		case B_F2_KEY:
-			tabView->Select(0);
+			tabView->Select(FAKTURATAB);
 			break;
 		case B_F3_KEY:
-			tabView->Select(1);
+			tabView->Select(TOWARTAB);
 			break;
 		case B_F4_KEY:
-			tabView->Select(2);
+			tabView->Select(FIRMATAB);
 			break;
 		case MENU_PRINTO:
 			p_typ = 0;
