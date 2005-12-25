@@ -83,7 +83,6 @@ const char *sql_schema =
 "	wystawil			TEXT,\n"
 "	uwagi				TEXT,\n"
 "\n"
-"	zaplacono			INTEGER NOT NULL DEFAULT 0,\n"
 "	zapl_dnia			DATE,\n"
 "	zapl_kwota			TEXT,\n"
 "\n"
