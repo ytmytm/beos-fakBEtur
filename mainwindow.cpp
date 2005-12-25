@@ -6,7 +6,9 @@
 //			else
 //			- deltamag = starailość(def.0)-nowailość
 //			- przy zapisie sprawdzać czy magazyn+deltamag<0, ostrzeżenie
+//				(validateTowar)
 //			- zapisać nową wartość magazynu
+//				(docommittowardata)
 //		- nie robić z w/w dla tych, które są 'usługa'
 // - dwuklik na należności - powrót na fakturę
 // - przemyśleć czy wszystkie kolumny w tabfaktura są potrzebne (pkwiu?)
