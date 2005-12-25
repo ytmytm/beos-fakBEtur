@@ -46,7 +46,7 @@
 			void fetch(void);
 			void del(void);
 			// data itself
-			BString data[4], ceny[6], notatki, dodany;
+			BString data[4], ceny[6], notatki, dodany, magazyn, magzmiana;
 			bool usluga;
 			int vatid;
 	};

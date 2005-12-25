@@ -111,7 +111,7 @@ towardat::towardat(sqlite *db) : dbdat(db) {
 
 void towardat::clear(void) {
 	id = -1;
-	data[0] = data[1] = data[2] = data[3] = notatki = dodany = "";
+	data[0] = data[1] = data[2] = data[3] = notatki = dodany = magazyn = magzmiana = "";
 	usluga = false;
 	ceny[0] = ceny[1] = ceny[2] = ceny[3] = "";
 	ceny[4] = "1.0"; ceny[5] = "";
@@ -140,6 +140,7 @@ void towardat::commit(void) {
 		sql += "nazwa = %Q, symbol = %Q, pkwiu = %Q, jm = %Q";
 		sql += ", usluga = %i, dodany = date('now'), notatki = %Q, vatid = %i";
 		sql += ", netto = %Q, zakupu = %Q, marza = %Q, rabat = %Q, kurs = %Q, clo = %Q";
+		sql += ", magazyn = %Q, magzmiana = date('now')";
 		sql += " WHERE id = %i";
 	} else {		// INSERT
 		id = generate_id();
@@ -148,11 +149,13 @@ void towardat::commit(void) {
 		sql += ", usluga, dodany, notatki, vatid";
 		sql += ", netto, zakupu, marza, rabat";
 		sql += ", kurs, clo";
+		sql += ", magazyn, magzmiana";
 		sql += ", id ) VALUES ( ";
 		sql += "%Q, %Q, %Q, %Q";
 		sql += ", %i, date('now'), %Q, %i";
 		sql += ", %Q, %Q, %Q, %Q";
 		sql += ", %Q, %Q";
+		sql += ", %Q, date('now')";
 		sql += ", %i)";
 	}
 //printf("sql:[%s]\n",sql.String());
@@ -161,6 +164,7 @@ void towardat::commit(void) {
 		usluga, notatki.String(), vatid,
 		ceny[0].String(), ceny[1].String(), ceny[2].String(), ceny[3].String(),
 		ceny[4].String(), ceny[5].String(),
+		magazyn.String(),
 		id);
 //printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
@@ -175,6 +179,7 @@ void towardat::fetch(void) {
 	sql += "nazwa, symbol, pkwiu, jm";
 	sql += ", usluga, dodany, notatki, vatid";
 	sql += ", netto, zakupu, marza, rabat, kurs, clo";
+	sql += ", magazyn, magzmiana";
 	sql += " FROM towar WHERE id = ";
 	sql << id;
 //printf("sql:%s\n",sql.String());
@@ -192,6 +197,8 @@ void towardat::fetch(void) {
 	for (j=0;j<=5;j++) {
 		ceny[j] = result[i++];
 	}
+	magazyn = result[i++];
+	magzmiana = result[i++];
 	sqlite_free_table(result);
 }
 

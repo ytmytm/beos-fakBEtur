@@ -1,17 +1,13 @@
 //
 // TODO:
-// - usunąć faktura.zaplacono ze schema
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
-//		- stan magazynu w stringview pomiędzy buttonami
-//		- info o stanie magazynowym z dnia XXXX do ustawienia w towary
-//		- podsumowanie zliczać dynamicznie (nie trzeba wtedy uaktualniać stanu
-//		  przy zmianie faktury) z data > XXXX
-//		- nie robić w/w dla tych, które są 'usługa'
-//		- co z remanentami?
-//	    LUB
-//		- trzymać pole magazyn, do zmiany w tabie towarów
-//		- przy edycji faktur o dacie < data_magazynu nic nie robić
-//		- else: magazyn+stara_ilość-nowa_ilość
+//		- faktura:
+//			- data sprzedaży < data_magazynu - nic nie robić
+//			else
+//			- deltamag = starailość(def.0)-nowailość
+//			- przy zapisie sprawdzać czy magazyn+deltamag<0, ostrzeżenie
+//			- zapisać nową wartość magazynu
+//		- nie robić z w/w dla tych, które są 'usługa'
 // - dwuklik na należności - powrót na fakturę
 // - przemyśleć czy wszystkie kolumny w tabfaktura są potrzebne (pkwiu?)
 // - skróty klawiaturowe i ergonomia:

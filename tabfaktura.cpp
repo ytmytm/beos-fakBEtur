@@ -293,7 +293,7 @@ void tabFaktura::initTab1(void) {
 
 	for (i=0;i<=10;i++) {
 		if (i!=1)
-		data[i]->SetDivider(be_plain_font->StringWidth(data[i]->Label())+5);
+			data[i]->SetDivider(be_plain_font->StringWidth(data[i]->Label())+5);
 	}
 	d = 0;
 	for (i=0;i<=10;i++) {
@@ -415,6 +415,12 @@ void tabFaktura::initTab2(void) {
 	sumasuma = new BStringView(BRect(100,440,400,455), "tfssv", NULL);
 	viewpozy->AddChild(sumasuma);
 	sumasuma->SetFont(&fontb);
+	// magazyn
+	box5->AddChild(magazyn = new BStringView(BRect(100,255,180,280), "tfmagd", "Magazyn:"));
+	magazyn->SetAlignment(B_ALIGN_RIGHT);
+	magazyn->SetFont(&fontb);
+	box5->AddChild(magazyn = new BStringView(BRect(180,255,300,280), "tfmag", "XXXX"));
+	magazyn->SetFont(&fontb);
 	// fix widths
 	for (i=0;i<=5;i++)
 		towar[i]->SetDivider(be_plain_font->StringWidth(towar[i]->Label())+5);
@@ -481,6 +487,11 @@ void tabFaktura::updateTab2(void) {
 			suma[j]->SetText(result[nCols+j]);
 	}
 	faklista->calcBruttoFin(result);
+	// retr magazyn state
+	BString sql;
+	sql = "SELECT magazyn FROM towar WHERE nazwa = '"; sql += towar[0]->Text();
+	sql += "'";
+	magazyn->SetText(execSQL(sql.String()));
 }
 
 void tabFaktura::updatePayment(void) {

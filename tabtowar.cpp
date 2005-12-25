@@ -144,14 +144,26 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	box2->AddChild(menuvatField);
 	// box3
 	box3 = new BBox(BRect(230,310,710,390), "tt_box3");
-	box3->SetLabel("Notatki");
+	box3->SetLabel("Magazyn");
 	this->view->AddChild(box3);
 	// box3-stuff
-	r = box3->Bounds();
+	magazyn = new BTextControl(BRect(10,30,250,40), "ttm0", "Stan:", NULL, new BMessage(DC));
+	magzmiana = new BStringView(BRect(230,30,370,45), "ttm1", "Ostatnia zmiana:");
+	magzmiana->SetAlignment(B_ALIGN_RIGHT);
+	box3->AddChild(magzmiana);
+	magzmiana = new BStringView(BRect(380,35,470,45), "ttm2", NULL);
+	box3->AddChild(magzmiana);
+	box3->AddChild(magazyn);
+	// box4
+	box4 = new BBox(BRect(230,400,710,480), "tt_box4");
+	box4->SetLabel("Notatki");
+	this->view->AddChild(box4);
+	// box4-stuff
+	r = box4->Bounds();
 	r.InsetBy(10,15);
 	BRect s = r; s.OffsetTo(0,0);
 	notatki = new BTextView(r, "ttno", s, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
-	box3->AddChild(notatki);
+	box4->AddChild(notatki);
 	// fix widths
 	int i;
 	// first set them to be enough
@@ -161,6 +173,7 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	for (i=0;i<=5;i++) {
 		ceny[i]->SetDivider(be_plain_font->StringWidth(ceny[i]->Label())+5);
 	}
+	magazyn->SetDivider(be_plain_font->StringWidth(magazyn->Label())+5);
 	// align in columns
 	float d;
 	d = max(data[0]->Divider(), data[2]->Divider());
@@ -191,6 +204,7 @@ void tabTowar::curdataFromTab(void) {
 	}
 	curdata->usluga = (usluga->Value() == B_CONTROL_ON);
 	curdata->notatki = notatki->Text();
+	curdata->magazyn = validateDecimal(magazyn->Text());
 }
 
 void tabTowar::curdataToTab(void) {
@@ -204,6 +218,8 @@ void tabTowar::curdataToTab(void) {
 	usluga->SetValue(curdata->usluga ? B_CONTROL_ON : B_CONTROL_OFF);
 	notatki->SetText(curdata->notatki.String());
 	dodany->SetText(curdata->dodany.String());
+	magazyn->SetText(curdata->magazyn.String());
+	magzmiana->SetText(curdata->magzmiana.String());
 	updateTab();
 }
 
@@ -223,7 +239,9 @@ void tabTowar::updateTab(void) {
 		brutto->SetText("???");
 		return;
 	}
-	// XXX usluga, to cos wylaczyc/wyzerowac??? - stan magazynu
+	// usluga?
+	magazyn->SetEnabled(usluga->Value() == B_CONTROL_OFF);
+
 	BString sql;
 // brać tu pod uwagę rabat/marżę - NIE: robi to but_sell
 	sql = "SELECT DECROUND(0"; sql += ceny[0]->Text();
