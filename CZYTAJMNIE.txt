@@ -31,6 +31,7 @@ ZMIANY
  - podsumowanie na zakładce z listą pozycji faktury
  - raport o zapłaconych/niezapłaconych fakturach kontrahenta, dostępny z należności i zakładki firm
  - guzik 'zapłacono' do natychmiastowego opłacenia całej faktury
+ - informacje o towarach rozszerzone o stan magazynu i ostatnią zmianę, stan nie uaktualniany
 0.3
  - zmiana formatu bazy, dodane wersjonowanie bazy - obecnie brak możliwości upgrade,
    będzie taka możliwość w przypadku kolejnych zmian
@@ -52,8 +53,8 @@ ZMIANY
 0.1
  - pierwsza publiczna wersja
 
-NOTATKI DO WERSJI 0.3
-Nie działają żadne skróty klawiaturowe, nie ma raportu należności danego odbiorcy.
+NOTATKI DO WERSJI 0.4
+Stan magazynu nie jest uaktualniany przy wystawianiu nowej faktury.
 
 
 
@@ -130,10 +131,10 @@ faktury. Pole @TABELA@ zostanie zamienione na ciąg wierszy tabeli HTML, bez dod
 
 ARCHIWIZACJA
 Do wykonania archiwum bazy danych wystarczy zachować w bezpieczny sposób plik
-bazy: /boot/home/config/share/befaktur.db
+bazy: /boot/home/config/share/fakbetur.db
 
 
 
 DEINSTALACJA
 Usunąć program, plik z szablonem HTML oraz plik bazy danych
-/boot/home/config/share/befaktur.db
+/boot/home/config/share/fakbetur.db
