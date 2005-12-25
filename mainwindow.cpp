@@ -4,7 +4,8 @@
 //		- faktura:
 //			else
 //			- data sprzedaży < data_magazynu - nic nie robić
-//			- deltamag = starailość(def.0)-nowailość
+//			- faktura posiada wlasne id?
+//				- deltamag = starailość(def.0)-nowailość
 //			- zapisać nową wartość magazynu
 //				(docommittowardata)
 //		- nie robić z w/w dla tych, które są 'usługa'

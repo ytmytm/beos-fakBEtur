@@ -886,13 +886,17 @@ bool tabFaktura::validateTowar(void) {
 			}
 		}
 		// sprawdzić stan magazynu, o ile to nie usługa
+		// i nie edytujemy starej faktury (data sprzedazy musi byc >= ostatnia zmiana mag)
 		if (!(oldtowar->usluga)) {
-			sql = "SELECT 0"; sql += oldtowar->magazyn; sql += "< 0"; sql += towar[4]->Text();
+			sql = "SELECT '"; sql += ogol[3]->Text(); sql += "' >= '"; sql += oldtowar->magzmiana; sql += "'";
 			if (toint(execSQL(sql.String()))) {
-				error = new BAlert(APP_NAME, "Sprzedawana ilość jest większa od tej w magazynie.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				if (error->Go() == 1) {
-					towar[4]->MakeFocus();
-					return false;
+				sql = "SELECT 0"; sql += oldtowar->magazyn; sql += "< 0"; sql += towar[4]->Text();
+				if (toint(execSQL(sql.String()))) {
+					error = new BAlert(APP_NAME, "Sprzedawana ilość jest większa od tej w magazynie.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+					if (error->Go() == 1) {
+						towar[4]->MakeFocus();
+						return false;
+					}
 				}
 			}
 		}
