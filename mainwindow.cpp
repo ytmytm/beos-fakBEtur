@@ -2,11 +2,9 @@
 // TODO:
 // - trzymanie stanu magazynu, info i podsumowania magazynowe
 //		- faktura:
-//			- data sprzedaży < data_magazynu - nic nie robić
 //			else
+//			- data sprzedaży < data_magazynu - nic nie robić
 //			- deltamag = starailość(def.0)-nowailość
-//			- przy zapisie sprawdzać czy magazyn+deltamag<0, ostrzeżenie
-//				(validateTowar)
 //			- zapisać nową wartość magazynu
 //				(docommittowardata)
 //		- nie robić z w/w dla tych, które są 'usługa'

@@ -885,6 +885,17 @@ bool tabFaktura::validateTowar(void) {
 					break;
 			}
 		}
+		// sprawdzić stan magazynu, o ile to nie usługa
+		if (!(oldtowar->usluga)) {
+			sql = "SELECT 0"; sql += oldtowar->magazyn; sql += "< 0"; sql += towar[4]->Text();
+			if (toint(execSQL(sql.String()))) {
+				error = new BAlert(APP_NAME, "Sprzedawana ilość jest większa od tej w magazynie.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				if (error->Go() == 1) {
+					towar[4]->MakeFocus();
+					return false;
+				}
+			}
+		}
 		delete oldtowar;
 	}
 	updateTab2();		// in case that data was fetched from db
