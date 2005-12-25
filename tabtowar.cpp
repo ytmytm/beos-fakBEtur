@@ -342,6 +342,7 @@ void tabTowar::MessageReceived(BMessage *Message) {
 				curdata->clear();
 				// refresh tabs
 				curdataToTab();
+				data[0]->MakeFocus();
 			}
 			break;
 		case B_F6_KEY:
