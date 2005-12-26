@@ -651,6 +651,49 @@ const char *pozfaklist::calcSumPayment(void) {
 	return result.String();
 }
 
+void pozfaklist::updateStorage(int fakturaid = -1) {
+	BString sql, nazwa, magazyn;
+	pozfakitem *cur = start;
+	int ret;
+	int nRows, nCols;
+	char **result;
+	bool usluga;
+
+	while (cur!=NULL) {
+		// get state
+		nazwa = cur->data->data[1]; nazwa.ReplaceAll("'","''"); nazwa.Prepend("'"); nazwa.Append("'");
+		sql = "SELECT usluga,magazyn FROM towar WHERE nazwa = "; sql += nazwa;
+		sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+		if (nRows<1) {
+			// nie ma takiego w bazie, nic nie robic
+		} else {
+			// usluga?
+			usluga = toint(result[nCols+0]);
+			printf("usluga:%i\n", usluga);
+			if (!usluga) {
+				// calc new magazyn state
+				magazyn = result[nCols+1];
+				printf("magazyn:%s, nowe:%s\n",magazyn.String(),cur->data->data[3].String());
+				if (fakturaid > 0) {
+					sql = "SELECT 0"; sql += magazyn; sql += "+ilosc-0"; sql += cur->data->data[3];
+					sql += " FROM pozycjafakt WHERE fakturaid = "; sql << fakturaid;
+					sql += " AND nazwa = "; sql += nazwa;
+				} else {
+					sql = "SELECT 0"; sql += magazyn; sql += "-0"; sql += cur->data->data[3];
+				}
+				magazyn = execSQL(sql.String());
+				printf("nowy mag: [%s]\n",magazyn.String());
+				// update magazyn state
+				ret = sqlite_exec_printf(dbData,
+					"UPDATE towar SET magazyn = %Q, magzmiana = DATE('now')",
+					0, 0, &dbErrMsg, magazyn.String());
+			}
+		}
+		sqlite_free_table(result);
+		cur = cur->nxt;
+	}
+}
+
 // XXX this is duplicated in befaktab!
 const char *pozfaklist::execSQL(const char *input) {
 	int nRows, nCols;

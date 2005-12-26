@@ -1,14 +1,11 @@
 //
 // TODO:
-// - trzymanie stanu magazynu, info i podsumowania magazynowe
-//		- faktura:
-//			else
-//			- data sprzedaży < data_magazynu - nic nie robić
-//			- faktura posiada wlasne id?
-//				- deltamag = starailość(def.0)-nowailość
-//			- zapisać nową wartość magazynu
-//				(docommittowardata)
-//		- nie robić z w/w dla tych, które są 'usługa'
+// - trzymanie stanu magazynu, info magazynowe
+//	 - XXX praca w fakdata.cpp, updateStorage
+//   - XXX bug - nie działa test na overflow magazynu (zmienić na prawidłowe liczenie)
+//		- czy wszędzie gdzie jest nazwa mam prawidłowe cytowanie?
+//		- to co w updateStorage robić dla każdego towaru przy zapisie na listę?
+//			- NIE:co gdy faktura zostanie porzucona???
 // - dwuklik na należności - powrót na fakturę
 // - przemyśleć czy wszystkie kolumny w tabfaktura są potrzebne (pkwiu?)
 // - skróty klawiaturowe i ergonomia:

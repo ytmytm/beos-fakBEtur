@@ -488,10 +488,11 @@ void tabFaktura::updateTab2(void) {
 	}
 	faklista->calcBruttoFin(result);
 	// retr magazyn state
-	BString sql;
-	sql = "SELECT usluga FROM towar WHERE nazwa = '"; sql += towar[0]->Text(); sql += "'";
+	BString sql, nazwa;
+	nazwa = towar[0]->Text(); nazwa.ReplaceAll("'","''"); nazwa.Prepend("'"); nazwa.Append("'");
+	sql = "SELECT usluga FROM towar WHERE nazwa = "; sql += nazwa;
 	if (!toint(execSQL(sql.String()))) {
-		sql = "SELECT magazyn FROM towar WHERE nazwa = '"; sql += towar[0]->Text();	sql += "'";
+		sql = "SELECT magazyn FROM towar WHERE nazwa = "; sql += nazwa;
 		sql = execSQL(sql.String());
 	}
 	else
@@ -887,6 +888,7 @@ bool tabFaktura::validateTowar(void) {
 		}
 		// sprawdzić stan magazynu, o ile to nie usługa
 		// i nie edytujemy starej faktury (data sprzedazy musi byc >= ostatnia zmiana mag)
+		// XXX usunąć test daty, policzyć deltamag ze starej faktury (jeśli mamy id)
 		if (!(oldtowar->usluga)) {
 			sql = "SELECT '"; sql += ogol[3]->Text(); sql += "' >= '"; sql += oldtowar->magzmiana; sql += "'";
 			if (toint(execSQL(sql.String()))) {
@@ -1159,8 +1161,12 @@ void tabFaktura::DoCommitCurdata(void) {
 		return;
 	if (!(DoCommitTowardata()))
 		return;
+//	update magazyn if needed
+	faklista->updateStorage(curdata->id);
+//	commit data
 	curdata->commit();
 	faklista->commit(curdata->id);
+//	clear flags, refresh
 	this->dirty = false;
 	towardirty = false;
 	RefreshIndexList();

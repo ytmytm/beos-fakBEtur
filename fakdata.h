@@ -116,6 +116,7 @@
 			char **calcBrutto(const char *cnetto, const char *rabat, const char *ilosc, const int vatid, int *retcols);
 			void calcBruttoFin(char **result);
 			const char *calcSumPayment(void);
+			void updateStorage(int faktudaid = -1);
 
 			pozfakitem *start;
 			pozfakitem *end;
