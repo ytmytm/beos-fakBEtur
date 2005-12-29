@@ -15,7 +15,7 @@
 beFakPrint::beFakPrint(int id, sqlite *db, int numkopii) {
 
 	if (id<1) {
-		printf("illegal id!\n");
+//		printf("illegal id!\n");
 		return;
 	}
 
@@ -275,5 +275,5 @@ void beFakPrint::saveToFile(const char *name, const BString *content) {
 }
 
 void beFakPrint::Go(void) {
-	printf("override and do sth meaningful with data\n");
+//	printf("override and do sth meaningful with data\n");
 }

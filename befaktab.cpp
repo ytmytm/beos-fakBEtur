@@ -101,7 +101,7 @@ bool beFakTab::CommitCurdata(bool haveCancelButton = true) {
 			break;
 		case 0:
 		default:
-printf("commiting data\n");
+//printf("commiting data\n");
 			curdataFromTab();
 			DoCommitCurdata();	// this is implemented in inherited class
 	};
