@@ -419,7 +419,7 @@ void tabFaktura::initTab2(void) {
 	box5->AddChild(magazyn = new BStringView(BRect(100,255,180,280), "tfmagd", "Magazyn:"));
 	magazyn->SetAlignment(B_ALIGN_RIGHT);
 	magazyn->SetFont(&fontb);
-	box5->AddChild(magazyn = new BStringView(BRect(180,255,300,280), "tfmag", "XXXX"));
+	box5->AddChild(magazyn = new BStringView(BRect(180,255,300,280), "tfmag", NULL));
 	magazyn->SetFont(&fontb);
 	// fix widths
 	for (i=0;i<=5;i++)

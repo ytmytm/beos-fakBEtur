@@ -688,11 +688,12 @@ void pozfaklist::updateStorage(int fakturaid = -1) {
 				// - fakturaid nieistniejące
 				if (magazyn.Length()==0)
 					magazyn="0";
-//				printf("nowy mag: [%s]\n",magazyn.String());
-				// update magazyn state
+//				printf("nowy mag[%s]: [%s]\n",nazwa.String(), magazyn.String());
+				// update magazyn state (note that nazwa() is already quoted)
 				ret = sqlite_exec_printf(dbData,
-					"UPDATE towar SET magazyn = %Q, magzmiana = DATE('now')",
-					0, 0, &dbErrMsg, magazyn.String());
+					"UPDATE towar SET magazyn = %Q, magzmiana = DATE('now') WHERE nazwa = %s",
+					0, 0, &dbErrMsg, magazyn.String(), nazwa.String());
+//				printf("got:%i,%s\n",ret,dbErrMsg);
 			}
 		}
 		sqlite_free_table(result);
