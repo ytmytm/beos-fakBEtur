@@ -31,7 +31,7 @@ void AboutView::Draw(BRect updateRect) {
 }
 
 dialAbout::dialAbout(const char *title) : BWindow(
-		BRect(100,100,400,280),
+		BRect(100,100,430,280),
 		title,
 		B_FLOATING_WINDOW_LOOK,
 		B_MODAL_APP_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_RESIZABLE) {
