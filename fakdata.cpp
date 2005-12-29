@@ -518,7 +518,7 @@ void pozfaklist::commititem(int fakturaid, pozfakitem *item) {
 	sql += "%i, %i, %Q";
 	sql += ", %Q, %Q, %Q, %i, %Q, %Q";
 	sql += ", %i )";
-printf("commit for %i #%i\n", id, fakturaid);
+//printf("commit for %i #%i\n", id, fakturaid);
 //printf("sql:[%s]\n",sql.String());
 	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
 		id, item->lp, data->data[3].String(),
@@ -669,11 +669,11 @@ void pozfaklist::updateStorage(int fakturaid = -1) {
 		} else {
 			// usluga?
 			usluga = toint(result[nCols+0]);
-			printf("usluga:%i\n", usluga);
+//			printf("usluga:%i\n", usluga);
 			if (!usluga) {
 				// calc new magazyn state
 				magazyn = result[nCols+1];
-				printf("magazyn:%s, nowe:%s\n",magazyn.String(),cur->data->data[3].String());
+//				printf("magazyn:%s, nowe:%s\n",magazyn.String(),cur->data->data[3].String());
 				if (fakturaid > 0) {
 					sql = "SELECT 0"; sql += magazyn; sql += "+ilosc-0"; sql += cur->data->data[3];
 					sql += " FROM pozycjafakt WHERE fakturaid = "; sql << fakturaid;
@@ -682,7 +682,13 @@ void pozfaklist::updateStorage(int fakturaid = -1) {
 					sql = "SELECT 0"; sql += magazyn; sql += "-0"; sql += cur->data->data[3];
 				}
 				magazyn = execSQL(sql.String());
-				printf("nowy mag: [%s]\n",magazyn.String());
+				// XXX XYZ to jest leczenie objawowe - skąd tu by wziął się NULL?
+				// - jeśli nazwa towaru generuje błędy
+				// - magazyn z góry NULL (równoważne)
+				// - fakturaid nieistniejące
+				if (magazyn.Length()==0)
+					magazyn="0";
+//				printf("nowy mag: [%s]\n",magazyn.String());
 				// update magazyn state
 				ret = sqlite_exec_printf(dbData,
 					"UPDATE towar SET magazyn = %Q, magzmiana = DATE('now')",

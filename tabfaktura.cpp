@@ -548,11 +548,17 @@ void tabFaktura::makeNewForm(void) {
 	// wystawiający - z konfiguracji
 	curdata->ogol[1] = execSQL("SELECT f_wystawil FROM konfiguracja WHERE zrobiona = 1");
 	// wygenerowanie nowej nazwy
+	bool prosta = toint(execSQL("SELECT f_numprosta FROM konfiguracja WHERE zrobiona = 1"));
 	// identyfikator z daty
-	rok = tmp; mies = tmp;
+	rok = tmp;
 	rok.Remove(4,rok.Length()-4);
-	mies.Remove(0,5);
-	mies.Remove(2,mies.Length()-2);
+	if (prosta) {
+		mies = "01";
+	} else {
+		mies = tmp;
+		mies.Remove(0,5);
+		mies.Remove(2,mies.Length()-2);
+	}
 	// max z konfiguracji? i tak działa nieźle
 	curmax = 0;
 	// nazwy wszystkich faktur z aktualnym rokiem i miesiacem
@@ -574,7 +580,7 @@ void tabFaktura::makeNewForm(void) {
 	sqlite_free_table(result);
 	// dodaj 1
 	tmp = ""; tmp << curmax+1; tmp << "/";
-	if (!(toint(execSQL("SELECT f_numprosta FROM konfiguracja WHERE zrobiona = 1")))) {
+	if (!(prosta)) {
 		tmp << mies; tmp << "/";
 	}
 	tmp << rok;
@@ -888,11 +894,19 @@ bool tabFaktura::validateTowar(void) {
 		}
 		// sprawdzić stan magazynu, o ile to nie usługa
 		// i nie edytujemy starej faktury (data sprzedazy musi byc >= ostatnia zmiana mag)
-		// XXX usunąć test daty, policzyć deltamag ze starej faktury (jeśli mamy id)
 		if (!(oldtowar->usluga)) {
+			// if (data_sprzedazy)>=(data_ostatniej zmiany)
 			sql = "SELECT '"; sql += ogol[3]->Text(); sql += "' >= '"; sql += oldtowar->magzmiana; sql += "'";
 			if (toint(execSQL(sql.String()))) {
-				sql = "SELECT 0"; sql += oldtowar->magazyn; sql += "< 0"; sql += towar[4]->Text();
+				if (curdata->id>0) {
+					// magazyn+starafaktura < nowa?
+					sql = "SELECT (0"; sql += oldtowar->magazyn; sql += "+ilosc < 0"; sql += towar[4]->Text();
+					sql += ") FROM pozycjafakt WHERE fakturaid = "; sql << curdata->id;
+					sql += " AND nazwa = '"; sql += oldtowar->data[0]; sql += "'";
+				} else {
+					// magazyn < nowa?
+					sql = "SELECT 0"; sql += oldtowar->magazyn; sql += "< 0"; sql += towar[4]->Text();
+				}
 				if (toint(execSQL(sql.String()))) {
 					error = new BAlert(APP_NAME, "Sprzedawana ilość jest większa od tej w magazynie.\nKontynuować?", "Tak", "Nie", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 					if (error->Go() == 1) {
