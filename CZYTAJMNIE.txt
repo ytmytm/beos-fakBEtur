@@ -1,7 +1,9 @@
 
-fakBEtur 0.4 (200512xx)
-(c) Maciej Witkowiak <ytm@elysium.pl>
+fakBEtur 0.4 (20051230)
+(c) Maciej Witkowiak <mwitkowiak@gmail.com>, <ytm@elysium.pl>
+http://ytm.bossstation.dnsalias.org/html/beos.html
 http://members.elysium.pl/html/beos.html
+http://atos.wmid.amu.edu.pl/~d118986/html/beos.html
 
 fakBEtur to program wspomagający wystawianie faktur. Program korzysta z własnej bazy
 danych, w której umieszcza informacje o wydanych dokumentach. Baza służy również do
@@ -10,7 +12,7 @@ przechowywania danych kontrahentów i towarów.
 
 
 LICENCJA
-Programu wolno używać w dowolny sposób w celu testowania na potrzeby konkursu
+Programu wolno używać w dowolny sposób w celu testowania, jedynie na potrzeby konkursu
 zorganizowanego przez portal http://www.haiku-os.pl/
 Autor dołożył wszelkich starań, ale nie daje żadnej gwarancji na poprawność działania
 programu, ani generowanych przez program dokumentów.
@@ -31,7 +33,7 @@ ZMIANY
  - podsumowanie na zakładce z listą pozycji faktury
  - raport o zapłaconych/niezapłaconych fakturach kontrahenta, dostępny z należności i zakładki firm
  - guzik 'zapłacono' do natychmiastowego opłacenia całej faktury
- - informacje o towarach rozszerzone o stan magazynu i ostatnią zmianę, stan nie uaktualniany
+ - informacje o towarach rozszerzone o stan magazynu i ostatnią zmianę
 0.3
  - zmiana formatu bazy, dodane wersjonowanie bazy - obecnie brak możliwości upgrade,
    będzie taka możliwość w przypadku kolejnych zmian
@@ -53,9 +55,6 @@ ZMIANY
 0.1
  - pierwsza publiczna wersja
 
-NOTATKI DO WERSJI 0.4
-Stan magazynu nie jest uaktualniany przy wystawianiu nowej faktury.
-
 
 
 WYMAGANIA
@@ -68,29 +67,42 @@ programu. Można go umieścić w dowolnej lokalizacji.
 
 INSTALACJA
 Program można rozpakować gdziekolwiek, do eksportu w HTML niezbędny jest szablon.
-Szablon należy umieścić domyślnie w pliku: /boot/home/vatszablon.html, jeśli go nie będzie,
-program poprosi o wskazanie szablonu. Jego lokalizacja zostanie zapamiętana.
+Szablon należy umieścić domyślnie w pliku: /boot/home/vatszablon.html, jeśli go tam nie
+będzie, program poprosi o wskazanie szablonu. Jego lokalizacja zostanie zapamiętana.
 
 
 
 KONFIGURACJA
 Przy pierwszym uruchomieniu program utworzy bazę danych i ustali domyślną konfigurację.
-Zostanie otwarty dialog, w którym należy podać dane firmy wystawiającej faktury.
+Następnie zostanie otwarty dialog, w którym należy podać dane firmy wystawiającej faktury.
 
 
 
 OBSŁUGA
+Większość operacji i przełączanie się między zakładkami można wykonać klawiszami funkcyjnymi.
+Klawisz 'ENTER' jest równoważny zapisowi aktualnej karty do bazy danych, na zakładce faktur
+nie należy pomylić zapisu towaru na fakturę z zapisem całej faktury.
+
 Pole 'SYMBOL' obecne w spisie kontrahentów i towarów służy do wprowadzenia skróconej
 nazwy, dzięki której możliwe jest szybkie odnajdywanie rekordów i wypełnianie pól faktury.
-Na wszystkich zakładkach pola 'Nazwa' i 'SYMBOL' muszą być wypełnione.
+Na wszystkich zakładkach pola 'Nazwa' i 'SYMBOL' muszą być wypełnione i unikalne.
 
-W polach numerycznych można wpisywać proste działania, jednak aby uniknąć błędnego
-zaokrąglenia należy po liczbach zawsze dodawać w postaci ułamka dziesiętnego. Np. zamiast
-"3/7" należy wpisać "3.0/7.0".
+W polach numerycznych można wpisywać proste działania arytmetyczne, jednak aby uniknąć
+błędnego zaokrąglenia należy po liczbach zawsze dodawać w postaci ułamka dziesiętnego.
+Np. zamiast "3/7" należałoby wpisać "3.0/7.0".
 
 a) MENU
-Menu 'Dokument' służy do wyboru rodzaju drukowanego dokumentu.
-W menu 'Opcje' można wybrać metodę drukowania i zmienić parametry firmy.
+DOKUMENT
+Służy do wyboru rodzaju drukowanych dokumentów.
+
+OPCJE
+Tu można wybrać metodę drukowania/eksportu, zmienić parametry firmy, ustalić
+nowe stawki podatków oraz wartości domyślne - liczbę drukowanych kopii oraz termin płatności.
+Ponadto można włączyć numerację uproszczoną faktur - bez miesiąca.
+
+PODSUMOWANIA
+To menu podaje podsumowania sprzedaży miesięcznej i zaległych należności. Należności bieżące
+każdego z kontrahentów można przywołać na karcie kontrahenta.
 
 b) TOWARY
 W zakładce 'Towary' umieszczono prosty kalkulator umożliwiający obliczanie cen.
@@ -99,6 +111,7 @@ Przeznaczenie przycisków:
 - Marża - na podstawie ceny zakupu, rabatu oraz ceny sprzedaży netto oblicza marżę
 - Import - na podstawie kursu waluty, ceny zakupu (jednostką jest wówczas obca waluta),
   cła, marży oraz rabatu oblicza cenę sprzedaży netto
+Na tej zakładce można również zmienić aktualny stan magazynu.
 
 c) KONTRAHENCI
 Pola odbiorca/dostawca nie mają obecnie żadnego znaczenia.
@@ -109,16 +122,20 @@ Pole 'Zablokowany' blokuje możliwość edycji danych kontrahenta.
 c) FAKTURY
 W polach 'Płatność' można wpisać datę płatności lub liczbę dni od daty sprzedaży, w drugim
 przypadku data zostanie uaktualniona automatycznie.
-Przy dodawaniu/edycji pozycji należy zawsze kliknąć 'Zapisz' (w ramce pozycji faktury)
-oraz 'Zapisz' na dole - aby zapisać całą informację o fakturze.
-
+Przy dodawaniu/edycji pozycji należy zawsze kliknąć 'Zapisz' (w ramce pozycji faktury),
+by dopisać nowe dane do faktury, a następnie wcisnąć ENTER lub kliknąć 'Zapisz' na dole,
+aby zapisać całą informację o fakturze.
+Guzik "Import z innej" służy do skopiowania listy pozycji z innego dokumentu na bieżący.
+Uwaga! Jeśli edytujemy dokument, który zawiera datę sprzedaży wcześniejszą niż data
+ostatniej zmiany magazynowej danego towaru, to ilość tego towaru w magazynie nie
+ulegnie zmianie.
 
 
 
 WYDRUK
 Aby wydrukować dokument należy wybrać rodzaj dokumentu z menu 'Dokument' oraz
 sposób drukowania z menu 'Opcje', następnie przejść na zakładkę 'FAKTURY', wybrać
-fakturę z listy i kliknąć u dołu 'Drukuj'.
+fakturę z listy i kliknąć u dołu 'Drukuj' lub wcisnąć F9.
 
 
 
