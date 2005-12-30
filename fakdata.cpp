@@ -111,11 +111,12 @@ towardat::towardat(sqlite *db) : dbdat(db) {
 
 void towardat::clear(void) {
 	id = -1;
-	data[0] = data[1] = data[2] = data[3] = notatki = dodany = magazyn = magzmiana = "";
+	data[0] = data[1] = data[2] = data[3] = notatki = dodany = magzmiana = "";
 	usluga = false;
 	ceny[0] = ceny[1] = ceny[2] = ceny[3] = "";
-	ceny[4] = "1.0"; ceny[5] = "";
+	ceny[4] = "1.00"; ceny[5] = "";
 	vatid = -1;
+	magazyn = "0.00";
 }
 
 int towardat::generate_id(void) {
@@ -652,7 +653,7 @@ const char *pozfaklist::calcSumPayment(void) {
 }
 
 void pozfaklist::updateStorage(int fakturaid = -1) {
-	BString sql, nazwa, magazyn;
+	BString sql, nazwa, magazyn, stare;
 	pozfakitem *cur = start;
 	int ret;
 	int nRows, nCols;
@@ -673,21 +674,18 @@ void pozfaklist::updateStorage(int fakturaid = -1) {
 			if (!usluga) {
 				// calc new magazyn state
 				magazyn = result[nCols+1];
-//				printf("magazyn:%s, nowe:%s\n",magazyn.String(),cur->data->data[3].String());
+//				printf("[%s]:mag:%s, nowe:%s\n",nazwa.String(),magazyn.String(),cur->data->data[3].String());
 				if (fakturaid > 0) {
-					sql = "SELECT 0"; sql += magazyn; sql += "+ilosc-0"; sql += cur->data->data[3];
-					sql += " FROM pozycjafakt WHERE fakturaid = "; sql << fakturaid;
+					// get old state
+					sql = "SELECT ilosc FROM pozycjafakt WHERE fakturaid = "; sql << fakturaid;
 					sql += " AND nazwa = "; sql += nazwa;
+					stare = execSQL(sql.String());
 				} else {
-					sql = "SELECT 0"; sql += magazyn; sql += "-0"; sql += cur->data->data[3];
+					stare = "0";
 				}
+				sql = "SELECT 0"; sql += stare; sql += "+0"; sql += magazyn; sql += "-0"; sql += cur->data->data[3];
+//printf("sql=[%s],magazyn=[%s]\n",sql.String(),execSQL(sql.String()));
 				magazyn = execSQL(sql.String());
-				// XXX XYZ to jest leczenie objawowe - skąd tu by wziął się NULL?
-				// - jeśli nazwa towaru generuje błędy
-				// - magazyn z góry NULL (równoważne)
-				// - fakturaid nieistniejące
-				if (magazyn.Length()==0)
-					magazyn="0";
 //				printf("nowy mag[%s]: [%s]\n",nazwa.String(), magazyn.String());
 				// update magazyn state (note that nazwa() is already quoted)
 				ret = sqlite_exec_printf(dbData,
