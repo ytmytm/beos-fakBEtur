@@ -90,7 +90,8 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	box1->AddChild(data[2]); box1->AddChild(data[3]);
 	usluga = new BCheckBox(BRect(350,50,420,65), "ttdo", "Usługa", new BMessage(DC));
 	box1->AddChild(usluga);
-	dodany = new BStringView(BRect(280,80,340,95), "tts0", "Dodano");
+	dodany = new BStringView(BRect(280,80,340,95), "tts0", "Dodano:");
+	dodany->SetAlignment(B_ALIGN_RIGHT);
 	box1->AddChild(dodany);
 	dodany = new BStringView(BRect(350,80,420,95), "ttsd", "");
 	box1->AddChild(dodany);
@@ -133,7 +134,7 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	but_import->ResizeToPreferred();
 	brutto = new BStringView(BRect(330,15,390,35), "ttb0", "Cena brutto:");
 	box2->AddChild(brutto);
-	brutto = new BStringView(BRect(400,15,475,35), "ttbr", "XXXX,YY zł");
+	brutto = new BStringView(BRect(400,15,475,35), "ttbr", NULL);
 	box2->AddChild(brutto);
 	// box2-menu
 	menuvat = new BPopUpMenu("[wybierz]");
