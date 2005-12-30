@@ -494,6 +494,8 @@ void tabFaktura::updateTab2(void) {
 	if (!toint(execSQL(sql.String()))) {
 		sql = "SELECT magazyn FROM towar WHERE nazwa = "; sql += nazwa;
 		sql = execSQL(sql.String());
+		sql += " ";
+		sql += towar[5]->Text();
 	}
 	else
 		sql = "[usługa]";
