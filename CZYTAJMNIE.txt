@@ -13,7 +13,10 @@ przechowywania danych kontrahentów i towarów.
 
 LICENCJA
 Programu wolno używać w dowolny sposób w celu testowania, jedynie na potrzeby konkursu
-zorganizowanego przez portal http://www.haiku-os.pl/
+zorganizowanego przez portal http://www.haiku-os.pl/. Jeśli chcesz używać programu w celach
+komercyjnych - skontaktuj się ze mną.
+Rozpowszechnianie programu jest dozwolone pod warunkiem, że program i dokumentacja
+pozostaną w stanie nienaruszonym.
 Autor dołożył wszelkich starań, ale nie daje żadnej gwarancji na poprawność działania
 programu, ani generowanych przez program dokumentów.
 
@@ -80,15 +83,15 @@ Następnie zostanie otwarty dialog, w którym należy podać dane firmy wystawia
 
 OBSŁUGA
 Większość operacji i przełączanie się między zakładkami można wykonać klawiszami funkcyjnymi.
-Klawisz 'ENTER' jest równoważny zapisowi aktualnej karty do bazy danych, na zakładce faktur
-nie należy pomylić zapisu towaru na fakturę z zapisem całej faktury.
+Klawisz 'ENTER' jest równoważny zapisowi aktualnej karty do bazy danych. Uwaga! Na zakładce
+faktur nie należy pomylić zapisu towaru na fakturę z zapisem całej faktury.
 
 Pole 'SYMBOL' obecne w spisie kontrahentów i towarów służy do wprowadzenia skróconej
 nazwy, dzięki której możliwe jest szybkie odnajdywanie rekordów i wypełnianie pól faktury.
 Na wszystkich zakładkach pola 'Nazwa' i 'SYMBOL' muszą być wypełnione i unikalne.
 
 W polach numerycznych można wpisywać proste działania arytmetyczne, jednak aby uniknąć
-błędnego zaokrąglenia należy po liczbach zawsze dodawać w postaci ułamka dziesiętnego.
+błędnego zaokrąglenia liczby należy zawsze podawać w postaci ułamka dziesiętnego.
 Np. zamiast "3/7" należałoby wpisać "3.0/7.0".
 
 a) MENU
@@ -98,14 +101,17 @@ Służy do wyboru rodzaju drukowanych dokumentów.
 OPCJE
 Tu można wybrać metodę drukowania/eksportu, zmienić parametry firmy, ustalić
 nowe stawki podatków oraz wartości domyślne - liczbę drukowanych kopii oraz termin płatności.
-Ponadto można włączyć numerację uproszczoną faktur - bez miesiąca.
+Ponadto można włączyć numerację uproszczoną faktur - bez miesiąca. Przy edycji już istniejących
+stawek podatku nie jest możliwa zmiana stawki, a jedynie zmiana nazwy. Pozwala to zachować
+integralność danych.
 
 PODSUMOWANIA
 To menu podaje podsumowania sprzedaży miesięcznej i zaległych należności. Należności bieżące
-każdego z kontrahentów można przywołać na karcie kontrahenta.
+każdego z kontrahentów można przywołać na karcie kontrahenta. Ujemna liczba dni do zapłaty (można
+ją również podać w dialogu należności) oznacza ile dni zostało do powstania zaległości.
 
 b) TOWARY
-W zakładce 'Towary' umieszczono prosty kalkulator umożliwiający obliczanie cen.
+W zakładce 'Towary' umieszczony został prosty kalkulator umożliwiający obliczanie cen.
 Przeznaczenie przycisków:
 - Cena sprzedaży - na podstawie ceny zakupu i rabatu oblicza nową cenę sprzedaży netto
 - Marża - na podstawie ceny zakupu, rabatu oraz ceny sprzedaży netto oblicza marżę
@@ -117,19 +123,19 @@ c) KONTRAHENCI
 Pola odbiorca/dostawca nie mają obecnie żadnego znaczenia.
 Pole 'Aktywny' kontroluje czy symbol kontrahenta ma być możliwy do wyboru w zakładce
 faktur.
-Pole 'Zablokowany' blokuje możliwość edycji danych kontrahenta.
+Pole 'Zablokowany' blokuje możliwość edycji danych kontrahenta i zabezpiecza przed przypadkowymi
+zmianami.
 
 c) FAKTURY
-W polach 'Płatność' można wpisać datę płatności lub liczbę dni od daty sprzedaży, w drugim
-przypadku data zostanie uaktualniona automatycznie po przeniesieniu focusu na inne pole
-tekstowe (np. tabulatorem).
+W polach 'Płatność' można wybrać/wpisać datę płatności lub liczbę dni od daty sprzedaży.
+W drugim przypadku data zostanie uaktualniona automatycznie po przeniesieniu focusu na inne
+pole tekstowe (np. tabulatorem).
 Przy dodawaniu/edycji pozycji należy zawsze kliknąć 'Zapisz' (w ramce pozycji faktury),
 by dopisać nowe dane do faktury, a następnie wcisnąć ENTER lub kliknąć 'Zapisz' na dole,
 aby zapisać całą informację o fakturze.
 Guzik "Import z innej" służy do skopiowania listy pozycji z innego dokumentu na bieżący.
 Uwaga! Jeśli edytujemy dokument, który zawiera datę sprzedaży wcześniejszą niż data
-ostatniej zmiany magazynowej danego towaru, to ilość tego towaru w magazynie nie
-ulegnie zmianie.
+ostatniej zmiany magazynowej danego towaru, to stan magazynu nie ulegnie zmianie.
 
 
 
@@ -144,6 +150,12 @@ EKSPORT HTML
 Wszelkich zmian wyglądu można dokonać korzystając z przykładowego szablonu. Teksty
 otoczone znakami @, np. @FNAZWA@ zostaną zamienione na odpowiednie dane z
 faktury. Pole @TABELA@ zostanie zamienione na ciąg wierszy tabeli HTML, bez dodatkowych atrybutów, podobnie pole @TABSUMA@.
+
+
+
+EKSPORT TXT
+Zapis do pliku tekstowego służy raczej jako demonstracja możliwości niż rzeczywiście użyteczna
+opcja. Odpowiednio przerobiony może być bazą do bezpośredniego wydruku na drukarkach igłowych.
 
 
 
