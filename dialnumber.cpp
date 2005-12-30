@@ -12,7 +12,7 @@ const uint32 DC			= 'NUDC';
 const uint32 BUT_OK		= 'NUOK';
 
 dialNumber::dialNumber(const char *title, const char *name, const char *def, uint32 msg, BHandler *hr) : BWindow(
-	BRect(100, 100, 380, 200),
+	BRect(100+20, 100+20, 380+20, 200+20),
 	title,
 	B_TITLED_WINDOW,
 	B_NOT_RESIZABLE ) {
