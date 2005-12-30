@@ -856,6 +856,7 @@ bool tabFaktura::validateTowar(void) {
 		newtowar->data[3] = towar[5]->Text();	// jm
 		newtowar->ceny[0] = towar[2]->Text();	// cena netto
 		newtowar->vatid = curtowarvatid;		// vatid
+		newtowar->magazyn = "0.00";				// magazyn
 		dialSymbol *sym = new dialSymbol(dbData, true, (dbdat*)newtowar, handler);
 		sym->Show();
 	} else {
