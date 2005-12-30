@@ -3,10 +3,12 @@
 // - zrobić dwucyfrowe numery faktur?
 // - DECROUND może generować segfault! DECROUND(NULL+2)
 // - dwuklik na należności - powrót na fakturę
+// - sortowanie kolumn liczbowych z "XXX.XX" niepoprawne
 // - przemyśleć czy wszystkie kolumny w tabfaktura są potrzebne (pkwiu?)
 // - skróty klawiaturowe i ergonomia:
 //		- sprawdzić sensowność i ergonomię kolejności przechodzenia TABem
 // - wydruk - cennik
+// - usuń fakturę - nie uaktualnia stanu magazynu (niby czemu?)
 // - konfiguracja:
 //		- czy ostrzegać o wszystkich błędach?
 //		- txt: znak końca linii

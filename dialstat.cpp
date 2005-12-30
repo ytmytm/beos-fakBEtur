@@ -136,12 +136,14 @@ void dialStat::DoFind(void) {
 	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
-		suma[0]->SetText("0");
-		suma[1]->SetText("0");
+		suma[0]->SetText("0.00 zł");
+		suma[1]->SetText("0.00 zł");
 	} else {
 		int i = nCols;
-		suma[0]->SetText(result[i++]);
-		suma[1]->SetText(result[i++]);
+		sql = result[i++]; sql += " zł";
+		suma[0]->SetText(sql.String());
+		sql = result[i++]; sql += " zł";
+		suma[1]->SetText(sql.String());
 	}
 	// update window title
 	sql = title; sql += " za "; sql += miesiace[mies-1]; sql += " "; sql += rok->Text();

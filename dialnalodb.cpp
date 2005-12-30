@@ -138,11 +138,14 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 	// fill summaries
 	sql = "SELECT DECROUND(SUM(kwota)) FROM nalodbsuma WHERE typ = ";
 	tmp = sql; tmp << F_ZALEGLA;
-	razemnold->SetText(execSQL(tmp.String()));
+	tmp = execSQL(tmp.String()); tmp += " zł";
+	razemnold->SetText(tmp.String());
 	tmp = sql; tmp << F_ZALEGLA; tmp += " OR typ = "; tmp << F_NIEZAPL;
-	razemn->SetText(execSQL(tmp.String()));
+	tmp = execSQL(tmp.String()); tmp += " zł";
+	razemn->SetText(tmp.String());
 	tmp = sql; tmp << F_ZAPLACONA;
-	razemp->SetText(execSQL(tmp.String()));
+	tmp = execSQL(tmp.String()); tmp += " zł";
+	razemp->SetText(tmp.String());
 	execSQL("DROP TABLE nalodbsuma");
 	this->Show();
 }
