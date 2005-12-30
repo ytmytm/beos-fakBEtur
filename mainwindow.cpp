@@ -6,7 +6,7 @@
 // - sortowanie kolumn liczbowych z "XXX.XX" niepoprawne
 // - przemyśleć czy wszystkie kolumny w tabfaktura są potrzebne (pkwiu?)
 // - skróty klawiaturowe i ergonomia:
-//		- sprawdzić sensowność i ergonomię kolejności przechodzenia TABem
+//		- na fak/pozycje - ENTER raczej na zapis pozycji niż całości... (niekonsekwentne)
 // - wydruk - cennik
 // - usuń fakturę - nie uaktualnia stanu magazynu (niby czemu?)
 // - konfiguracja:
@@ -14,9 +14,7 @@
 //		- txt: znak końca linii
 // - pole 'uwagi' w towar/faktura nie reaguje na zmiany
 // - usunąć duplikaty execSQL() - zrobic jakos globalnie?
-//		- dziedziczyc pusty befaktab
-// - na koniec - usunac printfy z debugiem
-// - na koniec - porównać opis w CZYTAJMNIE z listą zmian i uaktualnić
+//		- dziedziczyc pusty befaktab (nie dla pochodnych dbdata)
 //
 // zmiana curtab i przełączanie jest brzydkie, może cały beFakTab powinien
 // dziedziczyć z btab?
