@@ -121,7 +121,8 @@ Pole 'Zablokowany' blokuje możliwość edycji danych kontrahenta.
 
 c) FAKTURY
 W polach 'Płatność' można wpisać datę płatności lub liczbę dni od daty sprzedaży, w drugim
-przypadku data zostanie uaktualniona automatycznie.
+przypadku data zostanie uaktualniona automatycznie po przeniesieniu focusu na inne pole
+tekstowe (np. tabulatorem).
 Przy dodawaniu/edycji pozycji należy zawsze kliknąć 'Zapisz' (w ramce pozycji faktury),
 by dopisać nowe dane do faktury, a następnie wcisnąć ENTER lub kliknąć 'Zapisz' na dole,
 aby zapisać całą informację o fakturze.
