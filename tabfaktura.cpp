@@ -602,6 +602,7 @@ void tabFaktura::makeNewTowar(void) {
 		towar[i]->SetText("");
 	for (i=0;i<=5;i++)
 		suma[i]->SetText("");
+	magazyn->SetText("");
 	curtowarvatid = -1;
 	towardirty = false;
 	// un-mark list
