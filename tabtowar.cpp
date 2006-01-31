@@ -376,21 +376,26 @@ void tabTowar::MessageReceived(BMessage *Message) {
 			break;
 		case BUT_MARZA:
 //			printf("calc marza\n");
-			sql = "SELECT DECROUND((0";
-			sql += validateDecimal(ceny[0]->Text());
-			sql += "/(0";
+			sql = "SELECT (0+";
 			sql += validateDecimal(ceny[1]->Text());
-			sql += "*(1.0-";
-			sql += validateDecimal(ceny[3]->Text());
-			sql += "/100.0)*";
-			sql += validateDecimal(ceny[4]->Text());
-			sql += "*(1+";
-			sql += validateDecimal(ceny[5]->Text());
-			sql += "/100.0))-1)*100)";
-			result = execSQL(sql.String());
-//			printf("sql:[%s]\nres[%s]\n",sql.String(),result.String());
-			ceny[2]->SetText(result.String());
-			updateTab();
+			sql += ")>0";
+			if (toint(execSQL(sql.String()))) {
+				sql = "SELECT DECROUND((0";
+				sql += validateDecimal(ceny[0]->Text());
+				sql += "/(0";
+				sql += validateDecimal(ceny[1]->Text());
+				sql += "*(1.0-";
+				sql += validateDecimal(ceny[3]->Text());
+				sql += "/100.0)*";
+				sql += validateDecimal(ceny[4]->Text());
+				sql += "*(1+";
+				sql += validateDecimal(ceny[5]->Text());
+				sql += "/100.0))-1)*100)";
+				result = execSQL(sql.String());
+//				printf("sql:[%s]\nres[%s]\n",sql.String(),result.String());
+				ceny[2]->SetText(result.String());
+				updateTab();
+			}
 			break;
 		case BUT_IMPORT:
 //			printf("calc import\n");

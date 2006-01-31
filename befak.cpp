@@ -36,9 +36,8 @@ void BeFAKApp::AboutRequested(void) {
 	aboutDialog = new dialAbout("O programie");
 	aboutDialog->SetApplicationName(APP_NAME);
 	aboutDialog->SetVersionNumber(APP_VERSION);
-	aboutDialog->SetCopyrightString(B_UTF8_COPYRIGHT"2005 by Maciej Witkowiak");
+	aboutDialog->SetCopyrightString(B_UTF8_COPYRIGHT"2006 by Maciej Witkowiak");
 	aboutDialog->SetText("Kontakt: <mwitkowiak@gmail.com>, <ytm@elysium.pl>\n"
-		"http://atos.wmid.amu.edu.pl/~d118986/html/beos.html\n"
 		"http://members.elysium.pl/ytm/html\n"
 		"http://ytm.bossstation.dnsalias.org/html/\n"
 		"\nProgram powstał na konkurs zorganizowany\nprzez portal http://www.haiku-os.pl.\n"

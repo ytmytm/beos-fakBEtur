@@ -4,7 +4,7 @@
 	// application signature
 	#define APP_NAME "fakBEtur"
 	// bump it on every release
-	#define APP_VERSION "0.4"
+	#define APP_VERSION "0.5"
 	// sync it to sqlschema CVS revision
 	#define APP_DBVERSION "1.6"
 	#define APP_SIGNATURE "application/x-vnd.generic-fakBEtur"

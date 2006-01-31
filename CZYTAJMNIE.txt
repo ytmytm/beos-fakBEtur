@@ -1,9 +1,8 @@
 
-fakBEtur 0.4 (20051230)
+fakBEtur 0.5 (2006xxyy)
 (c) Maciej Witkowiak <mwitkowiak@gmail.com>, <ytm@elysium.pl>
 http://ytm.bossstation.dnsalias.org/html/beos.html
 http://members.elysium.pl/html/beos.html
-http://atos.wmid.amu.edu.pl/~d118986/html/beos.html
 
 fakBEtur to program wspomagający wystawianie faktur. Program korzysta z własnej bazy
 danych, w której umieszcza informacje o wydanych dokumentach. Baza służy również do
@@ -21,6 +20,8 @@ Autor dołożył wszelkich starań, ale nie daje żadnej gwarancji na poprawnoś
 programu, ani generowanych przez program dokumentów.
 
 ZMIANY
+0.5
+ - usunięty segfault przy obliczaniu marży przy zerowej cenie netto
 0.4
  - w wypadku błędnych danych focus przenoszony w odpowiednie pole
  - możliwość importu listy towarów z innego dokumentu
