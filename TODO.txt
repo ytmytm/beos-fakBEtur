@@ -1,0 +1,8 @@
+Lista pomysłów i błędów
+(własne i na podstawie recenzji pokonkursowych)
+- opcja wystawiania cen brutto (np. aby docelowo cena z 22% była 15zł)
+- wprowadzanie towarów przez fakturę zakupu (?)
+- otrzeżenie o zbyt dużym rabacie - próba sprzedaży po cenie niższej od ceny zakupu
+- lepsze sortowanie (własne)
+- wygląd: na modłę Be rozbić edycję na nowe okna, a w głównym tylko listy z pełną informacją o dokumencie (to co z lewej)
+- kontrola wprowadzania: nrb, nip, kod pocztowy, nazwa kontrahenta (niby jak to?) - odpowiednie ostrzeżenia

@@ -1,5 +1,5 @@
 
-fakBEtur 0.5 (2006xxyy)
+fakBEtur 0.5 (20061228)
 (c) Maciej Witkowiak <mwitkowiak@gmail.com>, <ytm@elysium.pl>
 http://ytm.bossstation.dnsalias.org/html/beos.html
 http://members.elysium.pl/html/beos.html
@@ -10,14 +10,25 @@ przechowywania danych kontrahentów i towarów.
 
 
 
+DLACZEGO OPEN SOURCE
+Wydanie 0.5 programu została udostępniona wraz z kodem źródłowym w nadziei, że okaże się użyteczna.
+Sam nie mam zamiaru dalej rozwijać programu (lista rzeczy do zrobienia w pliku TODO), brak mi do tego
+zapału i tym bardziej bardziej czasu. Tworzenie programu tego typu bez solidnej wiedzy i/lub wsparcia
+merytorycznego ze strony użytkowników nie ma sensu. Dla mnie przestało być zajęciem, przy okazji
+którego można się czegoś nauczyć, a zmieniło w pracę.
+
+
+
 LICENCJA
-Programu wolno używać w dowolny sposób w celu testowania, jedynie na potrzeby konkursu
-zorganizowanego przez portal http://www.haiku-os.pl/. Jeśli chcesz używać programu w celach
-komercyjnych - skontaktuj się ze mną.
-Rozpowszechnianie programu jest dozwolone pod warunkiem, że program i dokumentacja
-pozostaną w stanie nienaruszonym.
+Kod źródłowy programu został uwolniony w nadziei, że okaże się użyteczny. Wolno go kopiować, rozpowszechniać, zmieniać, tworzyć na jego podstawie nowe programy (również komercyjne).
+Jedyne, czego nie wolno w wypadku wykorzystania to podania pochodzenia i autorstwa kodu. Byłoby
+grzecznie również poinformować mnie i pochwalić się do czego ten kod został wykorzystany.
+W przypadku płatnych aplikacji liczę na darmową kopię.
+
 Autor dołożył wszelkich starań, ale nie daje żadnej gwarancji na poprawność działania
 programu, ani generowanych przez program dokumentów.
+
+
 
 ZMIANY
 0.5
