@@ -11,16 +11,16 @@ danych, w której umieszcza informacje o wydanych dokumentach. Baza służy rów
 przechowywania danych kontrahentów i towarów.
 
 #ZRZUTY EKRANU
-![Screenshot](/images/fakbetur01.png?raw=true) 
-![Screenshot](/images/fakbetur02.png?raw=true) 
-![Screenshot](/images/fakbetur03.png?raw=true) 
-![Screenshot](/images/fakbetur04.png?raw=true) 
-![Screenshot](/images/fakbetur05.png?raw=true) 
-![Screenshot](/images/fakbetur06.png?raw=true) 
-![Screenshot](/images/fakbetur07.png?raw=true) 
-![Screenshot](/images/fakbetur08.png?raw=true) 
-![Screenshot](/images/fakbetur09.png?raw=true) 
-![Screenshot](/images/fakbetur0a.png?raw=true) 
+![Screenshot](/images/fakbetur-01.png?raw=true) 
+![Screenshot](/images/fakbetur-02.png?raw=true) 
+![Screenshot](/images/fakbetur-03.png?raw=true) 
+![Screenshot](/images/fakbetur-04.png?raw=true) 
+![Screenshot](/images/fakbetur-05.png?raw=true) 
+![Screenshot](/images/fakbetur-06.png?raw=true) 
+![Screenshot](/images/fakbetur-07.png?raw=true) 
+![Screenshot](/images/fakbetur-08.png?raw=true) 
+![Screenshot](/images/fakbetur-09.png?raw=true) 
+![Screenshot](/images/fakbetur-0a.png?raw=true) 
 
 
 #DLACZEGO OPEN SOURCE
