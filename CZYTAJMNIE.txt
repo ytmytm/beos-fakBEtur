@@ -28,6 +28,7 @@ W przypadku płatnych aplikacji liczę na darmową kopię.
 Autor dołożył wszelkich starań, ale nie daje żadnej gwarancji na poprawność działania
 programu, ani generowanych przez program dokumentów.
 
+Dla legalistów - załączona licencja to MIT License.
 
 
 ZMIANY
