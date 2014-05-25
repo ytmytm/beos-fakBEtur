@@ -31,7 +31,6 @@ merytorycznego ze strony użytkowników nie ma sensu. Dla mnie przestało być z
 którego można się czegoś nauczyć, a zmieniło w pracę.
 
 
-
 #LICENCJA
 Kod źródłowy programu został uwolniony w nadziei, że okaże się użyteczny. Wolno go kopiować, rozpowszechniać, zmieniać, tworzyć na jego podstawie nowe programy (również komercyjne).
 Jedyne, czego nie wolno w wypadku wykorzystania to podania pochodzenia i autorstwa kodu. Byłoby
@@ -41,6 +40,7 @@ W przypadku płatnych aplikacji liczę na darmową kopię.
 Autor dołożył wszelkich starań, ale nie daje żadnej gwarancji na poprawność działania
 programu, ani generowanych przez program dokumentów.
 
+Dla legalistów - załączona licencja to MIT License.
 
 
 #ZMIANY
