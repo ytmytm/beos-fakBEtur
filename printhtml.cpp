@@ -12,7 +12,7 @@
 #include <Path.h>
 #include <stdio.h>
 
-printHTML::printHTML(int id, sqlite *db, int numkopii) : beFakPrint(id,db, numkopii) {
+printHTML::printHTML(int id, sqlite3 *db, int numkopii) : beFakPrint(id,db, numkopii) {
 
 }
 
@@ -41,8 +41,9 @@ void printHTML::Go(void) {
 		if (tpl.Length() == 0)
 			return;
 		// zapisać nową ścieżkę do szablonu
-		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET p_htmltemplate = %Q WHERE zrobiona = 1", 0, 0, &dbErrMsg,
-			tpl.String());
+		char *query = sqlite3_mprintf("UPDATE konfiguracja SET p_htmltemplate = %Q WHERE zrobiona = 1", tpl.String());
+		sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+		sqlite3_free(query);
 		szablon->SetTo(tpl.String(), B_READ_ONLY);
 	}
 	// wczytaj szablon

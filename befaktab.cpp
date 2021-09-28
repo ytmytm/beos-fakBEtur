@@ -10,7 +10,7 @@
 #include <parsedate.h>
 #include <stdio.h>
 
-beFakTab::beFakTab(BTabView *tv, sqlite *db, BHandler *hr) {
+beFakTab::beFakTab(BTabView *tv, sqlite3 *db, BHandler *hr) {
 
 	dbData = db;
 	handler = hr;
@@ -42,13 +42,13 @@ const char *beFakTab::execSQL(const char *input) {
 	char **result;
 	static BString res;
 //printf("sql=[%s]\n",sql.String());
-	sqlite_get_table(dbData, input, &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, input, &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	if (nRows < 1)
 		res = "";
 	else
 		res = result[1];
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	return res.String();
 }
 
@@ -80,7 +80,7 @@ const char *beFakTab::validateDate(const char *input) {
 }
 
 // if returns false -> cancel action and resume editing current data
-bool beFakTab::CommitCurdata(bool haveCancelButton = true) {
+bool beFakTab::CommitCurdata(bool haveCancelButton) {
 	// ask if commit data from current object into database
 	if (!dirty)
 		return true;

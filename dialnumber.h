@@ -3,7 +3,7 @@
 #define _DIALNUMBER_H
 
 #include <Window.h>
-#include <sqlite.h>
+#include <sqlite3.h>
 
 class BHandler;
 class BButton;

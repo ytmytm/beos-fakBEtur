@@ -30,7 +30,7 @@ tab3ListItem::tab3ListItem(const char *col0, const char *col1, const char *col2)
 	SetColumnContent(2,col2,true,true);
 }
 
-dialStat::dialStat(sqlite *db, BHandler *hr) : BWindow(
+dialStat::dialStat(sqlite3 *db, BHandler *hr) : BWindow(
 	BRect(100+20, 100+20, 740+20, 580+20),
 	NULL,
 	B_TITLED_WINDOW,
@@ -114,7 +114,7 @@ void dialStat::DoFind(void) {
 	sql += "GROUP BY p.nazwa ORDER BY sumanetto DESC";
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
@@ -126,14 +126,14 @@ void dialStat::DoFind(void) {
 				list->AddItem(new tab3ListItem(result[i*nCols+0], result[i*nCols+1], result[i*nCols+2]));
 		}
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	// podsumowanie - suma netto, suma vat
 	sql = "SELECT DECROUND(SUM(DECROUND(DECROUND(p.netto*(100-p.rabat)/100.0)*p.ilosc))) AS sumanetto, ";
 	sql += "DECROUND(SUM(DECROUND(DECROUND(DECROUND(p.netto*(100-p.rabat)/100.0)*p.ilosc)*s.stawka/100.0))) AS sumavat ";
 	sql += "FROM faktura AS f, pozycjafakt AS p, stawka_vat AS s ";
 	sql += "WHERE p.fakturaid = f.id AND p.vatid = s.id AND f.data_sprzedazy BETWEEN '";
 	sql += omies; sql += "' AND DATE('"; sql += omies; sql +="', '+1 month', 'start of month', '-1 day') ";
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 		suma[0]->SetText("0.00 zł");

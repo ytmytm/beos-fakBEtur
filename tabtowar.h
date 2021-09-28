@@ -14,12 +14,13 @@ class BPopUpMenu;
 class BStringView;
 class BTextControl;
 class BTextView;
+class BMenuItem;
 class ColumnListView;
 
 class tabTowar : public beFakTab {
 
 	public:
-		tabTowar(BTabView *tv, sqlite *db, BHandler *hr);
+		tabTowar(BTabView *tv, sqlite3 *db, BHandler *hr);
 		~tabTowar();
 		void MessageReceived(BMessage *Message);
 		void ChangedSelection(int newid);

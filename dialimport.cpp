@@ -14,7 +14,7 @@
 const uint32 LIST_INV	=	'DILI';
 const uint32 BUT_IMPORT =	'DIIM';
 
-dialImport::dialImport(sqlite *db, int aktualna, pozfaklist *faklista, BHandler *hr) : BWindow(
+dialImport::dialImport(sqlite3 *db, int aktualna, pozfaklist *faklista, BHandler *hr) : BWindow(
 	BRect(100, 100, 290, 480),
 	"Dokument do importu",
 	B_TITLED_WINDOW,
@@ -47,7 +47,7 @@ dialImport::dialImport(sqlite *db, int aktualna, pozfaklist *faklista, BHandler 
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, nazwa, data_sprzedazy FROM faktura ORDER BY data_sprzedazy, nazwa", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT id, nazwa, data_sprzedazy FROM faktura ORDER BY data_sprzedazy, nazwa", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
@@ -55,7 +55,7 @@ dialImport::dialImport(sqlite *db, int aktualna, pozfaklist *faklista, BHandler 
 			if (toint(result[i*nCols+0]) != aktualna)
 				list->AddItem(new tab2ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2]));
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	list->MakeFocus();
 }
 

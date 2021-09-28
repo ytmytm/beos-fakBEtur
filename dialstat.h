@@ -4,7 +4,7 @@
 
 #include <Window.h>
 #include "CLVEasyItem.h"
-#include <sqlite.h>
+#include <sqlite3.h>
 #include "befaktab.h"
 
 class BHandler;
@@ -17,7 +17,7 @@ class ColumnListView;
 
 class dialStat : public BWindow, public beFakTab {
 	public:
-		dialStat(sqlite *db, BHandler *hr);
+		dialStat(sqlite3 *db, BHandler *hr);
 		virtual void MessageReceived(BMessage *Message);
 		virtual bool QuitRequested();
 

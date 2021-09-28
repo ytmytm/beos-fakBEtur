@@ -3,7 +3,7 @@
 #define _MAINWINDOW_H
 
 	#include <Window.h>
-	#include <sqlite.h>
+	#include <sqlite3.h>
 	#include "globals.h"
 
 	class beFakTab;
@@ -74,7 +74,7 @@
 			beFakTab *curTab, *tabs[3];
 
 			// database
-			sqlite *dbData;
+			sqlite3 *dbData;
 			char *dbErrMsg;
 	};
 

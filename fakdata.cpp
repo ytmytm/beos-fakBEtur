@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-firmadat::firmadat(sqlite *db) : dbdat(db) {
+firmadat::firmadat(sqlite3 *db) : dbdat(db) {
 	clear();
 }
 
@@ -27,12 +27,12 @@ int firmadat::generate_id(void) {
 	int newid = 1;
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT MAX(id) FROM firma", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT MAX(id) FROM firma", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows > 0) {
 		// there is something in db
 		newid = toint(result[1]) + 1;
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	return newid;
 }
 
@@ -59,12 +59,14 @@ void firmadat::commit(void) {
 		sql += ", %i)";
 	}
 //printf("sql:[%s]\n",sql.String());
-	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
+	char *query = sqlite3_mprintf(sql.String(), 
 		data[0].String(), data[1].String(), data[2].String(), data[3].String(),
 		data[4].String(), data[5].String(), data[6].String(), data[7].String(),
 		data[8].String(), data[9].String(), data[10].String(),
 		odbiorca, dostawca, aktywny, zablokowany,
 		id);
+	ret = sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+	sqlite3_free(query);
 //printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
 
@@ -81,7 +83,7 @@ void firmadat::fetch(void) {
 	sql += " FROM firma WHERE id = ";
 	sql << id;
 //printf("sql:%s\n",sql.String());
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i\n", nRows, nCols);
 	// readout data
 	i = nCols;
@@ -93,19 +95,21 @@ void firmadat::fetch(void) {
 	aktywny = toint(result[i++]);
 	zablokowany = toint(result[i++]);
 
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }
 
 void firmadat::del(void) {
 	if (id>=0) {
-		sqlite_exec_printf(dbData, "DELETE FROM firma WHERE id = %i", 0, 0, &dbErrMsg, id);
+		char *query = sqlite3_mprintf("DELETE FROM firma WHERE id = %i", id);
+		sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+		sqlite3_free(query);
 	}
 	clear();
 }
 
 //----------------------
 
-towardat::towardat(sqlite *db) : dbdat(db) {
+towardat::towardat(sqlite3 *db) : dbdat(db) {
 	clear();
 }
 
@@ -123,12 +127,12 @@ int towardat::generate_id(void) {
 	int newid = 1;
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT MAX(id) FROM towar", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT MAX(id) FROM towar", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows > 0) {
 		// there is something in db
 		newid = toint(result[1]) + 1;
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	return newid;
 }
 
@@ -160,13 +164,14 @@ void towardat::commit(void) {
 		sql += ", %i)";
 	}
 //printf("sql:[%s]\n",sql.String());
-	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
+	char *query = sqlite3_mprintf(sql.String(),	
 		data[0].String(), data[1].String(), data[2].String(), data[3].String(),
 		usluga, notatki.String(), vatid,
 		ceny[0].String(), ceny[1].String(), ceny[2].String(), ceny[3].String(),
 		ceny[4].String(), ceny[5].String(),
-		magazyn.String(),
-		id);
+		magazyn.String(), id);
+	ret = sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+	sqlite3_free(query);
 //printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
 
@@ -184,7 +189,7 @@ void towardat::fetch(void) {
 	sql += " FROM towar WHERE id = ";
 	sql << id;
 //printf("sql:%s\n",sql.String());
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	// readout data
 	i = nCols;
@@ -200,12 +205,14 @@ void towardat::fetch(void) {
 	}
 	magazyn = result[i++];
 	magzmiana = result[i++];
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }
 
 void towardat::del(void) {
 	if (id>=0) {
-		sqlite_exec_printf(dbData, "DELETE FROM towar WHERE id = %i", 0, 0, &dbErrMsg, id);
+		char *query = sqlite3_mprintf("DELETE FROM towar WHERE id = %i", id);
+		sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+		sqlite3_free(query);
 	}
 	clear();
 }
@@ -249,7 +256,7 @@ const char *daysagostring(int days) {
 
 //----------------------
 
-fakturadat::fakturadat(sqlite *db) : dbdat(db) {
+fakturadat::fakturadat(sqlite3 *db) : dbdat(db) {
 	clear();
 }
 
@@ -268,12 +275,12 @@ int fakturadat::generate_id(void) {
 	int newid = 1;
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT MAX(id) FROM faktura", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT MAX(id) FROM faktura", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows > 0) {
 		// there is something in db
 		newid = toint(result[1]) + 1;
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	return newid;
 }
 
@@ -309,13 +316,15 @@ void fakturadat::commit(void) {
 		sql += ", %i)";
 	}
 //printf("sql:[%s]\n",sql.String());
-	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
+	char *query = sqlite3_mprintf(sql.String(),		
 		nazwa.String(), ogol[0].String(), ogol[1].String(), ogol[2].String(), ogol[3].String(),
 		ogol[4].String(), ogol[5].String(), ogol[6].String(),
 		ogol[8].String(), ogol[9].String(), uwagi.String(),
 		odata[0].String(), odata[2].String(), odata[3].String(), odata[4].String(), odata[5].String(), odata[6].String(),
 		odata[7].String(), odata[8].String(), odata[9].String(), odata[10].String(),
 		id);
+	ret = sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+	sqlite3_free(query);
 //printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
 
@@ -335,7 +344,7 @@ void fakturadat::fetch(void) {
 	sql += " FROM faktura WHERE id = ";
 	sql << id;
 //printf("sql:%s\n",sql.String());
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	// readout data
 	i = nCols;
@@ -350,13 +359,17 @@ void fakturadat::fetch(void) {
 	for (j=2;j<=10;j++) {
 		odata[j] = result[i++];
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }
 
 void fakturadat::del(void) {
 	if (id>=0) {
-		sqlite_exec_printf(dbData, "DELETE FROM faktura WHERE id = %i", 0, 0, &dbErrMsg, id);
-		sqlite_exec_printf(dbData, "DELETE FROM pozycjafakt WHERE fakturaid = %i", 0, 0, &dbErrMsg, id);
+		char *query = sqlite3_mprintf("DELETE FROM faktura WHERE id = %i", id);
+		sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+		sqlite3_free(query);
+		query = sqlite3_mprintf("DELETE FROM pozycjafakt WHERE fakturaid = %i", id);
+		sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+		sqlite3_free(query);
 	}
 	clear();
 }
@@ -372,7 +385,7 @@ pozfakitem::pozfakitem(pozfakdata *curdata, pozfakitem *prev, pozfakitem *next) 
 	lp = 0;
 }
 
-pozfaklist::pozfaklist(sqlite *db) {
+pozfaklist::pozfaklist(sqlite3 *db) {
 //	printf("constr\n");
 	dbData = db;
 	start = NULL;
@@ -483,19 +496,21 @@ int pozfaklist::generate_id(void) {
 	int newid = 1;
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT MAX(id) FROM pozycjafakt", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT MAX(id) FROM pozycjafakt", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows > 0) {
 		// there is something in db
 		newid = toint(result[1]) + 1;
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	return newid;
 }
 
 void pozfaklist::commit(int fakturaid) {
 	int ret;
 	/// remove all existing and insert new? convenient!
-	ret = sqlite_exec_printf(dbData, "DELETE FROM pozycjafakt WHERE fakturaid = %i", 0, 0, &dbErrMsg, fakturaid);
+	char *query = sqlite3_mprintf("DELETE FROM pozycjafakt WHERE fakturaid = %i", fakturaid);
+	ret = sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+	sqlite3_free(query);
 //printf("result: %i, %s;\n", ret, dbErrMsg);
 
 	// iterate through list, commit items
@@ -521,11 +536,12 @@ void pozfaklist::commititem(int fakturaid, pozfakitem *item) {
 	sql += ", %i )";
 //printf("commit for %i #%i\n", id, fakturaid);
 //printf("sql:[%s]\n",sql.String());
-	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
+	char *query = sqlite3_mprintf(sql.String(),
 		id, item->lp, data->data[3].String(),
-		data->data[1].String(), data->data[2].String(), data->data[4].String(), data->vatid, data->data[11].String(), data->data[5].String(),
-		fakturaid
-	);
+		data->data[1].String(), data->data[2].String(), data->data[4].String(),
+		data->vatid, data->data[11].String(), data->data[5].String(), fakturaid);
+	ret = sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+	sqlite3_free(query);
 //printf("result: %i, %s; id=%i\n", ret, dbErrMsg, id);
 }
 
@@ -547,7 +563,7 @@ void pozfaklist::fetch(int fakturaid) {
 	sql << fakturaid;
 	sql += " ORDER BY lp";
 //printf("sql:%s\n",sql.String());
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	if (nRows < 1)
 		return;
@@ -583,7 +599,7 @@ void pozfaklist::fetch(int fakturaid) {
 		data->data[8] = execSQL(sql.String());
 		j++;							// next row
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	setlp();							// reset lp
 }
 
@@ -601,8 +617,9 @@ char **pozfaklist::calcBrutto(const char *cnetto, const char *rabat, const char 
 
 	sql = "CREATE TEMPORARY TABLE calcs ( cnetto, ilosc, vatid );";
 	sql += "INSERT INTO calcs (cnetto, ilosc, vatid) VALUES (%Q, %Q, %i);";
-	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
-		cjednost.String(), ilosc, vatid );
+	char *query = sqlite3_mprintf(sql.String(), cjednost.String(), ilosc, vatid);
+	ret = sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+	sqlite3_free(query);
 //printf("got:%i,[%s]\n",ret,dbErrMsg);
 	sql = "SELECT ";
 	// [0] - cnettojednostkowa (po rabacie)
@@ -619,7 +636,7 @@ char **pozfaklist::calcBrutto(const char *cnetto, const char *rabat, const char 
 	sql += ",          DECROUND(DECROUND(cnetto*ilosc)*(100+s.stawka)/100.0) AS wbrutto";
 	sql += " FROM calcs, stawka_vat AS s WHERE s.id = vatid";
 //printf("sql:[%s]\n",sql.String());
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	if (nRows<1)
 		*retcols = 0;
@@ -629,7 +646,7 @@ char **pozfaklist::calcBrutto(const char *cnetto, const char *rabat, const char 
 }
 
 void pozfaklist::calcBruttoFin(char **result) {
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	execSQL("DROP TABLE calcs");
 }
 
@@ -642,9 +659,9 @@ const char *pozfaklist::calcSumPayment(void) {
 	pozfakitem *cur = start;
 
 	while (cur!=NULL) {
-		ret = sqlite_exec_printf(dbData,
-		"INSERT INTO sumpayment (cbrutto) VALUES (%Q);",
-		0, 0, &dbErrMsg, cur->data->data[10].String() );
+		char *query = sqlite3_mprintf("INSERT INTO sumpayment (cbrutto) VALUES (%Q);", cur->data->data[10].String());
+		ret = sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+		sqlite3_free(query);
 		cur = cur->nxt;
 	}
 	result = execSQL("SELECT DECROUND(SUM(cbrutto)) FROM sumpayment");
@@ -652,7 +669,7 @@ const char *pozfaklist::calcSumPayment(void) {
 	return result.String();
 }
 
-void pozfaklist::updateStorage(int fakturaid = -1) {
+void pozfaklist::updateStorage(int fakturaid) {
 	BString sql, nazwa, magazyn, stare;
 	pozfakitem *cur = start;
 	int ret;
@@ -664,7 +681,7 @@ void pozfaklist::updateStorage(int fakturaid = -1) {
 		// get state
 		nazwa = cur->data->data[1]; nazwa.ReplaceAll("'","''"); nazwa.Prepend("'"); nazwa.Append("'");
 		sql = "SELECT usluga,magazyn FROM towar WHERE nazwa = "; sql += nazwa;
-		sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+		sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 		if (nRows<1) {
 			// nie ma takiego w bazie, nic nie robic
 		} else {
@@ -688,13 +705,14 @@ void pozfaklist::updateStorage(int fakturaid = -1) {
 				magazyn = execSQL(sql.String());
 //				printf("nowy mag[%s]: [%s]\n",nazwa.String(), magazyn.String());
 				// update magazyn state (note that nazwa() is already quoted)
-				ret = sqlite_exec_printf(dbData,
-					"UPDATE towar SET magazyn = %Q, magzmiana = DATE('now') WHERE nazwa = %s",
-					0, 0, &dbErrMsg, magazyn.String(), nazwa.String());
+				char *query = sqlite3_mprintf("UPDATE towar SET magazyn = %Q, magzmiana = DATE('now') WHERE nazwa = %s",
+					 magazyn.String(), nazwa.String());
+				ret = sqlite3_exec(dbData, query,	0, 0, &dbErrMsg);
+				sqlite3_free(query);
 //				printf("got:%i,%s\n",ret,dbErrMsg);
 			}
 		}
-		sqlite_free_table(result);
+		sqlite3_free_table(result);
 		cur = cur->nxt;
 	}
 }
@@ -705,12 +723,12 @@ const char *pozfaklist::execSQL(const char *input) {
 	char **result;
 	static BString res;
 //printf("sql=[%s]\n",sql.String());
-	sqlite_get_table(dbData, input, &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, input, &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	if (nRows < 1)
 		res = "";
 	else
 		res = result[1];
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	return res.String();
 }

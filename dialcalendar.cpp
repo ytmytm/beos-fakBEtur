@@ -3,6 +3,7 @@
 #include <String.h>
 #include <StringView.h>
 #include <TextControl.h>
+#include <Message.h>
 #include <View.h>
 
 #include "globals.h"
@@ -58,13 +59,13 @@ dialCalendar::dialCalendar(const char *inidate, BTextControl *ptr, int32 msg, BH
 	for (i=0;i<=6;i++) {
 		view->AddChild(new BStringView(BRect(10+i*25,30,30+i*25,50), NULL, shortweekdays[i]));
 	}
-	BMessage *msg;
+	BMessage *mesg;
 	for (j=0;j<=5;j++) {
 		for (i=0;i<=6;i++) {
-			msg = new BMessage(BUT_CAL);
-			msg->AddInt32("_x", i);
-			msg->AddInt32("_y", j);
-			view->AddChild(caltab[i][j] = new BButton(BRect(10+i*25,55+j*25,30+i*25,75+j*25), NULL, "33", msg));
+			mesg = new BMessage(BUT_CAL);
+			mesg->AddInt32("_x", i);
+			mesg->AddInt32("_y", j);
+			view->AddChild(caltab[i][j] = new BButton(BRect(10+i*25,55+j*25,30+i*25,75+j*25), NULL, "33", mesg));
 		}
 	}
 	view->AddChild(but_ok = new BButton(BRect(120,210,165,230), "calendarButOk", "OK", new BMessage(BUT_OK)));

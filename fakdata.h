@@ -3,11 +3,11 @@
 #define _FAKDATA_H
 
 #include <String.h>
-#include <sqlite.h>
+#include <sqlite3.h>
 
 	class dbdat {
 		public:
-			dbdat(sqlite *db) { dbData = db; clear(); };
+			dbdat(sqlite3 *db) { dbData = db; clear(); };
 			virtual ~dbdat() { };
 			virtual void clear(void) { id = -1; };
 			// data management
@@ -16,13 +16,13 @@
 			// data itself
 			int id;
 		protected:
-			sqlite *dbData;
+			sqlite3 *dbData;
 			char *dbErrMsg;
 	};
 
 	class firmadat : public dbdat {
 		public:
-			firmadat(sqlite *db);
+			firmadat(sqlite3 *db);
 			~firmadat() { };
 			void clear(void);
 			// data management
@@ -37,7 +37,7 @@
 
 	class towardat : public dbdat {
 		public:
-			towardat(sqlite *db);
+			towardat(sqlite3 *db);
 			~towardat() { };
 			void clear(void);
 			// data management
@@ -53,7 +53,7 @@
 
 	class fakturadat : public dbdat {
 		public:
-			fakturadat(sqlite *db);
+			fakturadat(sqlite3 *db);
 			~fakturadat() { };
 			void clear(void);
 			// data management
@@ -92,7 +92,7 @@
 
 	class pozfaklist {	// list object
 		public:
-			pozfaklist(sqlite *db);
+			pozfaklist(sqlite3 *db);
 			~pozfaklist();
 	
 			void clear(void);
@@ -121,7 +121,7 @@
 			pozfakitem *start;
 			pozfakitem *end;
 		private:
-			sqlite *dbData;
+			sqlite3 *dbData;
 			char *dbErrMsg;
 	};
 

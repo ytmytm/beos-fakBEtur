@@ -14,12 +14,15 @@ class BTextControl;
 class BTextView;
 class BStringView;
 class BView;
+class BPopUpMenu;
+class BMenu;
+class BMenuItem;
 class ColumnListView;
 
 class tabFaktura : public beFakTab {
 
 	public:
-		tabFaktura(BTabView *tv, sqlite *db, BHandler *hr);
+		tabFaktura(BTabView *tv, sqlite3 *db, BHandler *hr);
 		~tabFaktura();
 		void MessageReceived(BMessage *Message);
 		void ChangedSelection(int newid);

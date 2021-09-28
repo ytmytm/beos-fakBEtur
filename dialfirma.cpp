@@ -13,7 +13,7 @@ const uint32 DC			= 'FIDC';
 const uint32 BUT_OK		= 'FIOK';
 const uint32 BUT_CANCEL	= 'FICA';
 
-dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
+dialFirma::dialFirma(const char *title, sqlite3 *db, bool cancancel) : BWindow(
 	BRect(120, 120, 120+460, 120+330+30+40),
 	"Informacje o Twojej firmie",
 	B_TITLED_WINDOW,
@@ -65,14 +65,14 @@ dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
 	}
 	// align in columns
 	float d;
-	d = max(data[0]->Divider(), data[2]->Divider());
-	d = max(data[3]->Divider(), d);
-	d = max(data[5]->Divider(), d);
+	d = MAX(data[0]->Divider(), data[2]->Divider());
+	d = MAX(data[3]->Divider(), d);
+	d = MAX(data[5]->Divider(), d);
 	data[0]->SetDivider(d); data[2]->SetDivider(d);
 	data[3]->SetDivider(d); data[5]->SetDivider(d);
-	d = max(data[7]->Divider(), data[8]->Divider());
-	d = max(data[9]->Divider(), d);
-	d = max(data[10]->Divider(), d);
+	d = MAX(data[7]->Divider(), data[8]->Divider());
+	d = MAX(data[9]->Divider(), d);
+	d = MAX(data[10]->Divider(), d);
 	data[7]->SetDivider(d); data[8]->SetDivider(d);
 	data[9]->SetDivider(d); data[10]->SetDivider(d);
 	// XXX end of ripped stuff
@@ -99,7 +99,7 @@ dialFirma::dialFirma(const char *title, sqlite *db, bool cancancel) : BWindow(
 	sql += ", nip, regon, bank, konto, f_wystawil";
 	sql += " FROM konfiguracja WHERE zrobiona = 1";
 //printf("sql:%s\n",sql.String());
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i\n", nRows, nCols);
 	if (nRows < 1) {
 		// WILL NEVER HAPPEN!
@@ -126,12 +126,13 @@ void dialFirma::commit(void) {
 	sql += ", nip = %Q, regon = %Q, bank = %Q, konto = %Q, f_wystawil = %Q";
 	sql += " WHERE zrobiona = 1";
 //printf("sql:[%s]\n",sql.String());
-	ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg,
+	char *query = sqlite3_mprintf(sql.String(),
 		data[0]->Text(), data[2]->Text(), data[3]->Text(),
 		data[4]->Text(), data[5]->Text(), data[6]->Text(), data[7]->Text(),
 		data[8]->Text(), data[9]->Text(), data[10]->Text(),
-		wystawil->Text()
-		);
+		wystawil->Text());
+	ret = sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+	sqlite3_free(query);
 //printf("result: %i, %s;\n", ret, dbErrMsg);
 }
 

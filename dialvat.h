@@ -3,7 +3,7 @@
 #define _DIALVAT_H
 
 #include <Window.h>
-#include <sqlite.h>
+#include <sqlite3.h>
 #include "befaktab.h"
 
 class BBox;
@@ -16,7 +16,7 @@ class ColumnListView;
 
 class dialVat : public BWindow, public beFakTab {
 	public:
-		dialVat(sqlite *db, BHandler *hr);
+		dialVat(sqlite3 *db, BHandler *hr);
 		~dialVat();
 		void MessageReceived(BMessage *Message);
 		void ChangedSelection(int newid);

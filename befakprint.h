@@ -3,12 +3,12 @@
 #define _BEFAKPRINT_H
 
 #include <String.h>
-#include <sqlite.h>
+#include <sqlite3.h>
 #include "fakdata.h"
 
 class beFakPrint {
 	public:
-		beFakPrint(int id, sqlite *db, int numkopii);
+		beFakPrint(int id, sqlite3 *db, int numkopii);
 		// if destructor override -> call it at the end of own
 		virtual ~beFakPrint();
 		virtual void Go(void);
@@ -45,7 +45,7 @@ class beFakPrint {
 		int fakturaid;
 		BString own[11];	// informacje o wlasnej firmie
 		// db stuff
-		sqlite *dbData;
+		sqlite3 *dbData;
 		char *dbErrMsg;
 };
 

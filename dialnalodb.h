@@ -3,7 +3,7 @@
 #define _DIALNALODB_H
 
 #include <Window.h>
-#include <sqlite.h>
+#include <sqlite3.h>
 #include "befaktab.h"
 
 class BBox;
@@ -15,7 +15,7 @@ class ColumnListView;
 
 class dialNalodb : public BWindow, public beFakTab {
 	public:
-		dialNalodb(sqlite *db, const char *odb);
+		dialNalodb(sqlite3 *db, const char *odb);
 		void MessageReceived(BMessage *Message);
 
 	private:

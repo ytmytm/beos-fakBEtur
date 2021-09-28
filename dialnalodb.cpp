@@ -21,7 +21,7 @@ const uint32 BUT_CLOSE	= 'DNOC';
 
 enum { F_ZALEGLA = 1, F_NIEZAPL, F_ZAPLACONA };
 
-dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
+dialNalodb::dialNalodb(sqlite3 *db, const char *odb) : BWindow(
 	BRect(100+40, 100+40, 740+40, 580+40),
 	NULL,
 	B_TITLED_WINDOW,
@@ -94,7 +94,7 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 
 	sql = "SELECT f.id, f.nazwa, f.onazwa, f.termin_zaplaty, f.zapl_kwota";
 	sql += " FROM faktura AS f, firma AS k WHERE k.nazwa = f.onazwa ORDER BY f.data_sprzedazy";
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
@@ -106,7 +106,7 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 			sql += "FROM faktura AS f, pozycjafakt AS p, stawka_vat AS s ";
 			sql += "WHERE p.fakturaid = f.id AND p.vatid = s.id AND f.id = ";
 			sql << result[i*nCols+0];
-			sqlite_get_table(dbData, sql.String(), &result2, &nRows2, &nCols2, &dbErrMsg);
+			sqlite3_get_table(dbData, sql.String(), &result2, &nRows2, &nCols2, &dbErrMsg);
 			// pozostalo - czy zaplacona_kwota < brutto?
 			sql = "SELECT 0"; sql += result[i*nCols+4]; sql += "<0"; sql += result2[nCols2];
 			if (toint(execSQL(sql.String()))) {
@@ -122,19 +122,23 @@ dialNalodb::dialNalodb(sqlite *db, const char *odb) : BWindow(
 					typ = F_ZALEGLA;
 				else
 					typ = F_NIEZAPL;
-				sqlite_exec_printf(dbData, "INSERT INTO nalodbsuma VALUES ( %Q, %i )", 0, 0, &dbErrMsg,
-					reszta.String(), typ);
+				
+				char *query = sqlite3_mprintf("INSERT INTO nalodbsuma VALUES ( %Q, %i )", reszta.String(), typ);
+				sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+				sqlite3_free(query);
+				
 			} else {
 				// zapłacona
 				listr->AddItem(new tab2ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result2[nCols2]));
 				typ = F_ZAPLACONA;
-				sqlite_exec_printf(dbData, "INSERT INTO nalodbsuma VALUES ( %Q, %i )", 0, 0, &dbErrMsg,
-					result2[nCols2], typ);
+				char *query = sqlite3_mprintf("INSERT INTO nalodbsuma VALUES ( %Q, %i )", result2[nCols2], typ);
+				sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+				sqlite3_free(query);
 			}
-			sqlite_free_table(result2);
+			sqlite3_free_table(result2);
 		}
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	// fill summaries
 	sql = "SELECT DECROUND(SUM(kwota)) FROM nalodbsuma WHERE typ = ";
 	tmp = sql; tmp << F_ZALEGLA;

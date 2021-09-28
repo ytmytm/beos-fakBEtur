@@ -3,7 +3,7 @@
 #define _DIALFIRMA_H
 
 #include <Window.h>
-#include <sqlite.h>
+#include <sqlite3.h>
 
 class BBox;
 class BButton;
@@ -13,7 +13,7 @@ class BView;
 
 class dialFirma : public BWindow {
 	public:
-		dialFirma(const char *title, sqlite *db, bool cancancel);
+		dialFirma(const char *title, sqlite3 *db, bool cancancel);
 		virtual void MessageReceived(BMessage *Message);
 
 	private:
@@ -26,7 +26,7 @@ class dialFirma : public BWindow {
 		BTextControl *data[11];
 		BTextControl *wystawil;
 
-		sqlite *dbData;
+		sqlite3 *dbData;
 		char *dbErrMsg;
 
 };

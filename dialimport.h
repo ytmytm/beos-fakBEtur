@@ -3,7 +3,7 @@
 #define _DIALIMPORT_H
 
 #include <Window.h>
-#include <sqlite.h>
+#include <sqlite3.h>
 
 class pozfaklist;
 class BButton;
@@ -14,7 +14,7 @@ class ColumnListView;
 
 class dialImport : public BWindow {
 	public:
-		dialImport(sqlite *db, int aktualna, pozfaklist *faklista, BHandler *hr);
+		dialImport(sqlite3 *db, int aktualna, pozfaklist *faklista, BHandler *hr);
 		virtual ~dialImport();
 		virtual void MessageReceived(BMessage *Message);
 
@@ -28,7 +28,7 @@ class dialImport : public BWindow {
 
 		pozfaklist *flist;
 
-		sqlite *dbData;
+		sqlite3 *dbData;
 		char *dbErrMsg;
 };
 

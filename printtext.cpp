@@ -9,7 +9,7 @@
 #include "globals.h"
 #include <stdio.h>
 
-printText::printText(int id, sqlite *db, int numkopii) : beFakPrint(id,db,numkopii) {
+printText::printText(int id, sqlite3 *db, int numkopii) : beFakPrint(id,db,numkopii) {
 	wide = ( p_textcols > 80 );
 	switch ( p_texteol ) {
 		case 2:
@@ -302,7 +302,7 @@ const char *printText::halfAlign(const BString line, const BString right) {
 	return tmp.String();
 }
 
-const char *printText::fitAlignR(const BString line, int len, bool space = false) {
+const char *printText::fitAlignR(const BString line, int len, bool space) {
 	static BString tmp;
 	int j;
 
@@ -321,7 +321,7 @@ const char *printText::fitAlignR(const BString line, int len, bool space = false
 	return tmp.String();
 }
 
-const char *printText::fitAlignL(const BString line, int len, bool space = false) {
+const char *printText::fitAlignL(const BString line, int len, bool space) {
 	static BString tmp;
 	int j;
 

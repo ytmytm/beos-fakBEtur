@@ -86,7 +86,7 @@ class pozCListItem : public CLVEasyItem {
 		}
 };
 
-tabFaktura::tabFaktura(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr) {
+tabFaktura::tabFaktura(BTabView *tv, sqlite3 *db, BHandler *hr) : beFakTab(tv, db, hr) {
 
 	printSettings = NULL;
 	curdata = new fakturadat(db);
@@ -281,14 +281,14 @@ void tabFaktura::initTab1(void) {
 	float d;
 	d = 0;
 	for (i=0;i<=4;i++)
-		d = max(ogol[i]->Divider(), d);
+		d = MAX(ogol[i]->Divider(), d);
 	for (i=0;i<=4;i++)
 		ogol[i]->SetDivider(d);
 	// platnosc
-	d = max(ogol[5]->Divider(), ogol[6]->Divider());
+	d = MAX(ogol[5]->Divider(), ogol[6]->Divider());
 	ogol[5]->SetDivider(d); ogol[6]->SetDivider(d);
 	// zaliczka
-	d = max(ogol[8]->Divider(), ogol[9]->Divider());
+	d = MAX(ogol[8]->Divider(), ogol[9]->Divider());
 	ogol[8]->SetDivider(d); ogol[9]->SetDivider(d);
 
 	for (i=0;i<=10;i++) {
@@ -298,7 +298,7 @@ void tabFaktura::initTab1(void) {
 	d = 0;
 	for (i=0;i<=10;i++) {
 		if ((i!=1)&&(i!=4)&&(i!=6))
-			d = max(data[i]->Divider(), d);
+			d = MAX(data[i]->Divider(), d);
 	}
 	for (i=0;i<=10;i++) {
 		if ((i!=1)&&(i!=4)&&(i!=6))
@@ -566,7 +566,7 @@ void tabFaktura::makeNewForm(void) {
 	// nazwy wszystkich faktur z aktualnym rokiem i miesiacem
 	tmp = "SELECT nazwa FROM faktura WHERE data_wystawienia > '";
 	tmp += rok; tmp += "-"; tmp += mies; tmp += "-01' ORDER BY data_wystawienia";
-	sqlite_get_table(dbData, tmp.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, tmp.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 //		printf("database is empty\n");
 	} else {
@@ -579,7 +579,7 @@ void tabFaktura::makeNewForm(void) {
 			curmax = (i>curmax) ? i : curmax;
 		}
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	// dodaj 1
 	tmp = ""; tmp << curmax+1; tmp << "/";
 	if (!(prosta)) {
@@ -1222,14 +1222,14 @@ void tabFaktura::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, nazwa, data_sprzedazy FROM faktura ORDER BY data_sprzedazy, nazwa", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT id, nazwa, data_sprzedazy FROM faktura ORDER BY data_sprzedazy, nazwa", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
 		for (int i=1;i<=nRows;i++)
 			list->AddItem(new tab2ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2]));
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }
 
 // ret. false -> cancel action and resume editing
@@ -1326,7 +1326,7 @@ void tabFaktura::RefreshFirmaSymbols(void) {
 	char **result;
 	BMessage *msg;
 
-	sqlite_get_table(dbData, "SELECT id, symbol FROM firma WHERE aktywny = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT id, symbol FROM firma WHERE aktywny = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// empty table
 	} else {
@@ -1341,7 +1341,7 @@ void tabFaktura::RefreshFirmaSymbols(void) {
 			menusymbol->AddItem(symbolMenuItems[i-1]);
 		}
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }
 
 void tabFaktura::RefreshTowarSymbols(void) {
@@ -1356,7 +1356,7 @@ void tabFaktura::RefreshTowarSymbols(void) {
 	char **result;
 	BMessage *msg;
 
-	sqlite_get_table(dbData, "SELECT id, symbol FROM towar ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT id, symbol FROM towar ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// empty table
 	} else {
@@ -1371,7 +1371,7 @@ void tabFaktura::RefreshTowarSymbols(void) {
 			tmenusymbol->AddItem(tsymbolMenuItems[i-1]);
 		}
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }
 
 void tabFaktura::RefreshVatSymbols(void) {
@@ -1386,7 +1386,7 @@ void tabFaktura::RefreshVatSymbols(void) {
 	char **result;
 	BMessage *msg;
 
-	sqlite_get_table(dbData, "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// XXX Panic! empty vat table
 	} else {
@@ -1401,7 +1401,7 @@ void tabFaktura::RefreshVatSymbols(void) {
 			menuvat->AddItem(vatMenuItems[i-1]);
 		}
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }
 
 void tabFaktura::printCurrent(void) {
@@ -1426,12 +1426,13 @@ void tabFaktura::printCurrent(void) {
 	}
 	// restore original if needed
 	if (p_typ != oldp_typ) {
-		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET p_typ = %i", 0, 0, &dbErrMsg,
-		oldp_typ);
+		char *query = sqlite3_mprintf("UPDATE konfiguracja SET p_typ = %i", oldp_typ);
+		sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+		sqlite3_free(query);
 	}
 }
 
-void tabFaktura::printAPage(int numkopii=0) {
+void tabFaktura::printAPage(int numkopii) {
 	if (curdata->id<0)
 		return;
 	beFakPrint *print;

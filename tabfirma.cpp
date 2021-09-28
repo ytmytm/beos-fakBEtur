@@ -29,7 +29,7 @@ const uint32 BUT_SAVE	= 'TFBS';
 const uint32 BUT_PAYMENT= 'TFBP';
 const uint32 DC			= 'TFDC';
 
-tabFirma::tabFirma(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr) {
+tabFirma::tabFirma(BTabView *tv, sqlite3 *db, BHandler *hr) : beFakTab(tv, db, hr) {
 
 	curdata = new firmadat(db);
 	this->dirty = false;
@@ -116,14 +116,14 @@ tabFirma::tabFirma(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	}
 	// align in columns
 	float d;
-	d = max(data[0]->Divider(), data[2]->Divider());
-	d = max(data[3]->Divider(), d);
-	d = max(data[5]->Divider(), d);
+	d = MAX(data[0]->Divider(), data[2]->Divider());
+	d = MAX(data[3]->Divider(), d);
+	d = MAX(data[5]->Divider(), d);
 	data[0]->SetDivider(d); data[2]->SetDivider(d);
 	data[3]->SetDivider(d); data[5]->SetDivider(d);
-	d = max(data[7]->Divider(), data[8]->Divider());
-	d = max(data[9]->Divider(), d);
-	d = max(data[10]->Divider(), d);
+	d = MAX(data[7]->Divider(), data[8]->Divider());
+	d = MAX(data[9]->Divider(), d);
+	d = MAX(data[10]->Divider(), d);
 	data[7]->SetDivider(d); data[8]->SetDivider(d);
 	data[9]->SetDivider(d); data[10]->SetDivider(d);
 	//
@@ -359,12 +359,12 @@ void tabFirma::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, symbol, nazwa FROM firma ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT id, symbol, nazwa FROM firma ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
 		for (int i=1;i<=nRows;i++)
 			list->AddItem(new tab2ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2]));
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }

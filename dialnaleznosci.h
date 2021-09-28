@@ -4,7 +4,7 @@
 
 #include <String.h>
 #include <Window.h>
-#include <sqlite.h>
+#include <sqlite3.h>
 #include "befaktab.h"
 #include "CLVEasyItem.h"
 
@@ -18,7 +18,7 @@ class dialNalodb;
 
 class dialNaleznosci : public BWindow, public beFakTab {
 	public:
-		dialNaleznosci(sqlite *db);
+		dialNaleznosci(sqlite3 *db);
 		void MessageReceived(BMessage *Message);
 //		bool QuitRequested();
 

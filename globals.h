@@ -10,13 +10,13 @@
 	#define APP_SIGNATURE "application/x-vnd.generic-fakBEtur"
 	extern int AppReturnValue;
 	// general max() function
-	#define max(x,y) ( ((x)>(y)) ? (x) : (y) )
+	#define MAX(x,y) ( ((x)>(y)) ? (x) : (y) )
 	// gettext-style translation helper
 	#define _(x) SpTranslate(x)
 	// Qt-style translation helper
 	#define tr(x) SpTranslate(x)
 	// db file with full path
-	#define DATABASE_PATHNAME "/boot/home/config/share/fakbetur.db"
+	#define DATABASE_PATHNAME "/boot/home/fakbetur.db"
 
 	// some globally visible stuff
 	#define MSG_REQTOWARUP		'RQTU'	// symbols in faktura

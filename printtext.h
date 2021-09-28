@@ -7,7 +7,7 @@
 class printText : public beFakPrint {
 
 	public:
-		printText(int id, sqlite *db, int numkopii);
+		printText(int id, sqlite3 *db, int numkopii);
 //		virtual ~beFakPrint();
 		void Go(void);
 

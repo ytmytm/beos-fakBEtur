@@ -19,7 +19,7 @@ const uint32 DC			= 'DVDC';
 const uint32 LIST_INV	= 'DVLI';
 const uint32 LIST_SEL	= 'DVLS';
 
-dialVat::dialVat(sqlite *db, BHandler *hr) : BWindow(
+dialVat::dialVat(sqlite3 *db, BHandler *hr) : BWindow(
 	BRect(120, 120, 120+380, 120+250),
 	"Stawki VAT",
 	B_TITLED_WINDOW,
@@ -62,7 +62,7 @@ dialVat::dialVat(sqlite *db, BHandler *hr) : BWindow(
 	but_save->ResizeToPreferred();
 
 	// fix widths
-	float d = max(be_plain_font->StringWidth(nazwa->Label())+5,be_plain_font->StringWidth(stawka->Label())+5);
+	float d = MAX(be_plain_font->StringWidth(nazwa->Label())+5,be_plain_font->StringWidth(stawka->Label())+5);
 	nazwa->SetDivider(d); stawka->SetDivider(d);
 
 	makeNewStawka();
@@ -109,15 +109,17 @@ void dialVat::MessageReceived(BMessage *Message) {
 			break;
 		case BUT_SAVE:
 			if (id>=0) {
-				sql = "UPDATE stawka_vat SET nazwa = %Q WHERE aktywne = 1 AND id = "; sql << id;
-				ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg, nazwa->Text());
+				char *query = sqlite3_mprintf("UPDATE stawka_vat SET nazwa = %Q WHERE aktywne = 1 AND id = %d", nazwa->Text(), id);
+				ret = sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+				sqlite3_free(query);
 			} else {
 				// dopisujemy nowy, ostrzec ze nieodwracalnie???
 				if (strlen(nazwa->Text())>0) {
 					stawka->SetText(validateDecimal(stawka->Text()));
-					ret = sqlite_exec_printf(dbData,
-					"INSERT INTO stawka_vat (nazwa,stawka,aktywne) VALUES ( %Q, %Q, 1 )",
-					0, 0, &dbErrMsg, nazwa->Text(), stawka->Text());
+					char *query = sqlite3_mprintf("INSERT INTO stawka_vat (nazwa,stawka,aktywne) VALUES ( %Q, %Q, 1 )",
+						nazwa->Text(), stawka->Text());
+					ret = sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+					sqlite3_free(query);
 				}
 			}
 			RefreshIndexList();
@@ -125,7 +127,7 @@ void dialVat::MessageReceived(BMessage *Message) {
 		case BUT_DEL:
 			if (id>=0) {
 				sql = "UPDATE stawka_vat SET aktywne = 0 WHERE id = "; sql << id;
-				ret = sqlite_exec_printf(dbData, sql.String(), 0, 0, &dbErrMsg);
+				ret = sqlite3_exec(dbData, sql.String(), 0, 0, &dbErrMsg);
 			}
 			makeNewStawka();
 			RefreshIndexList();
@@ -155,14 +157,14 @@ void dialVat::ChangedSelection(int newid) {
 		int nRows, nCols;
 		char **result;
 		BString sql = "SELECT nazwa, stawka FROM stawka_vat WHERE id = "; sql << id;
-		sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+		sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 		if (nRows < 1) {
 			// no entries
 		} else {
 			nazwa->SetText(result[nCols]);
 			stawka->SetText(validateDecimal(result[nCols+1]));
 		}
-		sqlite_free_table(result);
+		sqlite3_free_table(result);
 		this->dirty = false;
 		updateTab();
 	}
@@ -180,12 +182,12 @@ void dialVat::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, nazwa, stawka FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT id, nazwa, stawka FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
 		for (int i=1;i<=nRows;i++)
 			list->AddItem(new tab2ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2]));
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }

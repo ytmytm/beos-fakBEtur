@@ -14,7 +14,7 @@ const uint32 DC			= 'SYDC';
 const uint32 BUT_OK		= 'SYOK';
 const uint32 BUT_CANCEL	= 'SYCA';
 
-dialSymbol::dialSymbol(sqlite *db, bool towar, dbdat *data, BHandler *hr) : BWindow(
+dialSymbol::dialSymbol(sqlite3 *db, bool towar, dbdat *data, BHandler *hr) : BWindow(
 	BRect(100, 100, 420, 260),
 	"Wpisz symbol nowych danych",
 	B_TITLED_WINDOW,
@@ -68,8 +68,8 @@ bool dialSymbol::commit(void) {
 	tmp = symbol->Text(); tmp.ReplaceAll("'","''");	// sql quote
 	sql = "SELECT id FROM "; sql += table; sql += " WHERE symbol = '"; sql += tmp; sql += "'";
 	// unique?
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
-	sqlite_free_table(result);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_free_table(result);
 	if (nRows > 0) {
 		error->SetText("TAKI SYMBOL JUŻ JEST NA LIŚCIE");
 		return false;

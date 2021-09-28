@@ -3,7 +3,7 @@
 #define _BEFAKTAB_H
 
 #include "CLVEasyItem.h"
-#include <sqlite.h>
+#include <sqlite3.h>
 
 class BHandler;
 class BMessage;
@@ -13,7 +13,7 @@ class BView;
 
 class beFakTab {
 	public:
-		beFakTab(BTabView *tv, sqlite *db, BHandler *hr);
+		beFakTab(BTabView *tv, sqlite3 *db, BHandler *hr);
 		virtual ~beFakTab();
 
 		virtual void MessageReceived(BMessage *Message);
@@ -33,7 +33,7 @@ class beFakTab {
 		BView *view;
 		BTab *tab;
 
-		sqlite *dbData;
+		sqlite3 *dbData;
 		char *dbErrMsg;
 
 	protected:

@@ -20,7 +20,7 @@ const uint32 BUT_PAY	= 'NAPY';
 const uint32 BUT_PAYALL	= 'NAPA';
 const uint32 LIST_INV	= 'NALI';
 
-dialNaleznosci::dialNaleznosci(sqlite *db) : BWindow(
+dialNaleznosci::dialNaleznosci(sqlite3 *db) : BWindow(
 	BRect(100+20, 100+20, 740+20, 580+20),
 	"Należności",
 	B_TITLED_WINDOW,
@@ -80,7 +80,7 @@ void dialNaleznosci::DoFind(void) {
 	sql += "' ORDER BY termin_zaplaty";
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
@@ -92,7 +92,7 @@ void dialNaleznosci::DoFind(void) {
 			sql += "FROM faktura AS f, pozycjafakt AS p, stawka_vat AS s ";
 			sql += "WHERE p.fakturaid = f.id AND p.vatid = s.id AND f.id = ";
 			sql << result[i*nCols+0];
-			sqlite_get_table(dbData, sql.String(), &result2, &nRows2, &nCols2, &dbErrMsg);
+			sqlite3_get_table(dbData, sql.String(), &result2, &nRows2, &nCols2, &dbErrMsg);
 			// pozostalo - czy zaplacona_kwota < brutto?
 			sql = "SELECT 0"; sql += result[i*nCols+4]; sql += "<0"; sql += result2[nCols2];
 			if (toint(execSQL(sql.String()))) {
@@ -103,10 +103,10 @@ void dialNaleznosci::DoFind(void) {
 				dnizaleg << calcdaysago(result[i*nCols+3]);
 				list->AddItem(new tab5ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2], dnizaleg.String(), validateDecimal(result[i*nCols+4]), reszta.String()));
 			}
-			sqlite_free_table(result2);
+			sqlite3_free_table(result2);
 		}
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }
 
 void dialNaleznosci::DoPayForAll(void) {

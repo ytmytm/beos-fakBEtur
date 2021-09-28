@@ -43,7 +43,7 @@ const uint32 MENUVAT	= 'TTMV';
 
 const char *jmiary[] = { "szt.", "kg", "kpl.", "m", "mb", "m2", "km", "l", NULL };
 
-tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr) {
+tabTowar::tabTowar(BTabView *tv, sqlite3 *db, BHandler *hr) : beFakTab(tv, db, hr) {
 
 	curdata = new towardat(db);
 	this->dirty = false;
@@ -177,11 +177,11 @@ tabTowar::tabTowar(BTabView *tv, sqlite *db, BHandler *hr) : beFakTab(tv, db, hr
 	magazyn->SetDivider(be_plain_font->StringWidth(magazyn->Label())+5);
 	// align in columns
 	float d;
-	d = max(data[0]->Divider(), data[2]->Divider());
+	d = MAX(data[0]->Divider(), data[2]->Divider());
 	data[0]->SetDivider(d); data[2]->SetDivider(d);
-	d = max(ceny[0]->Divider(), ceny[1]->Divider());
-	d = max(ceny[2]->Divider(), d);
-	d = max(ceny[4]->Divider(), d);
+	d = MAX(ceny[0]->Divider(), ceny[1]->Divider());
+	d = MAX(ceny[2]->Divider(), d);
+	d = MAX(ceny[4]->Divider(), d);
 	ceny[0]->SetDivider(d); ceny[1]->SetDivider(d);
 	ceny[2]->SetDivider(d); ceny[4]->SetDivider(d);
 	//
@@ -504,14 +504,14 @@ void tabTowar::RefreshIndexList(void) {
 	// select list from db
 	int nRows, nCols;
 	char **result;
-	sqlite_get_table(dbData, "SELECT id, symbol, nazwa FROM towar ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT id, symbol, nazwa FROM towar ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// no entries
 	} else {
 		for (int i=1;i<=nRows;i++)
 			list->AddItem(new tab2ListItem(toint(result[i*nCols+0]), result[i*nCols+1], result[i*nCols+2]));
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }
 
 void tabTowar::RefreshVatSymbols(void) {
@@ -526,7 +526,7 @@ void tabTowar::RefreshVatSymbols(void) {
 	char **result;
 	BMessage *msg;
 
-	sqlite_get_table(dbData, "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, "SELECT id, nazwa FROM stawka_vat WHERE aktywne = 1 ORDER BY id", &result, &nRows, &nCols, &dbErrMsg);
 	if (nRows < 1) {
 		// XXX Panic! empty vat table
 	} else {
@@ -541,5 +541,5 @@ void tabTowar::RefreshVatSymbols(void) {
 			menuvat->AddItem(vatMenuItems[i-1]);
 		}
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }

@@ -23,7 +23,7 @@ const char *tabhline1[] = { "Lp.", "Nazwa towaru/usługi", "PKWiU", "Ilość", "
 const char *tabhline2[] = { "",    "",                    "",      "",      "",     "(%)",   "z rabatem", "netto", "", "VAT", "brutto", NULL };
 const char *tabhline3[] = { "88",  "MMMMMMMMMMMMMMMMMM", "MM.MM.MM.MM", "88888.88", "MMMMM", "88.88", "88888.88", "888888.88", "88.88%", "888888.88", "888888.88", NULL };
 
-printView::printView(int id, sqlite *db, int numkopii, BMessage *pSettings) : beFakPrint(id,db,numkopii),
+printView::printView(int id, sqlite3 *db, int numkopii, BMessage *pSettings) : beFakPrint(id,db,numkopii),
 	 BView(BRect(0,0,100,100), "printView", B_FOLLOW_ALL, B_WILL_DRAW) {
 	status_t result = B_OK;
 	printJob = new BPrintJob(fdata->nazwa.String());
@@ -220,8 +220,8 @@ void printView::Draw(BRect pageRect) {
 	tabl[0] = 0;
 	float d;
 	for (i=0;i<=10;i++) {
-		d = max(font.StringWidth(tabhline1[i]), font.StringWidth(tabhline2[i]));
-		d = max(font.StringWidth(tabhline3[i]), d);
+		d = MAX(font.StringWidth(tabhline1[i]), font.StringWidth(tabhline2[i]));
+		d = MAX(font.StringWidth(tabhline3[i]), d);
 		tabl[i+1] = tabl[i]+d;
 	}
 	float off = pageRect.Width()-tabl[11];

@@ -12,7 +12,7 @@
 
 // baseclass with stuff, inherit to print/export/whatever
 
-beFakPrint::beFakPrint(int id, sqlite *db, int numkopii) {
+beFakPrint::beFakPrint(int id, sqlite3 *db, int numkopii) {
 
 	if (id<1) {
 //		printf("illegal id!\n");
@@ -34,7 +34,7 @@ beFakPrint::beFakPrint(int id, sqlite *db, int numkopii) {
 	sql += ", nip, regon, bank, konto";
 	sql += " FROM konfiguracja WHERE zrobiona = 1";
 //printf("sql:%s\n",sql.String());
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i\n", nRows, nCols);
 	if (nRows < 1) {
 		// XXX brak informacji o własnej firmie, co robić?
@@ -50,7 +50,7 @@ beFakPrint::beFakPrint(int id, sqlite *db, int numkopii) {
 			own[j] = result[i++];
 		}
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 
 	switch (p_typ) {
 		case 2:
@@ -83,9 +83,10 @@ beFakPrint::beFakPrint(int id, sqlite *db, int numkopii) {
 
 void beFakPrint::updateSummary(const BString wnetto, const int vatid, const BString wvat, const BString wbrutto) {
 	int ret;
-
-	ret = sqlite_exec_printf(dbData, "INSERT INTO sumawydruk (wnetto,vatid,wvat,wbrutto) VALUES ( %Q, %i, %Q, %Q )", 0, 0, &dbErrMsg,
-		wnetto.String(), vatid, wvat.String(), wbrutto.String() );
+	char *query = sqlite3_mprintf("INSERT INTO sumawydruk (wnetto,vatid,wvat,wbrutto) VALUES ( %Q, %i, %Q, %Q )",
+		wnetto.String(), vatid, wvat.String(), wbrutto.String());
+	ret = sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+	sqlite3_free(query);
 //		printf("result: %i, %s\n", ret, dbErrMsg);
 
 }
@@ -99,7 +100,7 @@ void beFakPrint::makeSummary(void) {
 	// suma z rozbiciem na stawki
 	sql = "SELECT DECROUND(SUM(s.wnetto)), v.nazwa, DECROUND(SUM(s.wvat)), DECROUND(SUM(s.wbrutto)) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid GROUP BY s.vatid ORDER BY v.stawka";
 //printf("sql:[%s]\n",sql.String());
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	if (nRows < 1) {
 		// nothin'?
@@ -116,11 +117,11 @@ void beFakPrint::makeSummary(void) {
 			j++;
 		}
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 	// obliczyc RAZEM
 	sql = "SELECT DECROUND(SUM(s.wnetto)), '', DECROUND(SUM(s.wvat)), DECROUND(SUM(s.wbrutto)) FROM sumawydruk AS s, stawka_vat AS v WHERE v.id = s.vatid";
 //printf("sql:[%s]\n",sql.String());
-	sqlite_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
+	sqlite3_get_table(dbData, sql.String(), &result, &nRows, &nCols, &dbErrMsg);
 //printf ("got:%ix%i, %s\n", nRows, nCols, dbErrMsg);
 	if (nRows < 1) {
 		// nothin'?
@@ -131,7 +132,7 @@ void beFakPrint::makeSummary(void) {
 		razem.summa[2] = result[i++];
 		razem.summa[3] = result[i++];
 	}
-	sqlite_free_table(result);
+	sqlite3_free_table(result);
 }
 
 beFakPrint::~beFakPrint() {
@@ -269,8 +270,9 @@ void beFakPrint::saveToFile(const char *name, const BString *content) {
 		savefile->Unset();
 		// put path as default writing path
 		tmp.RemoveLast(path.Leaf());
-		sqlite_exec_printf(dbData, "UPDATE konfiguracja SET p_writepath = %Q WHERE zrobiona = 1", 0, 0, &dbErrMsg,
-			tmp.String());
+		char *query = sqlite3_mprintf("UPDATE konfiguracja SET p_writepath = %Q WHERE zrobiona = 1", tmp.String());
+		sqlite3_exec(dbData, query, 0, 0, &dbErrMsg);
+		sqlite3_free(query);
 	}
 }
 
